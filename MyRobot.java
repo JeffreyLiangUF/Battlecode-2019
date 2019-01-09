@@ -15,13 +15,9 @@ public class MyRobot extends BCAbstractRobot {
     	}
 
     	if (me.unit == SPECS.PILGRIM) {
-			log("Here");
 			Pilgrim pilgrim = new Pilgrim(this);
-			log("here");
 			pilgrim.Execute();
-			log("yah");
 		}
-		//
 		return null;	
 	}	
 }
