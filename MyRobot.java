@@ -9,13 +9,19 @@ public class MyRobot extends BCAbstractRobot {
 
 		
     	if (me.unit == SPECS.CASTLE) {
-			Castle.Execute();
+			Castle castle = new Castle(this);
+			castle.Execute();
 			//Will have to include more because you can take more than one action per turn
     	}
 
     	if (me.unit == SPECS.PILGRIM) {
-    		Pilgrim.Execute();
-    	}
+			log("Here");
+			Pilgrim pilgrim = new Pilgrim(this);
+			log("here");
+			pilgrim.Execute();
+			log("yah");
+		}
+		//
 		return null;	
 	}	
 }
@@ -24,17 +30,34 @@ public class MyRobot extends BCAbstractRobot {
 
 class Castle extends BCAbstractRobot{
 
-	public static Action Execute(){
-		return buildUnit(SPECS.PILGRIM,1,0);
+	MyRobot robot;
+
+	public Castle(MyRobot robot){
+		this.robot = robot;
+	}
+
+	public Action Execute(){
+		return buildUnit(2,1,0);
 	}
 
 }
 
 class Pilgrim extends BCAbstractRobot{
 
-	public static Action Execute(){
-		return buildUnit(SPECS.PILGRIM,1,0);
+	MyRobot robot;
+	
+	public Pilgrim(MyRobot robot){
+		this.robot = robot;
+	}
+
+	public Action Execute(){
+		return move(2,0);
 	}
 
 }
 
+
+//Wandering
+//Moving to Something In vision
+//Run Away
+//Moving Accross Map
