@@ -10,13 +10,13 @@ public class MyRobot extends BCAbstractRobot {
 		
     	if (me.unit == SPECS.CASTLE) {
 			Castle castle = new Castle(this);
-			castle.Execute();
+			return castle.Execute();
 			//Will have to include more because you can take more than one action per turn
     	}
 
     	if (me.unit == SPECS.PILGRIM) {
 			Pilgrim pilgrim = new Pilgrim(this);
-			pilgrim.Execute();
+			return pilgrim.Execute();
 		}
 		return null;	
 	}	
