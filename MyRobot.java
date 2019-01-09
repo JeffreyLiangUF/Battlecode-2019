@@ -7,13 +7,7 @@ public class MyRobot extends BCAbstractRobot {
 				turn++;
 		
 
-    	if (me.unit == SPECS.CASTLE) {	
-    		if (turn == 1) {
-    			log("Building a pilgrim.");
-    			//lets go
-    		}
-		}
-		//a
+			//DELETED
 
     	if (me.unit == SPECS.PILGRIM) {
 
