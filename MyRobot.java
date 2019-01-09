@@ -10,7 +10,7 @@ public class MyRobot extends BCAbstractRobot {
     	if (me.unit == SPECS.CASTLE) {
     		if (turn == 1) {
     			log("Building a pilgrim.");
-    			
+    			//lets go
 				
     		}
 		}
