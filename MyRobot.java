@@ -15,7 +15,7 @@ public class MyRobot extends BCAbstractRobot {
 
     	if (me.unit == SPECS.PILGRIM) {
     		if (turn == 1) {
-    			log("I am a pocket.");                 
+    			log("I am a pilgrim.");                 
     		}
     	}
 		return null;	
