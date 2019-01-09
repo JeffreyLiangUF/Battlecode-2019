@@ -15,14 +15,7 @@ public class MyRobot extends BCAbstractRobot {
 		}
 		//a
 
-    	if (me.unit == SPECS.PILGRIM) {
-
-    		if (turn == 1) {
-    			log("I am a pilgrim.");
-                 
-                //log(Integer.toString([0][getVisibleRobots()[0].castle_talk]));
-    		}
-    	}
+    	//Hello
 
     	return null;
 			//HI Jeff.
