@@ -33,7 +33,7 @@ class Castle extends BCAbstractRobot{
 	}
 
 	public Action Execute(){
-		return buildUnit(2,1,0);
+		return buildUnit(SPECS.PILGRIM,1,0);
 	}
 
 }
