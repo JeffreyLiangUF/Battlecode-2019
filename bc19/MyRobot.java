@@ -20,6 +20,7 @@ public class MyRobot extends BCAbstractRobot {
 			return castle.Execute();
 		}
 
+		
     	if (me.unit == SPECS.PILGRIM) {
 			Pilgrim pilgrim = new Pilgrim(this);
 			return pilgrim.Execute();
