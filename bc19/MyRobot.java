@@ -1,18 +1,25 @@
 package bc19;
 
-import java.util.Random;
 
 public class MyRobot extends BCAbstractRobot {
 	public int turn;
+	public int castleNum;
 	//not enirely sure how this turn thing works. Aswell as how to preform multiple actions
 
     public Action turn() {
-    	turn++;
+		turn++;
+		if(turn == 1){
+			castleNum = getVisibleRobots().length;
+			log(Integer.toString(castleNum));
+		}
+
+		/*
+
 
 		log(Integer.toString(turn));
     	if (me.unit == SPECS.CASTLE) {
 			Castle castle = new Castle(this);
-			return castle.Execute();
+			//return castle.Execute();
 
 
 			//Will have to include more because you can take more than one action per turn
@@ -20,8 +27,8 @@ public class MyRobot extends BCAbstractRobot {
 
     	if (me.unit == SPECS.PILGRIM) {
 			Pilgrim pilgrim = new Pilgrim(this);
-			return pilgrim.Execute();
-		}
+			//return pilgrim.Execute();
+		}*/
 		return null;	
 	}	
 }
@@ -53,14 +60,13 @@ class Pilgrim extends BCAbstractRobot{
 	}
 
 	public Action Execute(){
-		Random rn = new Random();
-		int dx = rn.nextInt(2);
-		int dy = rn.nextInt(2);
-		if(dx == 0 && dy == 0){
-			dx++;
-		}
+		//int dx = rn.nextInt(2);
+		//int dy = rn.nextInt(2);
+		//if(dx == 0 && dy == 0){
+		//	dx++;
+		//}
+		return robot.move(2,1);
 
-		return robot.move(2,0);
 	}
 
 }

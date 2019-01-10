@@ -10,7 +10,7 @@ public class BCAbstractRobot {
     private int signalRadius;
     private int castleTalk;
 
-    public Robot me;
+    public Robot men;
     public int id;
     public int fuel;
     public int karbonite;
