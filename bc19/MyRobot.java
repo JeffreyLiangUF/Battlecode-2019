@@ -15,6 +15,8 @@ public class MyRobot extends BCAbstractRobot {
 		}
 		
 
+
+
     	if (me.unit == SPECS.PILGRIM) {
 			Pilgrim pilgrim = new Pilgrim(this);
 			return pilgrim.Execute();
@@ -23,7 +25,7 @@ public class MyRobot extends BCAbstractRobot {
 	}	
 	void InitInfo(){
 		if(turn == 1 && numCastles == 0){
-			castleNum = getVisibleRobots().length;
+			numCastles = getVisibleRobots().length;
 		}
 	}
 }
