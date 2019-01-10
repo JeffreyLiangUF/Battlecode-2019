@@ -37,12 +37,15 @@ public class MyRobot extends BCAbstractRobot {
 		{
 			for (int i = 0; i < numCastles; i++)
 			{
-				
+				enemyCastlePositions[i] = new Position(ourCastlePositions[i].x, map.length - ourCastlePositions[i].y);
 			}
 		}
 		else if (!mapIsHorizontal)
 		{
-
+			for (int i = 0; i < numCastles; i++)
+			{
+				enemyCastlePositions[i] = new Position(map[0].length - ourCastlePositions[i].x, ourCastlePositions[i].y);
+			}
 		}
 	}
 	
