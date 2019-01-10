@@ -27,9 +27,13 @@ public class MyRobot extends BCAbstractRobot {
 		return null;	
 	}	
 	void InitInfo(){
-		if(turn == 1 && numCastles == 0){
-			numCastles = getVisibleRobots().length;
+		if(turn == 1 && me.unit == SPECS.CASTLE){
+			ourCastlePositions[numCastles] = new Position(me.x, me.y);
+			numCastles += 1;
 		}
+	}
+	void FindSymmetry(){
+		
 	}
 	void FindEnemyCastles(){
 
@@ -40,6 +44,11 @@ public class MyRobot extends BCAbstractRobot {
 class Position{
 	int x;
 	int y;
+
+	public Position(int x, int y){
+		this.x = x;
+		this.y = y;
+	}
 }
 
 class Castle extends BCAbstractRobot{
