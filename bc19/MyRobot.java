@@ -3,6 +3,9 @@ package bc19;
 
 public class MyRobot extends BCAbstractRobot {
 	public int turn;
+	public boolean[][] map;
+	public boolean[][] karboniteMap;
+	public boolean[][] fuelMap;
 	public int numCastles = 0;
 	public boolean mapIsHorizontal;
 	public Position[] ourCastlePositions;
@@ -40,6 +43,9 @@ public class MyRobot extends BCAbstractRobot {
 		
 	}
 	void FindEnemyCastles(){
+<<<<<<< HEAD
+
+=======
 		enemyCastlePositions = new Position[numCastles];
 		if (mapIsHorizontal)
 		{
@@ -57,6 +63,7 @@ public class MyRobot extends BCAbstractRobot {
 				log(enemyCastlePositions[i].toString());
 			}
 		}
+>>>>>>> 3ce1990abe65c1ab4e6864995937412983aa1020
 	}
 	
 }
