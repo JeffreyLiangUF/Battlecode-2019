@@ -13,7 +13,8 @@ public class MyRobot extends BCAbstractRobot {
     	if (me.unit == SPECS.CASTLE) {
 			Castle castle = new Castle(this);
 			return castle.Execute();
-			
+
+
 			//Will have to include more because you can take more than one action per turn
     	}
 
@@ -34,8 +35,8 @@ class Castle extends BCAbstractRobot{
 	public Castle(MyRobot robot){
 		this.robot = robot;
 	}
-	
-	
+
+
 
 	public Action Execute(){
 		return robot.buildUnit(robot.SPECS.PILGRIM,1,0);
