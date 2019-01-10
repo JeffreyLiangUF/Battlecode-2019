@@ -1,6 +1,7 @@
 package bc19;
 
 import java.util.HashMap;
+import java.util.ArrayList;
 
 public class MyRobot extends BCAbstractRobot {
 	public int turn;
@@ -56,7 +57,7 @@ public class MyRobot extends BCAbstractRobot {
 		{
 			for (int i = 0; i < numCastles; i++)
 			{
-				enemyCastlePositions[i] = new Position(ourCastlePositions[i].x, (byte)((map.length - 1) - ourCastlePositions[i].y));
+				enemyCastlePositions[i] = new Position(ourCastlePositions[i].x, (byte)((map[0].length - 1) - ourCastlePositions[i].y));
 				log(enemyCastlePositions[i].toString());
 			}
 		}
@@ -64,15 +65,72 @@ public class MyRobot extends BCAbstractRobot {
 		{
 			for (int i = 0; i < numCastles; i++)
 			{
-				enemyCastlePositions[i] = new Position((byte)((map[0].length - 1) - ourCastlePositions[i].x), ourCastlePositions[i].y);
+				enemyCastlePositions[i] = new Position((byte)((map.length - 1) - ourCastlePositions[i].x), ourCastlePositions[i].y);
 				log(enemyCastlePositions[i].toString());
 			}
 		}
 	}
-	void CreateFloodPath(Position pos){
 
+	boolean inMap(Position pos)
+	{
+		if (pos.x < 0 || pos.x > (map.length - 1) || pos.y < 0 || pos.y > (map[0].length - 1))
+		{
+			return false;
+		}
+		return true;	
+	}
+
+	void CreateFloodPath(Position pos){
+		
 	}
 	
+	Position[] AllPassableInRange(Position pos, int[] r)
+	{
+		ArrayList<Position> validPositions = new ArrayList<>();
+		for (int i = -r[1]; i <= r[1]; i++)
+		{
+			for (int j = -r[1]; j <= r[1]; j++)
+			{
+				int x = (pos.x + i);
+				int y = (pos.y + j);
+				if (!inMap(new Position(x, y)))
+				{
+					continue;
+				}
+				int distanceSquared = (x - pos.x) * (x - pos.x) + (y - pos.y) * (y - pos.y);
+				if (distanceSquared > r[1] || distanceSquared < r[0])
+				{
+					continue;
+				}
+				
+				validPositions.add(new Position(x, y));
+			}
+		}
+		return validPositions.toArray(new Position[validPositions.size()]);
+	}
+
+	Position FloodPathing(Position pos)
+	{
+		FloodPath path = paths.get(pos);
+		if (path == null)
+		{
+			return null;	
+		}
+
+		Position[] validPositions = AllPassableInRange(new Position(me.x, me.y), SPECS.UNITS[me.unit].ATTACK_RADIUS);
+		int lowest = Integer.MAX_VALUE;
+		Position lowestPos = null;
+
+		for (int i = 0; i < validPositions.length ; i++)
+		{
+			if (path.weights[validPositions[i].x][validPositions[i].y] < lowest)
+			{
+				lowest = path.weights[validPositions[i].x][validPositions[i].y];
+				lowestPos = validPositions[i];
+			}
+		}
+		return lowestPos;
+	}
 }
 
 class FloodPath{
@@ -80,10 +138,10 @@ class FloodPath{
 }
 
 class Position{
-	byte x;
-	byte y;
+	int x;
+	int y;
 
-	public Position(byte x, byte y){
+	public Position(int x, int y){
 		this.x = x;
 		this.y = y;
 	}
