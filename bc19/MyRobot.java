@@ -1,5 +1,6 @@
 package bc19;
 
+import java.util.HashMap;
 
 public class MyRobot extends BCAbstractRobot {
 	public int turn;
@@ -11,6 +12,8 @@ public class MyRobot extends BCAbstractRobot {
 	public boolean mapIsHorizontal;
 	public Position[] ourCastlePositions;
 	public Position[] enemyCastlePositions;
+	public HashMap<Position, FloodPath> paths;
+
 
     public Action turn() {
 		turn++;
@@ -36,7 +39,7 @@ public class MyRobot extends BCAbstractRobot {
 				numCastles = getVisibleRobots().length;
 				ourCastlePositions = new Position[numCastles];
 			}			
-			ourCastlePositions[castlesInitialized] = new Position(me.x, me.y);
+			ourCastlePositions[castlesInitialized] = new Position((byte)me.x, (byte)me.y);
 			castlesInitialized++;
 			if(castlesInitialized == numCastles){
 				FindEnemyCastles();
@@ -60,7 +63,7 @@ public class MyRobot extends BCAbstractRobot {
 		{
 			for (int i = 0; i < numCastles; i++)
 			{
-				enemyCastlePositions[i] = new Position(ourCastlePositions[i].x, (map.length - 1) - ourCastlePositions[i].y);
+				enemyCastlePositions[i] = new Position(ourCastlePositions[i].x, (byte)((map.length - 1) - ourCastlePositions[i].y));
 				log(enemyCastlePositions[i].toString());
 			}
 		}
@@ -68,19 +71,26 @@ public class MyRobot extends BCAbstractRobot {
 		{
 			for (int i = 0; i < numCastles; i++)
 			{
-				enemyCastlePositions[i] = new Position((map[0].length - 1) - ourCastlePositions[i].x, ourCastlePositions[i].y);
+				enemyCastlePositions[i] = new Position((byte)((map[0].length - 1) - ourCastlePositions[i].x), ourCastlePositions[i].y);
 				log(enemyCastlePositions[i].toString());
 			}
 		}
 	}
+	void CreateFloodPath(Position pos){
+		
+	}
 	
 }
 
-class Position{
-	int x;
-	int y;
+class FloodPath{
+	short[][] weights;
+}
 
-	public Position(int x, int y){
+class Position{
+	byte x;
+	byte y;
+
+	public Position(byte x, byte y){
 		this.x = x;
 		this.y = y;
 	}
