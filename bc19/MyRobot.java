@@ -12,7 +12,7 @@ public class MyRobot extends BCAbstractRobot {
 			castleNum = getVisibleRobots().length;
 			log(Integer.toString(castleNum));
 		}
-
+		
 		/*
 
 
