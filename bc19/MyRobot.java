@@ -48,7 +48,15 @@ public class MyRobot extends BCAbstractRobot {
 		}
 	}
 	void FindSymmetry(){
-		
+		for(int i = 0; i < map.length / 2; i++){
+			for(int j = 0; j < map[i].length; j++){
+				if(map[i][j] != map[(map.length - 1) - i][j]){
+					mapIsHorizontal = false;
+					return;
+				}
+			}
+		}
+		mapIsHorizontal = true;
 	}
 	void FindEnemyCastles(){
 		enemyCastlePositions = new Position[numCastles];
