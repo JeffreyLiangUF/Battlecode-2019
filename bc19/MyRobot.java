@@ -3,7 +3,11 @@ package bc19;
 
 public class MyRobot extends BCAbstractRobot {
 	public int turn;
+	public boolean[][] map;
+	public boolean[][] karboniteMap;
+	public boolean[][] fuelMap;
 	public int numCastles = 0;
+	public boolean mapIsHorizontal;
 	public Position[] ourCastlePositions;
 	public Position[] enemyCastlePositions;
 
@@ -28,7 +32,9 @@ public class MyRobot extends BCAbstractRobot {
 			numCastles = getVisibleRobots().length;
 		}
 	}
+	void FindEnemyCastles(){
 
+	}
 	
 }
 
