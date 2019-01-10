@@ -19,10 +19,6 @@ public class MyRobot extends BCAbstractRobot {
 		turn++;
 		InitInfo();
 
-		if (turn == 2)
-		{
-			FindEnemyCastles();
-		}
 
     	if (me.unit == SPECS.CASTLE) {
 			Castle castle = new Castle(this);
