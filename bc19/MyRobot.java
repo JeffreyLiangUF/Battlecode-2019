@@ -4,6 +4,8 @@ package bc19;
 public class MyRobot extends BCAbstractRobot {
 	public int turn;
 	public int numCastles = 0;
+	public Position[] ourCastlePositions;
+	public Position[] enemyCastlePositions;
 
     public Action turn() {
 		turn++;
@@ -13,8 +15,6 @@ public class MyRobot extends BCAbstractRobot {
 			Castle castle = new Castle(this);
 			return castle.Execute();
 		}
-		
-
 
 
     	if (me.unit == SPECS.PILGRIM) {
@@ -28,9 +28,14 @@ public class MyRobot extends BCAbstractRobot {
 			numCastles = getVisibleRobots().length;
 		}
 	}
+
+	
 }
 
-
+class Position{
+	int x;
+	int y;
+}
 
 class Castle extends BCAbstractRobot{
 
