@@ -6,6 +6,7 @@ public class MyRobot extends BCAbstractRobot {
 	public boolean[][] map;
 	public boolean[][] karboniteMap;
 	public boolean[][] fuelMap;
+	public int castlesInitialized = 0;
 	public int numCastles = 0;
 	public boolean mapIsHorizontal;
 	public Position[] ourCastlePositions;
@@ -14,11 +15,6 @@ public class MyRobot extends BCAbstractRobot {
     public Action turn() {
 		turn++;
 		InitInfo();
-
-		if (turn == 2)
-		{
-			FindEnemyCastles();
-		}
 
     	if (me.unit == SPECS.CASTLE) {
 			Castle castle = new Castle(this);
@@ -34,24 +30,37 @@ public class MyRobot extends BCAbstractRobot {
 	}	
 	void InitInfo(){
 		if(turn == 1 && me.unit == SPECS.CASTLE){
-			ourCastlePositions = new Position[3];
-			ourCastlePositions[numCastles] = new Position(me.x, me.y);
-			numCastles += 1;
+			FindSymmetry();
+			log(String.valueOf(mapIsHorizontal));
+			if(numCastles == 0){
+				numCastles = getVisibleRobots().length;
+				ourCastlePositions = new Position[numCastles];
+			}			
+			ourCastlePositions[castlesInitialized] = new Position(me.x, me.y);
+			castlesInitialized++;
+			if(castlesInitialized == numCastles){
+				FindEnemyCastles();
+			}
 		}
 	}
 	void FindSymmetry(){
-		
+		for(int i = 0; i < map.length / 2; i++){
+			for(int j = 0; j < map[i].length; j++){
+				if(map[i][j] != map[(map.length - 1) - i][j]){
+					mapIsHorizontal = false;
+					return;
+				}
+			}
+		}
+		mapIsHorizontal = true;
 	}
 	void FindEnemyCastles(){
-<<<<<<< HEAD
-
-=======
 		enemyCastlePositions = new Position[numCastles];
 		if (mapIsHorizontal)
 		{
 			for (int i = 0; i < numCastles; i++)
 			{
-				enemyCastlePositions[i] = new Position(ourCastlePositions[i].x, map.length - ourCastlePositions[i].y);
+				enemyCastlePositions[i] = new Position(ourCastlePositions[i].x, (map.length - 1) - ourCastlePositions[i].y);
 				log(enemyCastlePositions[i].toString());
 			}
 		}
@@ -59,11 +68,10 @@ public class MyRobot extends BCAbstractRobot {
 		{
 			for (int i = 0; i < numCastles; i++)
 			{
-				enemyCastlePositions[i] = new Position(map[0].length - ourCastlePositions[i].x, ourCastlePositions[i].y);
+				enemyCastlePositions[i] = new Position((map[0].length - 1) - ourCastlePositions[i].x, ourCastlePositions[i].y);
 				log(enemyCastlePositions[i].toString());
 			}
 		}
->>>>>>> 3ce1990abe65c1ab4e6864995937412983aa1020
 	}
 	
 }
