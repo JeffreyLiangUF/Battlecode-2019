@@ -3,34 +3,28 @@ package bc19;
 
 public class MyRobot extends BCAbstractRobot {
 	public int turn;
-	public int castleNum;
-	//not enirely sure how this turn thing works. Aswell as how to preform multiple actions
+	public int numCastles = 0;
 
     public Action turn() {
 		turn++;
-		if(turn == 1){
-			castleNum = getVisibleRobots().length;
-			log(Integer.toString(castleNum));
-		}
-		
-		/*
+		InitInfo();
 
-
-		log(Integer.toString(turn));
     	if (me.unit == SPECS.CASTLE) {
 			Castle castle = new Castle(this);
-			//return castle.Execute();
-
-
-			//Will have to include more because you can take more than one action per turn
+			return castle.Execute();
     	}
 
     	if (me.unit == SPECS.PILGRIM) {
 			Pilgrim pilgrim = new Pilgrim(this);
-			//return pilgrim.Execute();
-		}*/
+			return pilgrim.Execute();
+		}
 		return null;	
 	}	
+	void InitInfo(){
+		if(turn == 1 && numCastles == 0){
+			castleNum = getVisibleRobots().length;
+		}
+	}
 }
 
 
@@ -42,9 +36,6 @@ class Castle extends BCAbstractRobot{
 	public Castle(MyRobot robot){
 		this.robot = robot;
 	}
-
-
-
 	public Action Execute(){
 		return robot.buildUnit(robot.SPECS.PILGRIM,1,0);
 	}
@@ -60,12 +51,12 @@ class Pilgrim extends BCAbstractRobot{
 	}
 
 	public Action Execute(){
-		//int dx = rn.nextInt(2);
-		//int dy = rn.nextInt(2);
-		//if(dx == 0 && dy == 0){
-		//	dx++;
-		//}
-		return robot.move(2,1);
+		int dx = (int)(Math.random() * 3);
+		int dy = (int)(Math.random() * 3);
+		if(dx == 0 && dy == 0){
+		dx++;
+		}
+		return robot.move(dx, dy);
 
 	}
 
