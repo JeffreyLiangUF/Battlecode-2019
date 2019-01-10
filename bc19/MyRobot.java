@@ -3,7 +3,13 @@ package bc19;
 
 public class MyRobot extends BCAbstractRobot {
 	public int turn;
+	public boolean[][] map;
+	public boolean[][] karboniteMap;
+	public boolean[][] fuelMap;
 	public int numCastles = 0;
+	public boolean mapIsHorizontal;
+	public Position[] ourCastlePositions;
+	public Position[] enemyCastlePositions;
 
     public Action turn() {
 		turn++;
@@ -13,8 +19,6 @@ public class MyRobot extends BCAbstractRobot {
 			Castle castle = new Castle(this);
 			return castle.Execute();
 		}
-		
-
 
     	if (me.unit == SPECS.PILGRIM) {
 			Pilgrim pilgrim = new Pilgrim(this);
@@ -27,9 +31,16 @@ public class MyRobot extends BCAbstractRobot {
 			numCastles = getVisibleRobots().length;
 		}
 	}
+	void FindEnemyCastles(){
+
+	}
+	
 }
 
-
+class Position{
+	int x;
+	int y;
+}
 
 class Castle extends BCAbstractRobot{
 
