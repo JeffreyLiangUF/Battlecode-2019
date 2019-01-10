@@ -19,7 +19,7 @@ public class MyRobot extends BCAbstractRobot {
 		turn++;
 		InitInfo();
 
-
+ 
     	if (me.unit == SPECS.CASTLE) {
 			Castle castle = new Castle(this);
 			//return castle.Execute();
