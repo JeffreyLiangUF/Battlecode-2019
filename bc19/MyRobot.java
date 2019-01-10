@@ -15,20 +15,26 @@ public class MyRobot extends BCAbstractRobot {
 		turn++;
 		InitInfo();
 
+		if (turn == 2)
+		{
+			FindEnemyCastles();
+		}
+
     	if (me.unit == SPECS.CASTLE) {
 			Castle castle = new Castle(this);
-			return castle.Execute();
+			//return castle.Execute();
 		}
 
 		
     	if (me.unit == SPECS.PILGRIM) {
 			Pilgrim pilgrim = new Pilgrim(this);
-			return pilgrim.Execute();
+			//return pilgrim.Execute();
 		}
 		return null;	
 	}	
 	void InitInfo(){
 		if(turn == 1 && me.unit == SPECS.CASTLE){
+			ourCastlePositions = new Position[3];
 			ourCastlePositions[numCastles] = new Position(me.x, me.y);
 			numCastles += 1;
 		}
@@ -37,7 +43,27 @@ public class MyRobot extends BCAbstractRobot {
 		
 	}
 	void FindEnemyCastles(){
+<<<<<<< HEAD
 
+=======
+		enemyCastlePositions = new Position[numCastles];
+		if (mapIsHorizontal)
+		{
+			for (int i = 0; i < numCastles; i++)
+			{
+				enemyCastlePositions[i] = new Position(ourCastlePositions[i].x, map.length - ourCastlePositions[i].y);
+				log(enemyCastlePositions[i].toString());
+			}
+		}
+		else if (!mapIsHorizontal)
+		{
+			for (int i = 0; i < numCastles; i++)
+			{
+				enemyCastlePositions[i] = new Position(map[0].length - ourCastlePositions[i].x, ourCastlePositions[i].y);
+				log(enemyCastlePositions[i].toString());
+			}
+		}
+>>>>>>> 3ce1990abe65c1ab4e6864995937412983aa1020
 	}
 	
 }
@@ -49,6 +75,11 @@ class Position{
 	public Position(int x, int y){
 		this.x = x;
 		this.y = y;
+	}
+
+	public String toString()
+	{
+		return Integer.toString(x) + " " + Integer.toString(y);
 	}
 }
 
