@@ -91,6 +91,17 @@ public class MyRobot extends BCAbstractRobot {
 	void CreateFloodPath(Position pos){
 		
 	}
+
+	int PathingDistance(Position endPos)
+	{
+		FloodPath path = paths.get(endPos);
+		if (path == null)
+		{
+			return -1;
+		}
+
+		return path.weights[me.x][me.y];
+	}
 	
 	Position[] AllPassableInRange(Position pos, int[] r)
 	{
