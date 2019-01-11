@@ -99,6 +99,16 @@ public class MyRobot extends BCAbstractRobot {
 			floodMap[pos.x][pos.y] = -1;
 		}
 	}
+	int PathingDistance(Position endPos)
+	{
+		FloodPath path = paths.get(endPos);
+		if (path == null)
+		{
+			return -1;
+		}
+
+		return path.weights[me.x][me.y];
+	}
 	
 	Position[] AllPassableInRange(Position pos, int[] r)
 	{
@@ -203,6 +213,51 @@ class Pilgrim extends BCAbstractRobot{
 	}
 
 }
+
+class Crusader extends BCAbstractRobot{
+	
+	MyRobot robot;
+
+	public Crusader(MyRobot robot)
+	{
+		this.robot = robot;
+	}
+
+	public Action Execute(){
+		return robot.move(0,0);
+	}
+}
+
+class Prophet extends BCAbstractRobot{
+	
+	MyRobot robot;
+
+	public Prophet(MyRobot robot)
+	{
+		this.robot = robot;
+	}
+
+	public Action Execute(){
+		return robot.move(0,0);
+	}
+}
+
+class Preacher extends BCAbstractRobot{
+	
+	MyRobot robot;
+
+	public Preacher(MyRobot robot)
+	{
+		this.robot = robot;
+	}
+
+	public Action Execute(){
+		return robot.move(0,0);
+	}
+}
+
+
+
 
 
 //Wandering
