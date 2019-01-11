@@ -184,6 +184,20 @@ class Castle extends BCAbstractRobot{
 
 }
 
+class Church extends BCAbstractRobot{
+
+	MyRobot robot;
+
+	public Church(MyRobot robot)
+	{
+		this.robot = robot;
+	}
+
+	public Action Execute(){
+		return robot.buildUnit(robot.SPECS.PILGRIM,1,0);
+	}
+}
+
 class Pilgrim extends BCAbstractRobot{
 
 	MyRobot robot;
@@ -235,7 +249,7 @@ class Prophet extends BCAbstractRobot{
 class Preacher extends BCAbstractRobot{
 	
 	MyRobot robot;
-
+ 
 	public Preacher(MyRobot robot)
 	{
 		this.robot = robot;
@@ -246,7 +260,31 @@ class Preacher extends BCAbstractRobot{
 	}
 }
 
+class Movement extends BCAbstractRobot{
 
+	Position FloodPathing(Position pos)
+	{
+		FloodPath path = paths.get(pos);
+		if (path == null)
+		{
+			return null;	
+		}
+
+		Position[] validPositions = AllPassableInRange(new Position(me.x, me.y), SPECS.UNITS[me.unit].ATTACK_RADIUS);
+		int lowest = Integer.MAX_VALUE;
+		Position lowestPos = null;
+
+		for (int i = 0; i < validPositions.length ; i++)
+		{
+			if (path.weights[validPositions[i].x][validPositions[i].y] < lowest)
+			{
+				lowest = path.weights[validPositions[i].x][validPositions[i].y];
+				lowestPos = validPositions[i];
+			}
+		}
+		return lowestPos;
+	}
+}
 
 
 
