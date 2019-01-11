@@ -14,7 +14,7 @@ public class MyRobot extends BCAbstractRobot {
 	public boolean mapIsHorizontal;
 	public Position[] ourCastlePositions;
 	public Position[] enemyCastlePositions;
-	public HashMap<Position, FloodPath> paths;
+	public HashMap<Position, int[][]> paths;
 
 
     public Action turn() {
@@ -79,12 +79,14 @@ public class MyRobot extends BCAbstractRobot {
 			}
 		}
 	}
+	void GenerateCastlePaths(){
+		for(int i = 0; i < ourCastlePositions.length; i++){
+			paths.put(ourCastlePositions[i], Movement.CreateFloodPath(map, ourCastlePositions[i]));
+		}
+		for(int i = 0; i < ourCastlePositions.length; i++){
 
-
-}
-
-class FloodPath{
-	int[][] weights;
+		}
+	}
 }
 
 class Position{
@@ -228,16 +230,19 @@ class Helper extends BCAbstractRobot{
 		}
 		return validPositions.toArray(new Position[validPositions.size()]);
 	}
+	public static float DistanceSquared(Position pos1, Position pos2){
+		return (pos2.x - pos1.x) * (pos2.x - pos1.x) + (pos2.y - pos1.y) * (pos2.y - pos1.y);
+	}
 }
 
 class Movement extends BCAbstractRobot{
 
-	int[][] CreateFloodPath(Position pos){
+	public static int[][] CreateFloodPath(boolean[][] map, Position pos){
 		int[][] output = new int[map.length][map[0].length];
-		Flood(output, pos, 0);
+		Flood(map, output, pos, 0);
 		return output;
 	}
-	void Flood(int[][] floodMap, Position pos, int prev){
+	static void Flood(boolean[][] map, int[][] floodMap, Position pos, int prev){
 		if(!Helper.inMap(map, pos)){
 			return;
 		}
@@ -247,23 +252,19 @@ class Movement extends BCAbstractRobot{
 		else if(floodMap[pos.x][pos.y] == 0){
 			floodMap[pos.x][pos.y] = prev + 1;
 		}
-		Flood(floodMap, new Position(pos.x + 1, pos.y), prev + 1);
-		Flood(floodMap, new Position(pos.x, pos.y + 1), prev + 1);
-		Flood(floodMap, new Position(pos.x - 1, pos.y), prev + 1);
-		Flood(floodMap, new Position(pos.x, pos.y - 1), prev + 1);
+		Flood(map, floodMap, new Position(pos.x + 1, pos.y), prev + 1);
+		Flood(map, floodMap, new Position(pos.x, pos.y + 1), prev + 1);
+		Flood(map, floodMap, new Position(pos.x - 1, pos.y), prev + 1);
+		Flood(map, floodMap, new Position(pos.x, pos.y - 1), prev + 1);
 		//might consider 8 directional
 
 	}
-	int PathingDistance(FloodPath path)
+	int PathingDistance(int[][] path)
 	{
-		if (path == null)
-		{
-			return -1;
-		}
-		return path.weights[me.x][me.y];
+		return path[me.x][me.y];
 	}
 	
-	Position FloodPathing(FloodPath path)
+	Position FloodPathing(int[][] path)
 	{
 		if (path == null)
 		{
@@ -276,9 +277,9 @@ class Movement extends BCAbstractRobot{
 
 		for (int i = 0; i < validPositions.length ; i++)
 		{
-			if (path.weights[validPositions[i].x][validPositions[i].y] < lowest)
+			if (path[validPositions[i].x][validPositions[i].y] < lowest)
 			{
-				lowest = path.weights[validPositions[i].x][validPositions[i].y];
+				lowest = path[validPositions[i].x][validPositions[i].y];
 				lowestPos = validPositions[i];
 			}
 		}
