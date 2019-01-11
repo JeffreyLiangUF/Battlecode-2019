@@ -204,6 +204,51 @@ class Pilgrim extends BCAbstractRobot{
 
 }
 
+class Crusader extends BCAbstractRobot{
+	
+	MyRobot robot;
+
+	public Crusader(MyRobot robot)
+	{
+		this.robot = robot;
+	}
+
+	public Action Execute(){
+		return robot.move(0,0);
+	}
+}
+
+class Prophet extends BCAbstractRobot{
+	
+	MyRobot robot;
+
+	public Prophet(MyRobot robot)
+	{
+		this.robot = robot;
+	}
+
+	public Action Execute(){
+		return robot.move(0,0);
+	}
+}
+
+class Preacher extends BCAbstractRobot{
+	
+	MyRobot robot;
+
+	public Preacher(MyRobot robot)
+	{
+		this.robot = robot;
+	}
+
+	public Action Execute(){
+		return robot.move(0,0);
+	}
+}
+
+
+
+
 
 //Wandering
 //Moving to Something In vision
