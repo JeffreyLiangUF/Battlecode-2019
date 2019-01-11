@@ -14,6 +14,8 @@ public class MyRobot extends BCAbstractRobot {
 			Castle castle = new Castle(this);
 			return castle.Execute();
 			
+			
+
 			//Will have to include more because you can take more than one action per turn
     	}
 
