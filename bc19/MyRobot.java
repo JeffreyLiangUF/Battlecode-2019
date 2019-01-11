@@ -91,6 +91,14 @@ public class MyRobot extends BCAbstractRobot {
 	void CreateFloodPath(Position pos){
 		
 	}
+	void Flood(short[][] floodMap, Position pos, int prev){
+		if(!inMap(pos)){
+			return;
+		}
+		if(!map[pos.x][pos.y]){
+			floodMap[pos.x][pos.y] = -1;
+		}
+	}
 	
 	Position[] AllPassableInRange(Position pos, int[] r)
 	{
@@ -103,6 +111,9 @@ public class MyRobot extends BCAbstractRobot {
 				int y = (pos.y + j);
 				if (!inMap(new Position(x, y)))
 				{
+					continue;
+				}
+				if(!map[x][y]){
 					continue;
 				}
 				int distanceSquared = (x - pos.x) * (x - pos.x) + (y - pos.y) * (y - pos.y);
