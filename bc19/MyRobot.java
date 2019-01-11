@@ -79,11 +79,7 @@ public class MyRobot extends BCAbstractRobot {
 		}
 	}
 
-	
-	
-	
 
-	
 }
 
 class FloodPath{
@@ -278,6 +274,13 @@ class Movement extends BCAbstractRobot{
 	}
 }
 
+class Attack extends BCAbstractRobot{
+
+	public Action AttackClosest()
+	{
+		
+	}
+}
 
 
 //Wandering
