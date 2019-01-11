@@ -2,7 +2,6 @@ package bc19;
 
 import java.util.ArrayList;
 
-@jsweet.lang.Interface
 public class Robot {
 	public int id;
 	public int team;

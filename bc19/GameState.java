@@ -1,7 +1,6 @@
 package bc19;
 
 
-@jsweet.lang.Interface
 public class GameState {
 	public int id;
 	public int[][] shadow;

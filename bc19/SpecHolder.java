@@ -1,6 +1,5 @@
 package bc19;
 
-@jsweet.lang.Interface
 public class SpecHolder {
 	public int COMMUNICATION_BITS;
 	public int CASTLE_TALK_BITS; 
