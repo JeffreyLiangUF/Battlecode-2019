@@ -1,6 +1,9 @@
 package bc19;
 
 import java.util.HashMap;
+
+import com.sun.tools.javac.util.Position;
+
 import java.util.ArrayList;
 
 public class MyRobot extends BCAbstractRobot {
@@ -192,14 +195,36 @@ class Prophet extends BCAbstractRobot{
 class Preacher extends BCAbstractRobot{
 	
 	MyRobot robot;
+	int ourTeam;
  
-	public Preacher(MyRobot robot)
+	public Preacher(MyRobot robot, int ourTeam)
 	{
 		this.robot = robot;
+		this.ourTeam = ourTeam;
 	}
 
 	public Action Execute(){
 		return robot.move(0,0);
+	}
+
+	public Action AttackClosest()
+	{
+		Robot[] visibleRobots = getVisibleRobots();
+		float leastDistance = Integer.MAX_VALUE;
+		int closestIndex = -1;
+		for (int i = 0; i < visibleRobots.length; i++)
+		{
+			if (visibleRobots[i].team != ourTeam)
+			{
+				float distance = Helper.DistanceSquared(new Position(visibleRobots[i].x, visibleRobots[i].y), new Position(me.x, me.y));
+				if (distance < leastDistance)
+				{
+					leastDistance = distance; 
+					closestIndex = i;
+				}
+			}
+		}
+		return attack(visibleRobots[closestIndex].x - me.x, visibleRobots[closestIndex].y - me.y);	
 	}
 }
 
@@ -294,23 +319,6 @@ class Movement extends BCAbstractRobot{
 			}
 		}
 		return lowestPos;
-	}
-}
-
-class Attack extends BCAbstractRobot{
-
-	public Action AttackClosest()
-	{
-		Robot[] visibleRobots = getVisibleRobots();
-		int leastDistance = Integer.MAX_VALUE;
-		int botIndex = -1;
-		for (int i = 0; i < visibleRobots.length; i++)
-		{
-			if (visibleRobots[i].team != ourTeam)
-			{
-				if ()
-			}
-		}	
 	}
 }
 
