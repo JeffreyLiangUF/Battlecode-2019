@@ -282,7 +282,16 @@ class Attack extends BCAbstractRobot{
 
 	public Action AttackClosest()
 	{
-		Robot[] visibleRobots = me.getVisibleRobots();	
+		Robot[] visibleRobots = getVisibleRobots();
+		int leastDistance = Integer.MAX_VALUE;
+		int botIndex = -1;
+		for (int i = 0; i < visibleRobots.length; i++)
+		{
+			if (visibleRobots[i].team != ourTeam)
+			{
+				if ()
+			}
+		}	
 	}
 }
 
