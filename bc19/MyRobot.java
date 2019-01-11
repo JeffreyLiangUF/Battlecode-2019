@@ -245,6 +245,10 @@ class Movement extends BCAbstractRobot{
 		if(!map[pos.x][pos.y]){
 			floodMap[pos.x][pos.y] = -1;
 		}
+		else{
+			floodMap[pos.x][pos.y] = (short)(prev + 1);
+		}
+
 	}
 	int PathingDistance(FloodPath path)
 	{
