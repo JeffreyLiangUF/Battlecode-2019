@@ -41,7 +41,7 @@ public class MyRobot extends BCAbstractRobot {
 				numCastles = getVisibleRobots().length;
 				ourCastlePositions = new Position[numCastles];
 			}			
-			ourCastlePositions[castlesInitialized] = new Position((byte)me.x, (byte)me.y);
+			ourCastlePositions[castlesInitialized] = new Position(me.x, me.y);
 			castlesInitialized++;
 			if(castlesInitialized == numCastles){
 				FindEnemyCastles();
@@ -278,7 +278,7 @@ class Attack extends BCAbstractRobot{
 
 	public Action AttackClosest()
 	{
-		
+		Robot[] visibleRobots = me.getVisibleRobots();	
 	}
 }
 
