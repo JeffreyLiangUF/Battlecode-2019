@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 public class MyRobot extends BCAbstractRobot {
 	public int turn;
+	public int ourTeam;//red: 0 blue: 1
 	public boolean[][] map;
 	public boolean[][] karboniteMap;
 	public boolean[][] fuelMap;
@@ -35,11 +36,11 @@ public class MyRobot extends BCAbstractRobot {
 	}	
 	void InitInfo(){
 		if(turn == 1 && me.unit == SPECS.CASTLE){
-			FindSymmetry();
-			log(String.valueOf(mapIsHorizontal));
 			if(numCastles == 0){
 				numCastles = getVisibleRobots().length;
 				ourCastlePositions = new Position[numCastles];
+				FindSymmetry();
+				ourTeam = me.team == SPECS.RED ? 0 : 1;
 			}			
 			ourCastlePositions[castlesInitialized] = new Position((byte)me.x, (byte)me.y);
 			castlesInitialized++;
@@ -83,7 +84,7 @@ public class MyRobot extends BCAbstractRobot {
 }
 
 class FloodPath{
-	short[][] weights;
+	int[][] weights;
 }
 
 class Position{
@@ -231,19 +232,26 @@ class Helper extends BCAbstractRobot{
 
 class Movement extends BCAbstractRobot{
 
-	void CreateFloodPath(Position pos){
-		
+	int[][] CreateFloodPath(Position pos){
+		int[][] output = new int[map.length][map[0].length];
+		Flood(output, pos, 0);
+		return output;
 	}
-	void Flood(short[][] floodMap, Position pos, int prev){
+	void Flood(int[][] floodMap, Position pos, int prev){
 		if(!Helper.inMap(map, pos)){
 			return;
 		}
 		if(!map[pos.x][pos.y]){
 			floodMap[pos.x][pos.y] = -1;
 		}
-		else{
-			floodMap[pos.x][pos.y] = (short)(prev + 1);
+		else if(floodMap[pos.x][pos.y] == 0){
+			floodMap[pos.x][pos.y] = prev + 1;
 		}
+		Flood(floodMap, new Position(pos.x + 1, pos.y), prev + 1);
+		Flood(floodMap, new Position(pos.x, pos.y + 1), prev + 1);
+		Flood(floodMap, new Position(pos.x - 1, pos.y), prev + 1);
+		Flood(floodMap, new Position(pos.x, pos.y - 1), prev + 1);
+		//might consider 8 directional
 
 	}
 	int PathingDistance(FloodPath path)
