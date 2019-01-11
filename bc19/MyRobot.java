@@ -21,6 +21,15 @@ public class MyRobot extends BCAbstractRobot {
 		turn++;
 		InitInfo();
   
+		if(turn == 2){
+			for(int  i =0; i < ourCastlePositions.length; i++){
+				 for(int j = 0; j < paths.get(ourCastlePositions[i]).length; j++){
+					 for(int k = 0; k < paths.get(ourCastlePositions[i])[j].length; k++){
+						log(Integer.toString(paths.get(ourCastlePositions[i])[j][k]) + "  ");
+					 }
+				 }
+			}
+		}
  
     	if (me.unit == SPECS.CASTLE) {
 			Castle castle = new Castle(this);
@@ -46,6 +55,7 @@ public class MyRobot extends BCAbstractRobot {
 			castlesInitialized++;
 			if(castlesInitialized == numCastles){
 				FindEnemyCastles();
+				GenerateCastlePaths();
 			}
 		}
 	}
@@ -83,8 +93,8 @@ public class MyRobot extends BCAbstractRobot {
 		for(int i = 0; i < ourCastlePositions.length; i++){
 			paths.put(ourCastlePositions[i], Movement.CreateFloodPath(map, ourCastlePositions[i]));
 		}
-		for(int i = 0; i < ourCastlePositions.length; i++){
-
+		for(int i = 0; i < enemyCastlePositions.length; i++){
+			paths.put(enemyCastlePositions[i], Movement.CreateFloodPath(map, enemyCastlePositions[i]));
 		}
 	}
 }
