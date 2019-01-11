@@ -1,9 +1,8 @@
 package bc19;
 
 import java.util.HashMap;
-
-import com.sun.tools.javac.util.Position;
-
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.ArrayList;
 
 public class MyRobot extends BCAbstractRobot {
@@ -23,7 +22,7 @@ public class MyRobot extends BCAbstractRobot {
     public Action turn() {
 		turn++;
 		InitInfo();
-  
+  /*
 		if(turn == 2){
 			for(int  i =0; i < ourCastlePositions.length; i++){
 				 for(int j = 0; j < paths.get(ourCastlePositions[i]).length; j++){
@@ -32,8 +31,9 @@ public class MyRobot extends BCAbstractRobot {
 					 }
 				 }
 			}
-		}
- 
+		}*/
+	
+		/*
     	if (me.unit == SPECS.CASTLE) {
 			Castle castle = new Castle(this);
 			//return castle.Execute();
@@ -43,9 +43,11 @@ public class MyRobot extends BCAbstractRobot {
     	if (me.unit == SPECS.PILGRIM) {
 			Pilgrim pilgrim = new Pilgrim(this);
 			//return pilgrim.Execute();
-		}
+		}*/
 		return null;	
 	}	
+	
+
 	void InitInfo(){
 		if(turn == 1 && me.unit == SPECS.CASTLE){
 			if(numCastles == 0){
@@ -80,7 +82,6 @@ public class MyRobot extends BCAbstractRobot {
 			for (int i = 0; i < numCastles; i++)
 			{
 				enemyCastlePositions[i] = new Position(ourCastlePositions[i].x, (byte)((map[0].length - 1) - ourCastlePositions[i].y));
-				log(enemyCastlePositions[i].toString());
 			}
 		}
 		else if (!mapIsHorizontal)
@@ -88,7 +89,6 @@ public class MyRobot extends BCAbstractRobot {
 			for (int i = 0; i < numCastles; i++)
 			{
 				enemyCastlePositions[i] = new Position((byte)((map.length - 1) - ourCastlePositions[i].x), ourCastlePositions[i].y);
-				log(enemyCastlePositions[i].toString());
 			}
 		}
 	}
@@ -97,7 +97,7 @@ public class MyRobot extends BCAbstractRobot {
 			paths.put(ourCastlePositions[i], Movement.CreateFloodPath(map, ourCastlePositions[i]));
 		}
 		for(int i = 0; i < enemyCastlePositions.length; i++){
-			paths.put(enemyCastlePositions[i], Movement.CreateFloodPath(map, enemyCastlePositions[i]));
+			//paths.put(enemyCastlePositions[i], Movement.CreateFloodPath(map, enemyCastlePositions[i]));
 		}
 	}
 }
@@ -273,26 +273,54 @@ class Helper extends BCAbstractRobot{
 class Movement extends BCAbstractRobot{
 
 	public static int[][] CreateFloodPath(boolean[][] map, Position pos){
-		int[][] output = new int[map.length][map[0].length];
-		Flood(map, output, pos, 0);
-		return output;
-	}
-	static void Flood(boolean[][] map, int[][] floodMap, Position pos, int prev){
-		if(!Helper.inMap(map, pos)){
-			return;
-		}
-		if(!map[pos.x][pos.y]){
-			floodMap[pos.x][pos.y] = -1;
-		}
-		else if(floodMap[pos.x][pos.y] == 0){
-			floodMap[pos.x][pos.y] = prev + 1;
-		}
-		Flood(map, floodMap, new Position(pos.x + 1, pos.y), prev + 1);
-		Flood(map, floodMap, new Position(pos.x, pos.y + 1), prev + 1);
-		Flood(map, floodMap, new Position(pos.x - 1, pos.y), prev + 1);
-		Flood(map, floodMap, new Position(pos.x, pos.y - 1), prev + 1);
-		//might consider 8 directional
+		int[][] outputPath = new int[map.length][map[0].length];
+		Queue<Position> toBeVisited = new LinkedList<>();
+		toBeVisited.add(pos);
+		ArrayList<Position> visited = new ArrayList<>();
+		int currentMapValue = 1;
+		int currentCount = 0;
+		int needForRing = 0;
+		visited.add(pos);
 
+		while(toBeVisited.size() > 0){
+			Position removed = toBeVisited.poll();
+			outputPath[removed.x][removed.y] = currentMapValue;
+			currentCount += 1;
+			if(needForRing <= currentCount){
+				currentCount = 0;
+				needForRing += 4;
+				currentMapValue++;
+			}
+			Position top = new Position(removed.x - 1, removed.y);
+			if(Helper.inMap(map, top) && !containsPosition(visited, top)){
+				toBeVisited.add(top);
+				visited.add(top);
+			}
+			Position right = new Position(removed.x, removed.y + 1);
+			if(Helper.inMap(map, right) && !containsPosition(visited, right)){
+				toBeVisited.add(right);
+				visited.add(right);
+			}
+			Position bottom = new Position(removed.x + 1, removed.y);
+			if(Helper.inMap(map, bottom) && !containsPosition(visited, bottom)){
+				toBeVisited.add(bottom);
+				visited.add(bottom);
+			}
+			Position left = new Position(removed.x, removed.y - 1);
+			if(Helper.inMap(map, left) && !containsPosition(visited, left)){
+				toBeVisited.add(left);
+				visited.add(left);
+			}
+		}
+		return outputPath;
+	}
+    static boolean containsPosition(ArrayList<Position> positions, Position pos){
+		for(int i = 0; i < positions.size(); i++){
+			if(positions.get(i).x == pos.x && positions.get(i).y == pos.y){
+				return true;
+			}
+		}
+		return false;
 	}
 	int PathingDistance(int[][] path)
 	{
