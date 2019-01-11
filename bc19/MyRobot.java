@@ -79,87 +79,11 @@ public class MyRobot extends BCAbstractRobot {
 		}
 	}
 
-	boolean inMap(Position pos)
-	{
-		if (pos.x < 0 || pos.x > (map.length - 1) || pos.y < 0 || pos.y > (map[0].length - 1))
-		{
-			return false;
-		}
-		return true;	
-	}
-
-	void CreateFloodPath(Position pos){
-		
-	}
-	void Flood(short[][] floodMap, Position pos, int prev){
-		if(!inMap(pos)){
-			return;
-		}
-		if(!map[pos.x][pos.y]){
-			floodMap[pos.x][pos.y] = -1;
-		}
-	}
-	int PathingDistance(Position endPos)
-	{
-		FloodPath path = paths.get(endPos);
-		if (path == null)
-		{
-			return -1;
-		}
-
-		return path.weights[me.x][me.y];
-	}
 	
-	Position[] AllPassableInRange(Position pos, int[] r)
-	{
-		ArrayList<Position> validPositions = new ArrayList<>();
-		for (int i = -r[1]; i <= r[1]; i++)
-		{
-			for (int j = -r[1]; j <= r[1]; j++)
-			{
-				int x = (pos.x + i);
-				int y = (pos.y + j);
-				if (!inMap(new Position(x, y)))
-				{
-					continue;
-				}
-				if(!map[x][y]){
-					continue;
-				}
-				int distanceSquared = (x - pos.x) * (x - pos.x) + (y - pos.y) * (y - pos.y);
-				if (distanceSquared > r[1] || distanceSquared < r[0])
-				{
-					continue;
-				}
-				
-				validPositions.add(new Position(x, y));
-			}
-		}
-		return validPositions.toArray(new Position[validPositions.size()]);
-	}
+	
+	
 
-	Position FloodPathing(Position pos)
-	{
-		FloodPath path = paths.get(pos);
-		if (path == null)
-		{
-			return null;	
-		}
-
-		Position[] validPositions = AllPassableInRange(new Position(me.x, me.y), SPECS.UNITS[me.unit].ATTACK_RADIUS);
-		int lowest = Integer.MAX_VALUE;
-		Position lowestPos = null;
-
-		for (int i = 0; i < validPositions.length ; i++)
-		{
-			if (path.weights[validPositions[i].x][validPositions[i].y] < lowest)
-			{
-				lowest = path.weights[validPositions[i].x][validPositions[i].y];
-				lowestPos = validPositions[i];
-			}
-		}
-		return lowestPos;
-	}
+	
 }
 
 class FloodPath{
@@ -270,17 +194,75 @@ class Preacher extends BCAbstractRobot{
 	}
 }
 
+class Helper extends BCAbstractRobot{
+	public static boolean inMap(boolean[][] map, Position pos)
+	{
+		if (pos.x < 0 || pos.x > (map.length - 1) || pos.y < 0 || pos.y > (map[0].length - 1))
+		{
+			return false;
+		}
+		return true;	
+	}
+
+	public static Position[] AllPassableInRange(boolean[][] map, Position pos, int[] r)
+	{
+		ArrayList<Position> validPositions = new ArrayList<>();
+		for (int i = -r[1]; i <= r[1]; i++)
+		{
+			for (int j = -r[1]; j <= r[1]; j++)
+			{
+				int x = (pos.x + i);
+				int y = (pos.y + j);
+				if (!inMap(map, new Position(x, y)))
+				{
+					continue;
+				}
+				if(!map[x][y]){
+					continue;
+				}
+				int distanceSquared = (x - pos.x) * (x - pos.x) + (y - pos.y) * (y - pos.y);
+				if (distanceSquared > r[1] || distanceSquared < r[0])
+				{
+					continue;
+				}
+				
+				validPositions.add(new Position(x, y));
+			}
+		}
+		return validPositions.toArray(new Position[validPositions.size()]);
+	}
+}
+
 class Movement extends BCAbstractRobot{
 
-	Position FloodPathing(Position pos)
+	void CreateFloodPath(Position pos){
+		
+	}
+	void Flood(short[][] floodMap, Position pos, int prev){
+		if(!Helper.inMap(map, pos)){
+			return;
+		}
+		if(!map[pos.x][pos.y]){
+			floodMap[pos.x][pos.y] = -1;
+		}
+	}
+	int PathingDistance(FloodPath path)
 	{
-		FloodPath path = paths.get(pos);
+		if (path == null)
+		{
+			return -1;
+		}
+		return path.weights[me.x][me.y];
+	}
+	
+	Position FloodPathing(FloodPath path)
+	{
 		if (path == null)
 		{
 			return null;	
 		}
 
-		Position[] validPositions = AllPassableInRange(new Position(me.x, me.y), SPECS.UNITS[me.unit].ATTACK_RADIUS);
+		Position[] validPositions = Helper.AllPassableInRange(map, new Position(me.x, me.y), SPECS.UNITS[me.unit].ATTACK_RADIUS);
 		int lowest = Integer.MAX_VALUE;
 		Position lowestPos = null;
 
