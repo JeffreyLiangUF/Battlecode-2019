@@ -12,7 +12,7 @@ public class MyRobot extends BCAbstractRobot {
 	public boolean[][] karboniteMap;
 	public boolean[][] fuelMap;
 	public int numCastles = 0;
-	public int castlesInitialized;
+	public int castlesInitialized = 0;
 	public boolean mapIsHorizontal;
 	public Position[] ourCastlePositions;
 	public Position[] enemyCastlePositions;
@@ -21,41 +21,54 @@ public class MyRobot extends BCAbstractRobot {
 
     public Action turn() {
 		turn++;
-		InitInfo();
-  /*
-		if(turn == 2){
-			for(int  i =0; i < ourCastlePositions.length; i++){
-				 for(int j = 0; j < paths.get(ourCastlePositions[i]).length; j++){
-					 for(int k = 0; k < paths.get(ourCastlePositions[i])[j].length; k++){
-						log(Integer.toString(paths.get(ourCastlePositions[i])[j][k]) + "  ");
-					 }
-				 }
+		
+		if(turn == 1 && me.unit == SPECS.CASTLE){
+			Robot[] robots = getVisibleRobots();
+			int talking = 0;
+			for (int i = 0; i < robots.length; i++) {
+				if(robots[i].castle_talk != 0){
+					talking++;
+				}
 			}
-		}*/
-	
-		/*
-    	if (me.unit == SPECS.CASTLE) {
-			Castle castle = new Castle(this);
-			//return castle.Execute();
-		}
+			castleTalk(talking);
+			
+			
+			if(robots.length == 1){
+				numCastles = 1;
+			}
+			else if(robots.length > 1 && talking == 0){
+				numCastles = robots.length;
+				castleTalk(numCastles);
+			}else{
+				for (int i = 0; i < robots.length; i++) {
+					if(robots[i].castle_talk != 0){
+						numCastles = robots[i].castle_talk;
+						castleTalk(numCastles);
+					}
+				}
+			}log("number of castles: "+ Integer.toString(numCastles));
+						return buildUnit(SPECS.PILGRIM, 1, 0);
+			
+		}		
+		
+		
 
 		
-    	if (me.unit == SPECS.PILGRIM) {
-			Pilgrim pilgrim = new Pilgrim(this);
-			//return pilgrim.Execute();
-		}*/
 		return null;	
 	}	
 	
 
 	void InitInfo(){
-		if(turn == 1 && me.unit == SPECS.CASTLE){
+		if(me.unit == SPECS.CASTLE){
 			if(numCastles == 0){
 				numCastles = getVisibleRobots().length;
+				log("occurs");
 				ourCastlePositions = new Position[numCastles];
 				FindSymmetry();
 				ourTeam = me.team == SPECS.RED ? 0 : 1;
-			}			
+				paths = new HashMap<>();
+			}	
+			log(Integer.toString(numCastles) + " This is the num");		
 			ourCastlePositions[castlesInitialized] = new Position(me.x, me.y);
 			castlesInitialized++;
 			if(castlesInitialized == numCastles){
@@ -94,6 +107,7 @@ public class MyRobot extends BCAbstractRobot {
 	}
 	void GenerateCastlePaths(){
 		for(int i = 0; i < ourCastlePositions.length; i++){
+			log("here");
 			paths.put(ourCastlePositions[i], Movement.CreateFloodPath(map, ourCastlePositions[i]));
 		}
 		for(int i = 0; i < enemyCastlePositions.length; i++){
@@ -284,7 +298,13 @@ class Movement extends BCAbstractRobot{
 
 		while(toBeVisited.size() > 0){
 			Position removed = toBeVisited.poll();
-			outputPath[removed.x][removed.y] = currentMapValue;
+			if(map[removed.x][removed.y]){
+				outputPath[removed.x][removed.y] = currentMapValue;
+			}
+			else{
+				outputPath[removed.x][removed.y] = -1;
+			}
+
 			currentCount += 1;
 			if(needForRing <= currentCount){
 				currentCount = 0;
@@ -292,35 +312,27 @@ class Movement extends BCAbstractRobot{
 				currentMapValue++;
 			}
 			Position top = new Position(removed.x - 1, removed.y);
-			if(Helper.inMap(map, top) && !containsPosition(visited, top)){
+			if(Helper.inMap(map, top) && outputPath[top.x][top.y] == 0){
 				toBeVisited.add(top);
-				visited.add(top);
+				outputPath[top.x][top.y] = -2;
 			}
 			Position right = new Position(removed.x, removed.y + 1);
-			if(Helper.inMap(map, right) && !containsPosition(visited, right)){
+			if(Helper.inMap(map, right) && outputPath[right.x][right.y] == 0){
 				toBeVisited.add(right);
-				visited.add(right);
+				outputPath[right.x][right.y] = -2;
 			}
 			Position bottom = new Position(removed.x + 1, removed.y);
-			if(Helper.inMap(map, bottom) && !containsPosition(visited, bottom)){
+			if(Helper.inMap(map, bottom) && outputPath[bottom.x][bottom.y] == 0){
 				toBeVisited.add(bottom);
-				visited.add(bottom);
+				outputPath[bottom.x][bottom.y] = -2;
 			}
 			Position left = new Position(removed.x, removed.y - 1);
-			if(Helper.inMap(map, left) && !containsPosition(visited, left)){
+			if(Helper.inMap(map, left) && outputPath[left.x][left.y] == 0){
 				toBeVisited.add(left);
-				visited.add(left);
+				outputPath[left.x][left.y] = -2;
 			}
 		}
 		return outputPath;
-	}
-    static boolean containsPosition(ArrayList<Position> positions, Position pos){
-		for(int i = 0; i < positions.size(); i++){
-			if(positions.get(i).x == pos.x && positions.get(i).y == pos.y){
-				return true;
-			}
-		}
-		return false;
 	}
 	int PathingDistance(int[][] path)
 	{
@@ -340,7 +352,7 @@ class Movement extends BCAbstractRobot{
 
 		for (int i = 0; i < validPositions.length ; i++)
 		{
-			if (path[validPositions[i].x][validPositions[i].y] < lowest)
+			if (path[validPositions[i].x][validPositions[i].y] < lowest && path[validPositions[i].x][validPositions[i].y] > 0)
 			{
 				lowest = path[validPositions[i].x][validPositions[i].y];
 				lowestPos = validPositions[i];
@@ -349,8 +361,3 @@ class Movement extends BCAbstractRobot{
 		return lowestPos;
 	}
 }
-
-
-//Wandering
-//Moving to Something In vision
-//Run Away
