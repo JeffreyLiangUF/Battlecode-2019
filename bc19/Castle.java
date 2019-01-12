@@ -3,11 +3,11 @@ package bc19;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class Castle extends BCAbstractRobot implements Machine{
+public class Castle implements Machine{
 
     MyRobot robot;
-    int turn;
-    boolean initilized = false;
+    int turn = 0;
+    boolean initialized = false;
     boolean mapIsHorizontal;
     int ourTeam;// red: 0 blue: 1
     int numCastles;
@@ -21,21 +21,28 @@ public class Castle extends BCAbstractRobot implements Machine{
 
     public Action Execute() {
         turn++;
-        return robot.buildUnit(robot.SPECS.PILGRIM, 1, 0);
+        if(turn == 1){
+            InitializeVariables();
+        }
+        if(!initialized){
+            initialized = SetupAllyCastles();
+        }
+        robot.log("" + initialized);
+        return null;
     }
 
-    void Initialize() {
-        mapIsHorizontal = Helper.FindSymmetry(map);
-        ourTeam = me.team == SPECS.RED ? 0 : 1;
+    void InitializeVariables() {
+       // mapIsHorizontal = Helper.FindSymmetry(map);
+        ourTeam = robot.me.team == robot.SPECS.RED ? 0 : 1;
         ourCastles = new HashMap<>();
-        enemyCastles = new HashMap<>();
+        enemyCastles = new HashMap<>();   
     }
-    void SetupAllyCastles(){
-        Robot[] robots = getVisibleRobots();
+    boolean SetupAllyCastles(){
+        Robot[] robots = robot.getVisibleRobots();
         if(numCastles == 1 || robots.length == 1){
             numCastles = 1;
-            ourCastles.put(me.id, new Position(me.y, me.x));
-            return;
+            ourCastles.put(robot.me.id, new Position(robot.me.y, robot.me.x));
+            return true;
         }        
         int castlesTalking = 0;
         for (int i = 0; i < robots.length; i++) {
@@ -64,24 +71,32 @@ public class Castle extends BCAbstractRobot implements Machine{
                 }                
             }
         }
-        if(ourCastles.containsKey(me.id)){
-            Position current = ourCastles.get(me.id);
-            Position input = new Position(current.y, me.x);
-            ourCastles.put(me.id, input);
-            castleTalk(CastleInfoTalk(numCastles == 3 ? true : false, false, me.x));
+        if(ourCastles.containsKey(robot.me.id)){
+            Position current = ourCastles.get(robot.me.id);
+            Position input = new Position(current.y, robot.me.x);
+            ourCastles.put(robot.me.id, input);
+            robot.castleTalk(CastleInfoTalk(numCastles == 3 ? true : false, false, robot.me.x));
         }
         else{
-            Position input = new Position(me.y, -1);
-            ourCastles.put(me.id, input);
-            castleTalk(CastleInfoTalk(numCastles == 3 ? true : false, true, me.y));
+            Position input = new Position(robot.me.y, -1);
+            ourCastles.put(robot.me.id, input);
+            robot.castleTalk(CastleInfoTalk(numCastles == 3 ? true : false, true, robot.me.y));
         }
-        //last check for 00-000000    
+        return CheckComplete();
     }
     int CastleInfoTalk(boolean three, boolean yValue, int value){
         int output = value;
         output += three ? 128 : 0;
         output += yValue ? 64 : 0;
         return output;
+    }
+    boolean CheckComplete(){
+        for(Position pos : ourCastles.values()){
+            if(pos.y == -1 || pos.x == -1){
+                return false;
+            }
+        }
+        return true;
     }
 
 }

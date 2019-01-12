@@ -22,7 +22,7 @@ public class MyRobot extends BCAbstractRobot {
 			}
 			else if(me.unit == SPECS.PROPHET){
 				robot = new Prophet(this);
-			}
+			}	
 			else if(me.unit == SPECS.PREACHER){
 				robot = new Preacher(this);
 			}
