@@ -1,6 +1,6 @@
 package bc19;
 
-public class Preacher extends BCAbstractRobot implements Machine{
+public class Preacher implements Machine{
 	
 	MyRobot robot;
 	int ourTeam;
@@ -16,14 +16,14 @@ public class Preacher extends BCAbstractRobot implements Machine{
 
 	public Action AttackClosest()
 	{
-		Robot[] visibleRobots = getVisibleRobots();
+		Robot[] visibleRobots = robot.getVisibleRobots();
 		float leastDistance = Integer.MAX_VALUE;
 		int closestIndex = -1;
 		for (int i = 0; i < visibleRobots.length; i++)
 		{
 			if (visibleRobots[i].team != ourTeam)
 			{
-				float distance = Helper.DistanceSquared(new Position(visibleRobots[i].y, visibleRobots[i].x), new Position(me.y, me.x));
+				float distance = Helper.DistanceSquared(new Position(visibleRobots[i].y, visibleRobots[i].x), new Position(robot.me.y, robot.me.x));
 				if (distance < leastDistance)
 				{
 					leastDistance = distance; 
@@ -31,6 +31,6 @@ public class Preacher extends BCAbstractRobot implements Machine{
 				}
 			}
 		}
-		return attack(visibleRobots[closestIndex].y - me.y, visibleRobots[closestIndex].x - me.x);	
+		return robot.attack(visibleRobots[closestIndex].y - robot.me.y, visibleRobots[closestIndex].x - robot.me.x);	
 	}
 }

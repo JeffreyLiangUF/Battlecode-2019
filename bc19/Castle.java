@@ -27,7 +27,12 @@ public class Castle implements Machine{
         if(!initialized){
             initialized = SetupAllyCastles();
         }
-        robot.log("" + initialized);
+        if(turn ==5){
+            robot.log("initialized: " + initialized);
+            for(Position pos : ourCastles.values()){
+                robot.log(pos.toString());
+            }
+        }
         return null;
     }
 

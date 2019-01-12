@@ -1,6 +1,6 @@
 package bc19;
 
-public class Church extends BCAbstractRobot implements Machine{
+public class Church implements Machine{
 
 	MyRobot robot;
 
