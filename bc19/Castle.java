@@ -30,7 +30,8 @@ public class Castle implements Machine{
             Initialize();
         }
 
-
+        //these two falses can be info we send
+        DeclareAllyCastlePositions(false, false, 2);
 
 
 

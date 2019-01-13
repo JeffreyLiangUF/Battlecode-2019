@@ -82,4 +82,13 @@ public class MovingRobot{
 		}
 		return lowestPos;
 	}
+
+	boolean ReadInitialSignals(MyRobot robot, ArrayList<Position> castleLocations){
+		Robot spawnCastle = new Robot();
+		for(Robot r : robot.getVisibleRobots()){
+			if(r.unit == robot.SPECS.CASTLE && Helper.DistanceSquared())
+		}
+	}
+
+
 }
