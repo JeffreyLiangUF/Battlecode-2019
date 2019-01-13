@@ -4,7 +4,8 @@ public class Preacher extends MovingRobot implements Machine{
 	
     MyRobot robot;
     int turn = 0;
-	int ourTeam;
+	int ourTeam; //red:0 blue:1
+	boolean mapIsHorizontal;
  
 	public Preacher(MyRobot robot)
 	{
@@ -15,6 +16,13 @@ public class Preacher extends MovingRobot implements Machine{
       
 		return robot.move(1,0);
 	}
+
+	void InitializeVariables(){
+        ourTeam = robot.me.team == robot.SPECS.RED ? 0 : 1;
+		mapIsHorizontal = Helper.FindSymmetry(robot.map);
+		
+		
+    }
 
 	public Action AttackClosest()
 	{
