@@ -2,6 +2,9 @@ package bc19;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.lang.model.util.ElementScanner6;
+
 import java.util.ArrayList;
 
 public class Pilgrim extends MovingRobot implements Machine{
@@ -89,8 +92,33 @@ public class Pilgrim extends MovingRobot implements Machine{
 
     void UpdateOccupiedResources()
     {
-        int[][] visibleRobotMap = robot.getVisibleRobotMap();
-        
+        int visionRadius = (int)Math.sqrt(robot.SPECS.UNITS[robot.me.unit].VISION_RADIUS);
+        for (int i = -visionRadius; i < visionRadius; i++)
+        {
+            for (int j = -visionRadius; j < visionRadius; j++)
+            {
+                int yNew = robot.me.y + i, xNew = robot.me.x + i;
+                Position tile = new Position(yNew, xNew);
+                if (Helper.DistanceSquared(tile, new Position(robot.me.y, robot.me.x)) > robot.SPECS.UNITS[robot.SPECS.PILGRIM].VISION_RADIUS)
+                {
+                    continue;
+                }
+
+                if (Helper.RobotAtPosition(robot, tile) == null)
+                {
+                    occupiedResources[yNew][xNew] = 0;
+                }
+                else if (Helper.RobotAtPosition(robot, tile).unit == robot.SPECS.PILGRIM)
+                {
+                    occupiedResources[yNew][xNew] = 1;
+                }
+                else
+                {
+                    occupiedResources[yNew][xNew] = 2;
+                }
+
+            }
+        }
     }
 
     public Action goToNearest(boolean karbResource)
