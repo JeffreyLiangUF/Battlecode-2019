@@ -37,11 +37,6 @@ public class MovingRobot{
 				toBeVisited.add(top);
 				outputPath[top.y][top.x] = -2;
             }
-            Position topRight = new Position(removed.y - 1, removed.x);
-			if(Helper.inMap(map, top) && outputPath[topRight.y][topRight.x] == 0){
-				toBeVisited.add(top);
-				outputPath[top.y][top.x] = -2;
-			}
 			Position right = new Position(removed.y, removed.x + 1);
 			if(Helper.inMap(map, right) && outputPath[right.y][right.x] == 0){
 				toBeVisited.add(right);
@@ -60,12 +55,12 @@ public class MovingRobot{
 		}
 		return outputPath;
 	}
-	int PathingDistance(int[][] path)
+	int PathingDistance(MyRobot robot, int[][] path)
 	{
-		return path[me.y][me.x];
+		return path[robot.me.y][robot.me.x];
 	}
 	
-    Position FloodPathing(int[][] path)
+    Position FloodPathing(MyRobot robot, int[][] path)
     
 	{//needs to include use closest to goal of lowest number
 		if (path == null)
@@ -73,7 +68,7 @@ public class MovingRobot{
 			return null;	
 		}
 
-		Position[] validPositions = Helper.AllPassableInRange(map, new Position(me.y, me.x), SPECS.UNITS[me.unit].ATTACK_RADIUS);
+		Position[] validPositions = Helper.AllPassableInRange(robot.map, new Position(robot.me.y, robot.me.x), robot.SPECS.UNITS[robot.me.unit].ATTACK_RADIUS);
 		int lowest = Integer.MAX_VALUE;
 		Position lowestPos = null;
 

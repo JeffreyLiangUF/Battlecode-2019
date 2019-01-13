@@ -2,7 +2,7 @@ package bc19;
 
 import java.util.ArrayList;
 
-public class Helper extends BCAbstractRobot{
+public class Helper{
 	public static boolean inMap(boolean[][] map, Position pos)
 	{
 		if (pos.y < 0 || pos.y > (map.length - 1) || pos.x < 0 || pos.x > (map[0].length - 1))

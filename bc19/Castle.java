@@ -2,6 +2,7 @@ package bc19;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Castle implements Machine{
 
@@ -11,36 +12,47 @@ public class Castle implements Machine{
     boolean mapIsHorizontal;
     int ourTeam;// red: 0 blue: 1
     int numCastles;
-    int test;
     HashMap<Integer, Position> ourCastles;
-    HashMap<Integer, Position> enemyCastles;
+    HashMap<Integer, Position> enemyCastles;//ids are just ourCastles ID's
+
+    boolean radioingTwo;
+
+    //hashmap of ids and unit types to keep track of number of assualt units and such
 
     public Castle(MyRobot robot) {
         this.robot = robot;
     }
 
     public Action Execute() {
-        turn++;
+        turn++;       
+        
+        if(!initialized){
+            Initialize();
+        }
+
+
+
+
+
+
+        return null;
+    }
+
+    void Initialize(){
         if(turn == 1){
             InitializeVariables();
         }
         if(!initialized){
             initialized = SetupAllyCastles();
+            FindEnemyCastles();
         }
-        if(turn ==5){
-            robot.log("initialized: " + initialized);
-            for(Position pos : ourCastles.values()){
-                robot.log(pos.toString());
-            }
-        }
-        return null;
     }
-
     void InitializeVariables() {
-       // mapIsHorizontal = Helper.FindSymmetry(map);
+        mapIsHorizontal = Helper.FindSymmetry(robot.map);
         ourTeam = robot.me.team == robot.SPECS.RED ? 0 : 1;
         ourCastles = new HashMap<>();
         enemyCastles = new HashMap<>();   
+        radioingTwo = true;
     }
     boolean SetupAllyCastles(){
         Robot[] robots = robot.getVisibleRobots();
@@ -103,6 +115,31 @@ public class Castle implements Machine{
         }
         return true;
     }
+    void FindEnemyCastles(){
+        for (Map.Entry<Integer, Position> entry : ourCastles.entrySet()) {
+            enemyCastles.put(entry.getKey(), Helper.FindEnemyCastle(robot.map, mapIsHorizontal, entry.getValue()));
+        }
+    }
+    void DeclareAllyCastlePositions(){
+        if(numCastles == 1){
+            return;
+        }
+        else if(numCastles == 2){
+            
+        }
+        else{
+            if(radioingTwo){
+
+            }
+            else{
+
+            }
+        }
+    }
+    void BinaryForAttackUnitsInitialization(boolean bit1, boolean bit2, boolean bit3, boolean bit4, Position pos){
+
+    }
+
 
 }
 class CastleLocation{

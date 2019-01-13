@@ -2,7 +2,8 @@ package bc19;
 
 public class Preacher extends MovingRobot implements Machine{
 	
-	MyRobot robot;
+    MyRobot robot;
+    int turn = 0;
 	int ourTeam;
  
 	public Preacher(MyRobot robot)
@@ -11,7 +12,8 @@ public class Preacher extends MovingRobot implements Machine{
 	}
 
 	public Action Execute(){
-		return robot.move(0,0);
+      
+		return robot.move(1,0);
 	}
 
 	public Action AttackClosest()
