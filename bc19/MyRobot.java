@@ -8,7 +8,7 @@ public class MyRobot extends BCAbstractRobot {
 
 	public Action turn() {
 		debugTurn++;
-		/*
+		
 		if(robot == null){
 			if(me.unit == SPECS.CASTLE){
 				robot = new Castle(this);
@@ -28,74 +28,38 @@ public class MyRobot extends BCAbstractRobot {
 			else if(me.unit == SPECS.PREACHER){
 				robot = new Preacher(this);
 			}
-		}*/
-		
+		}
+		if(me.unit == SPECS.CASTLE){
+			if(debugTurn == 1){
+				
+			return buildUnit(SPECS.PROPHET, 1, 0);}
+		}
+		return robot.Execute();
+		//return robot.Execute();
 /*
 		if(debugTurn == 1){
-		int[][] test = new int[map.length][map[0].length];
-		test = drawcircle(10, 10, 5);
+		Position tester = new Position(15, 15);
+		int[][] test = MovingRobot.CreateStepFlood(map, tester, 3);
 		for (int i = 0; i < test.length; i++) {
 			String cat = "";
-			for (int j = 0; j < test[0].length; j++) {
-				cat += Integer.toString(test[i][j]);
-			}
+			for (int j = 0; j < test.length; j++) {
+				String out = "";
+				if(test[i][j] == -2){
+					 out = " " +  " ";
+				}else{
+				out = " " +  test[i][j];}
+				if(out.length() < 3){
+					out = " " + out;
+				}
+				cat += out;
+			}	
 			log(cat);
 		}}*/
-return null;
-		//return robot.Execute();
+
 	}
 
-	int[][] drawcircle(int x0, int y0, int radius)
-{
-	int[][] output = new int[map.length][map[0].length];
-    int x = radius-1;
-    int y = 0;
-    int dx = 1;
-    int dy = 1;
-    int err = dx - (radius << 1);
 
-    while (x >= y)
-    {
-        output[x0 + x][y0 + y] = 1;
-        output[x0 + y][y0 + x]=1;
-        output[x0 - y][y0 + x]=1;
-        output[x0 - x][y0 + y]=1;
-        output[x0 - x][y0 - y]=1;
-        output[x0 - y][y0 - x]=1;
-        output[x0 + y][y0 - x]=1;
-        output[x0 + x][y0 - y]=1;
-
-        if (err <= 0)
-        {
-            y++;
-            err += dy;
-            dy += 2;
-        }
-        
-        if (err > 0)
-        {
-            x--;
-            dx += 2;
-            err += dx - (radius << 1);
-        }
-	}
-	return output;
-}
-
-
-	public String convertBinary(int num){
-		int binary[] = new int[40];
-		int index = 0;
-		while(num > 0){
-		  binary[index++] = num%2;
-		  num = num/2;
-		}
-		String cat = "";
-		for(int i = index-1;i >= 0;i--){
-		  cat += binary[i];
-		}
-		return cat;
-	 }
+	
 }
 
 class Position {
@@ -110,4 +74,20 @@ class Position {
 	public String toString() {
 		return Integer.toString(y) + " " + Integer.toString(x);
 	}
+	
+	
+	
+	public static String convertBinary(int num){
+		int binary[] = new int[40];
+		int index = 0;
+		while(num > 0){
+		  binary[index++] = num%2;
+		  num = num/2;
+		}
+		String cat = "";
+		for(int i = index-1;i >= 0;i--){
+		  cat += binary[i];
+		}
+		return cat;
+	 }
 }
