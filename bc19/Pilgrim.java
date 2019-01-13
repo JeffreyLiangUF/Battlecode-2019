@@ -2,9 +2,6 @@ package bc19;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.lang.model.util.ElementScanner6;
-
 import java.util.ArrayList;
 
 public class Pilgrim extends MovingRobot implements Machine{
@@ -12,6 +9,7 @@ public class Pilgrim extends MovingRobot implements Machine{
     MyRobot robot;
     int ourTeam; //red:0 blue:1
     int turn = 0;
+    Position location;
     boolean mapIsHorizontal;
     HashMap<Position, int[][]> karbRoutes;
     HashMap<Position, int[][]> fuelRoutes;
@@ -25,12 +23,8 @@ public class Pilgrim extends MovingRobot implements Machine{
 	}
 
 	public Action Execute(){
-		int dx = (int)(Math.random() * 3);
-		int dy = (int)(Math.random() * 3);
-		if(dx == 0 && dy == 0){
-		dx++;
-        }        
-		return robot.move(dx, dy);
+		UpdateOccupiedResources();
+		return robot.move(0, 1);
 
     }
 
@@ -40,6 +34,7 @@ public class Pilgrim extends MovingRobot implements Machine{
         karbRoutes = new HashMap<>();
         fuelRoutes = new HashMap<>();
         ourDropOffRoutes = new HashMap<>();
+        location = new Position(robot.me.y, robot.me.x);
         occupiedResources = new int[robot.map.length][robot.map[0].length];
         for (int i = 0; i < robot.map.length; i++)
         {
@@ -58,30 +53,30 @@ public class Pilgrim extends MovingRobot implements Machine{
     }
 
     public Action ReturnToDropOff(){
-        if ((dropOff.x - robot.me.x) * (dropOff.x - robot.me.x) > 1 || (dropOff.y - robot.me.y) * (dropOff.y - robot.me.y) > 1)
+        if ((dropOff.x - location.x) * (dropOff.x - location.x) > 1 || (dropOff.y - location.y) * (dropOff.y - location.y) > 1)
         {
             //move to dropOff
         }
         
-        return robot.give(dropOff.x - robot.me.x, dropOff.y - robot.me.y, robot.me.karbonite, robot.me.fuel); 
+        return robot.give(dropOff.x - location.x, dropOff.y - location.y, robot.me.karbonite, robot.me.fuel); 
     }
 
     public float FuelToReturn(int[][] path)
     {
-        int tilesFromTarget = path[robot.me.y][robot.me.x];
+        int tilesFromTarget = path[location.y][location.x];
         float amountOfMoves = (float)(tilesFromTarget / Math.sqrt(robot.SPECS.UNITS[robot.SPECS.PILGRIM].SPEED));
         return (float)(amountOfMoves * robot.SPECS.UNITS[robot.SPECS.PILGRIM].FUEL_PER_MOVE);
     }
 
-    public Position getNearestResource(ArrayList<Position> occupiedResources, boolean karbResource)
+    public Position getNearestResource(boolean karbResource)
     {
         HashMap<Position, int[][]> chosenRoute = karbResource ? karbRoutes : fuelRoutes;
         int lowest = Integer.MAX_VALUE;
         Position closest = null;
         for (Map.Entry<Position, int[][]> pair : chosenRoute.entrySet())
         {
-            int distance = pair.getValue()[robot.me.y][robot.me.x];
-            if (!occupiedResources.contains(pair.getKey()) && distance < lowest)
+            int distance = pair.getValue()[location.y][location.x];
+            if (occupiedResources[pair.getKey().y][pair.getKey().x] != 1 && distance < lowest)
             {
                 lowest = distance;
                 closest = pair.getKey();
@@ -99,7 +94,7 @@ public class Pilgrim extends MovingRobot implements Machine{
             {
                 int yNew = robot.me.y + i, xNew = robot.me.x + i;
                 Position tile = new Position(yNew, xNew);
-                if (Helper.DistanceSquared(tile, new Position(robot.me.y, robot.me.x)) > robot.SPECS.UNITS[robot.SPECS.PILGRIM].VISION_RADIUS)
+                if (Helper.DistanceSquared(tile, location) > robot.SPECS.UNITS[robot.SPECS.PILGRIM].VISION_RADIUS)
                 {
                     continue;
                 }
@@ -121,8 +116,15 @@ public class Pilgrim extends MovingRobot implements Machine{
         }
     }
 
-    public Action goToNearest(boolean karbResource)
+    public Action goToMine(boolean karbResource)
     {
+        /*
+        get nearest position of resource
+            if far, move to it
+            if close, stand on it
+        if on position
+            start mining
+        */
         
     }
 

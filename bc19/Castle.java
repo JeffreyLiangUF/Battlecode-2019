@@ -12,6 +12,7 @@ public class Castle implements Machine{
     boolean mapIsHorizontal;
     int ourTeam;// red: 0 blue: 1
     int numCastles;
+    Position location;
     HashMap<Integer, Position> ourCastles;
     HashMap<Integer, Position> enemyCastles;//ids are just ourCastles ID's
 
@@ -54,12 +55,13 @@ public class Castle implements Machine{
         ourCastles = new HashMap<>();
         enemyCastles = new HashMap<>();   
         idDone = 0;
+        location = new Position(robot.me.y, robot.me.x);
     }
     boolean SetupAllyCastles(){
         Robot[] robots = robot.getVisibleRobots();
         if(numCastles == 1 || robots.length == 1){
             numCastles = 1;
-            ourCastles.put(robot.me.id, new Position(robot.me.y, robot.me.x));
+            ourCastles.put(robot.me.id, location);
             return true;
         }        
         int castlesTalking = 0;
@@ -91,14 +93,14 @@ public class Castle implements Machine{
         }
         if(ourCastles.containsKey(robot.me.id)){
             Position current = ourCastles.get(robot.me.id);
-            Position input = new Position(current.y, robot.me.x);
+            Position input = new Position(current.y, location.x);
             ourCastles.put(robot.me.id, input);
-            robot.castleTalk(CastleInfoTalk(numCastles == 3 ? true : false, false, robot.me.x));
+            robot.castleTalk(CastleInfoTalk(numCastles == 3 ? true : false, false, location.x));
         }
         else{
-            Position input = new Position(robot.me.y, -1);
+            Position input = new Position(location.y, -1);
             ourCastles.put(robot.me.id, input);
-            robot.castleTalk(CastleInfoTalk(numCastles == 3 ? true : false, true, robot.me.y));
+            robot.castleTalk(CastleInfoTalk(numCastles == 3 ? true : false, true, location.y));
         }
         return CheckComplete();
     }
