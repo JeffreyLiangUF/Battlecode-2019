@@ -23,12 +23,8 @@ public class Pilgrim extends MovingRobot implements Machine{
 	}
 
 	public Action Execute(){
-		int dx = (int)(Math.random() * 3);
-		int dy = (int)(Math.random() * 3);
-		if(dx == 0 && dy == 0){
-		dx++;
-        }        
-		return robot.move(dx, dy);
+		UpdateOccupiedResources();
+		return robot.move(0, 1);
 
     }
 
@@ -72,7 +68,7 @@ public class Pilgrim extends MovingRobot implements Machine{
         return (float)(amountOfMoves * robot.SPECS.UNITS[robot.SPECS.PILGRIM].FUEL_PER_MOVE);
     }
 
-    public Position getNearestResource(ArrayList<Position> occupiedResources, boolean karbResource)
+    public Position getNearestResource(boolean karbResource)
     {
         HashMap<Position, int[][]> chosenRoute = karbResource ? karbRoutes : fuelRoutes;
         int lowest = Integer.MAX_VALUE;
@@ -80,7 +76,7 @@ public class Pilgrim extends MovingRobot implements Machine{
         for (Map.Entry<Position, int[][]> pair : chosenRoute.entrySet())
         {
             int distance = pair.getValue()[location.y][location.x];
-            if (!occupiedResources.contains(pair.getKey()) && distance < lowest)
+            if (occupiedResources[pair.getKey().y][pair.getKey().x] != 1 && distance < lowest)
             {
                 lowest = distance;
                 closest = pair.getKey();
@@ -120,8 +116,15 @@ public class Pilgrim extends MovingRobot implements Machine{
         }
     }
 
-    public Action goToNearest(boolean karbResource)
+    public Action goToMine(boolean karbResource)
     {
+        /*
+        get nearest position of resource
+            if far, move to it
+            if close, stand on it
+        if on position
+            start mining
+        */
         
     }
 

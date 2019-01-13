@@ -73,4 +73,14 @@ public class Helper{
 		}
 		return null;
 	}
+	//boolean  inVision  robot pos
+	public static boolean PositionInVision(MyRobot robot, Position pos)
+	{
+		Position robotPos = new Position(robot.me.y, robot.me.x);
+		if (DistanceSquared(robotPos, pos) <= robot.SPECS.UNITS[robot.me.unit].VISION_RADIUS)
+		{
+			return true;
+		}
+		return false;
+	}
 }
