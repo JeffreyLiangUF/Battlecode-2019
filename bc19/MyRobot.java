@@ -6,7 +6,7 @@ public class MyRobot extends BCAbstractRobot {
 	public Machine robot;
 
 	public Action turn() {
-		/*
+		
 		if(robot == null){
 			if(me.unit == SPECS.CASTLE){
 				robot = new Castle(this);
@@ -30,22 +30,7 @@ public class MyRobot extends BCAbstractRobot {
 
 
 
-		return robot.Execute();*/
-
-		int test = 0;
-		Position pos = new Position(41, 22);
-		int attackingOrDefending = 1;
-		test =  attackingOrDefending;
-		test = test << 6;
-		test += pos.x;
-		test = test <<6;
-		test += pos.y;
-		log(convertBinary(test));
-		log(new Position(test & 63, ((test >> 6)) & 63).toString());
-
-
-
-		return null;
+		return robot.Execute();
 	}
 	public String convertBinary(int num){
 		int binary[] = new int[40];

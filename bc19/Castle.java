@@ -15,7 +15,7 @@ public class Castle implements Machine{
     HashMap<Integer, Position> ourCastles;
     HashMap<Integer, Position> enemyCastles;//ids are just ourCastles ID's
 
-    boolean radioingTwo;
+    int idDone;
 
     //hashmap of ids and unit types to keep track of number of assualt units and such
 
@@ -52,7 +52,7 @@ public class Castle implements Machine{
         ourTeam = robot.me.team == robot.SPECS.RED ? 0 : 1;
         ourCastles = new HashMap<>();
         enemyCastles = new HashMap<>();   
-        radioingTwo = true;
+        idDone = 0;
     }
     boolean SetupAllyCastles(){
         Robot[] robots = robot.getVisibleRobots();
@@ -120,24 +120,55 @@ public class Castle implements Machine{
             enemyCastles.put(entry.getKey(), Helper.FindEnemyCastle(robot.map, mapIsHorizontal, entry.getValue()));
         }
     }
-    void DeclareAllyCastlePositions(){
+    void DeclareAllyCastlePositions(boolean bit1, boolean bit2, int radius){
         if(numCastles == 1){
             return;
         }
         else if(numCastles == 2){
-            
+            Position other = new Position(0, 0);
+            for(Integer id : ourCastles.keySet()){
+                if(id != robot.id){
+                    other = ourCastles.get(id);
+                }
+            }
+            robot.signal(BinarySignalsForInitialization(bit1, bit2, other), radius);
         }
         else{
-            if(radioingTwo){
-
+            if(idDone == 0){
+                Position other = new Position(0, 0);
+                for(Integer id : ourCastles.keySet()){
+                    if(id != robot.id){
+                        idDone = id;
+                        other = ourCastles.get(id);
+                    }
+                }
+                robot.signal(BinarySignalsForInitialization(bit1, bit2, other), radius);
             }
             else{
-
+                Position other = new Position(0, 0);
+                for(Integer id : ourCastles.keySet()){
+                    if(id != robot.id && id != idDone){
+                        idDone = 0;
+                        other = ourCastles.get(id);
+                    }
+                }
+                robot.signal(BinarySignalsForInitialization(bit1, bit2, other), radius);
             }
         }
     }
-    void BinaryForAttackUnitsInitialization(boolean bit1, boolean bit2, boolean bit3, boolean bit4, Position pos){
+    int BinarySignalsForInitialization(boolean bit1, boolean bit2, Position pos){
+        int output = bit1 ? 1 : 0;
+        output = output << 1;
+        output += bit2 ? 1 : 0;
+        output = output << 1;
+        output += numCastles;
 
+        output = output << 2;        
+        output = output << 6;
+        output += pos.y;
+        output = output << 6;
+        output += pos.x;
+        return output;
     }
 
 
