@@ -30,6 +30,8 @@ public class Pilgrim extends MovingRobot implements Machine{
     void InitializeVariables(){
         ourTeam = robot.me.team == robot.SPECS.RED ? 0 : 1;
         mapIsHorizontal = Helper.FindSymmetry(robot.map);
+        resourceRoutes = new HashMap<>();
+        ourCastleRoutes = new HashMap<>();
     }
 
     public Action ReturnToDropOff(){
