@@ -5,17 +5,55 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class MovingRobot{
+/*
+	public static int[][] CreateLayeredFloodPath(boolean[][] map, Position pos, float stepDistance){
+		int[][] singleStep = CreateSingleStepFlood(map, pos);
 
-	public static int[][] CreateFloodPath(boolean[][] map, Position pos){
-        //overlay multiple flood path of different step size keep lowest value per square
-		int[][] outputPath = new int[map.length][map[0].length];
+	}
+	public static int[][] CreateStepFlood(boolean[][] map, Position pos, int stepDistance){
+		int[][] singleStep = new int[map.length][map[0].length];
 		Queue<Position> toBeVisited = new LinkedList<>();
 		toBeVisited.add(pos);
-		ArrayList<Position> visited = new ArrayList<>();
+	}*/
+
+	public static int[][] CreateSingleStepFlood(boolean[][] map, Position pos){
+		int[][] singleStep = new int[map.length][map[0].length];
+		Queue<Position> toBeVisited = new LinkedList<>();
+		toBeVisited.add(pos);
 		int currentMapValue = 1;
 		int currentCount = 0;
 		int needForRing = 0;
-		visited.add(pos);
+		while(toBeVisited.size() > 0){
+			Position removed = toBeVisited.poll();
+			singleStep[removed.y][removed.x] = map[removed.y][removed.x] ? currentMapValue : -1;
+
+			currentCount += 1;
+			if(needForRing <= currentCount){
+				currentCount = 0;
+				needForRing += 8;
+				currentMapValue++;
+			}
+
+			for(int y = -1; y <= 1; y++){
+				for(int x = -1; x <= 1; x++){
+					Position relative = new Position(removed.y + y, removed.x + x);
+					if(Helper.inMap(map, relative) && singleStep[relative.y][relative.x] == 0){
+						toBeVisited.add(relative);
+						singleStep[relative.y][relative.x] = -2;
+					}
+				}
+			}
+		}
+		return singleStep;
+	}
+
+	public static int[][] CreateFloodPath(boolean[][] map, Position pos){
+		int[][] outputPath = new int[map.length][map[0].length];
+		Queue<Position> toBeVisited = new LinkedList<>();
+		toBeVisited.add(pos);
+		int currentMapValue = 1;
+		int currentCount = 0;
+		int needForRing = 0;
 
 		while(toBeVisited.size() > 0){
 			Position removed = toBeVisited.poll();
@@ -100,7 +138,19 @@ public class MovingRobot{
 		}
 		int x = signal & 63;
 		signal -= x;
-		signal = signal 
+		signal = signal >> 6;
+		int y = signal & 63;
+		signal -= y;
+		signal = signal >> 6;
+		int numCastle = signal & 3;
+		if(numCastle == 2){
+			castleLocations.add(new Position(y, x));
+			return true;
+		}
+		else{
+			castleLocations.add(new Position(y, x));
+			return false;
+		}
 	}
 
 

@@ -4,9 +4,11 @@ import java.util.HashMap;
 
 public class MyRobot extends BCAbstractRobot {
 	public Machine robot;
+	int debugTurn = 0;
 
 	public Action turn() {
-		
+		debugTurn++;
+		/*
 		if(robot == null){
 			if(me.unit == SPECS.CASTLE){
 				robot = new Castle(this);
@@ -26,12 +28,61 @@ public class MyRobot extends BCAbstractRobot {
 			else if(me.unit == SPECS.PREACHER){
 				robot = new Preacher(this);
 			}
-		}
-
-
-
-		return robot.Execute();
+		}*/
+		
+/*
+		if(debugTurn == 1){
+		int[][] test = new int[map.length][map[0].length];
+		test = drawcircle(10, 10, 5);
+		for (int i = 0; i < test.length; i++) {
+			String cat = "";
+			for (int j = 0; j < test[0].length; j++) {
+				cat += Integer.toString(test[i][j]);
+			}
+			log(cat);
+		}}*/
+return null;
+		//return robot.Execute();
 	}
+
+	int[][] drawcircle(int x0, int y0, int radius)
+{
+	int[][] output = new int[map.length][map[0].length];
+    int x = radius-1;
+    int y = 0;
+    int dx = 1;
+    int dy = 1;
+    int err = dx - (radius << 1);
+
+    while (x >= y)
+    {
+        output[x0 + x][y0 + y] = 1;
+        output[x0 + y][y0 + x]=1;
+        output[x0 - y][y0 + x]=1;
+        output[x0 - x][y0 + y]=1;
+        output[x0 - x][y0 - y]=1;
+        output[x0 - y][y0 - x]=1;
+        output[x0 + y][y0 - x]=1;
+        output[x0 + x][y0 - y]=1;
+
+        if (err <= 0)
+        {
+            y++;
+            err += dy;
+            dy += 2;
+        }
+        
+        if (err > 0)
+        {
+            x--;
+            dx += 2;
+            err += dx - (radius << 1);
+        }
+	}
+	return output;
+}
+
+
 	public String convertBinary(int num){
 		int binary[] = new int[40];
 		int index = 0;

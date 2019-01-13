@@ -115,7 +115,7 @@ public class Pilgrim extends MovingRobot implements Machine{
             }
         }
     }
-
+/*
     public Action goToMine(boolean karbResource)
     {
         /*
@@ -124,9 +124,9 @@ public class Pilgrim extends MovingRobot implements Machine{
             if close, stand on it
         if on position
             start mining
-        */
         
-    }
+        
+}*/
 
     //flee if enemy
     //if find enemy church or castle relay info
