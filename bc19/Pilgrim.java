@@ -2,7 +2,7 @@ package bc19;
 
 import java.util.HashMap;
 
-public class Pilgrim implements Machine{
+public class Pilgrim extends MovingRobot implements Machine{
   
     MyRobot robot;
     HashMap<Position, int[][]> resourceRoutes;

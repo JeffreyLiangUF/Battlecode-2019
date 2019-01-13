@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class Movement extends BCAbstractRobot{
+public class MovingRobot{
 
 	public static int[][] CreateFloodPath(boolean[][] map, Position pos){
         //overlay multiple flood path of different step size keep lowest value per square
@@ -34,6 +34,11 @@ public class Movement extends BCAbstractRobot{
 			}
 			Position top = new Position(removed.y - 1, removed.x);
 			if(Helper.inMap(map, top) && outputPath[top.y][top.x] == 0){
+				toBeVisited.add(top);
+				outputPath[top.y][top.x] = -2;
+            }
+            Position topRight = new Position(removed.y - 1, removed.x);
+			if(Helper.inMap(map, top) && outputPath[topRight.y][topRight.x] == 0){
 				toBeVisited.add(top);
 				outputPath[top.y][top.x] = -2;
 			}
