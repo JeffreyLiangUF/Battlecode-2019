@@ -84,10 +84,23 @@ public class MovingRobot{
 	}
 
 	boolean ReadInitialSignals(MyRobot robot, ArrayList<Position> castleLocations){
-		Robot spawnCastle = new Robot();
+		Robot spawnCastle = new Robot();	
 		for(Robot r : robot.getVisibleRobots()){
-			if(r.unit == robot.SPECS.CASTLE && Helper.DistanceSquared())
+			if(r.unit == robot.SPECS.CASTLE && Helper.DistanceSquared(new Position(robot.me.y, robot.me.x), new Position(r.y, r.x)) < 2){
+				spawnCastle = r;
+			}
 		}
+		Position spawnCastlePos = new Position(spawnCastle.y, spawnCastle.x);	
+		if(castleLocations.size() == 0){
+			castleLocations.add(spawnCastlePos);
+		}
+		int signal = spawnCastle.signal;
+		if(signal == -1){
+			return true;
+		}
+		int x = signal & 63;
+		signal -= x;
+		signal = signal 
 	}
 
 
