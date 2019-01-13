@@ -1,6 +1,8 @@
 package bc19;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.ArrayList;
 
 public class Pilgrim extends MovingRobot implements Machine{
   
@@ -8,9 +10,11 @@ public class Pilgrim extends MovingRobot implements Machine{
     int ourTeam; //red:0 blue:1
     int turn = 0;
     boolean mapIsHorizontal;
-    HashMap<Position, int[][]> resourceRoutes;
-    HashMap<Position, int[][]> ourCastleRoutes;
+    HashMap<Position, int[][]> karbRoutes;
+    HashMap<Position, int[][]> fuelRoutes;
+    HashMap<Position, int[][]> ourDropOffRoutes;
     Position dropOff;
+    int[][] occupiedResources;
     //method to get fuel cost from current tile value
 	
 	public Pilgrim(MyRobot robot){
@@ -30,8 +34,24 @@ public class Pilgrim extends MovingRobot implements Machine{
     void InitializeVariables(){
         ourTeam = robot.me.team == robot.SPECS.RED ? 0 : 1;
         mapIsHorizontal = Helper.FindSymmetry(robot.map);
-        resourceRoutes = new HashMap<>();
-        ourCastleRoutes = new HashMap<>();
+        karbRoutes = new HashMap<>();
+        fuelRoutes = new HashMap<>();
+        ourDropOffRoutes = new HashMap<>();
+        occupiedResources = new int[robot.map.length][robot.map[0].length];
+        for (int i = 0; i < robot.map.length; i++)
+        {
+            for (int j = 0; j < robot.map[0].length; j++)
+            {
+                if (robot.getKarboniteMap()[i][j] == true || robot.getFuelMap()[i][j] == true)
+                {
+                    occupiedResources[i][j] = 0;
+                }
+                else
+                {
+                    occupiedResources[i][j] = -1;
+                }
+            }
+        }
     }
 
     public Action ReturnToDropOff(){
@@ -48,6 +68,34 @@ public class Pilgrim extends MovingRobot implements Machine{
         int tilesFromTarget = path[robot.me.y][robot.me.x];
         float amountOfMoves = (float)(tilesFromTarget / Math.sqrt(robot.SPECS.UNITS[robot.SPECS.PILGRIM].SPEED));
         return (float)(amountOfMoves * robot.SPECS.UNITS[robot.SPECS.PILGRIM].FUEL_PER_MOVE);
+    }
+
+    public Position getNearestResource(ArrayList<Position> occupiedResources, boolean karbResource)
+    {
+        HashMap<Position, int[][]> chosenRoute = karbResource ? karbRoutes : fuelRoutes;
+        int lowest = Integer.MAX_VALUE;
+        Position closest = null;
+        for (Map.Entry<Position, int[][]> pair : chosenRoute.entrySet())
+        {
+            int distance = pair.getValue()[robot.me.y][robot.me.x];
+            if (!occupiedResources.contains(pair.getKey()) && distance < lowest)
+            {
+                lowest = distance;
+                closest = pair.getKey();
+            }
+        }
+        return closest;
+    }
+
+    void UpdateOccupiedResources()
+    {
+        int[][] visibleRobotMap = robot.getVisibleRobotMap();
+        
+    }
+
+    public Action goToNearest(boolean karbResource)
+    {
+        
     }
 
     //flee if enemy

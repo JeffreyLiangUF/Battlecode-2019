@@ -39,9 +39,11 @@ public class Helper{
 		}
 		return validPositions.toArray(new Position[validPositions.size()]);
 	}
+
 	public static float DistanceSquared(Position pos1, Position pos2){
 		return (pos2.y - pos1.y) * (pos2.y - pos1.y)  + (pos2.x - pos1.x) * (pos2.x - pos1.x);
-    }
+	}
+	
     public static boolean FindSymmetry(boolean[][] map){
         boolean mapIsHorizontal = true;
 		for(int i = 0; i < map.length / 2; i++){
@@ -53,9 +55,22 @@ public class Helper{
 			}
         }
         return mapIsHorizontal;
-    }
+	}
+	
     public static Position FindEnemyCastle(boolean[][] map, boolean mapIsHorizontal, Position ourCastle){
         return mapIsHorizontal ? new Position(ourCastle.y, (map[0].length - 1) - ourCastle.x) : new Position((map.length - 1) - ourCastle.y, ourCastle.x);
-    }
-    
+	}
+	
+	public static Robot RobotAtPosition(MyRobot robot, Position pos)
+	{
+		Robot[] visibleRobots = robot.getVisibleRobots();
+		for (int i = 0; i < visibleRobots.length; i++)
+		{
+			if (pos.y == visibleRobots[i].y && pos.x == visibleRobots[i].x)
+			{
+				return visibleRobots[i];
+			}
+		}
+		return null;
+	}
 }
