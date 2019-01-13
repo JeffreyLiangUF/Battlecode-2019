@@ -2,9 +2,6 @@ package bc19;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.lang.model.util.ElementScanner6;
-
 import java.util.ArrayList;
 
 public class Pilgrim extends MovingRobot implements Machine{
@@ -12,6 +9,7 @@ public class Pilgrim extends MovingRobot implements Machine{
     MyRobot robot;
     int ourTeam; //red:0 blue:1
     int turn = 0;
+    Position location;
     boolean mapIsHorizontal;
     HashMap<Position, int[][]> karbRoutes;
     HashMap<Position, int[][]> fuelRoutes;
@@ -40,6 +38,7 @@ public class Pilgrim extends MovingRobot implements Machine{
         karbRoutes = new HashMap<>();
         fuelRoutes = new HashMap<>();
         ourDropOffRoutes = new HashMap<>();
+        location = new Position(robot.me.y, robot.me.x);
         occupiedResources = new int[robot.map.length][robot.map[0].length];
         for (int i = 0; i < robot.map.length; i++)
         {
@@ -58,17 +57,17 @@ public class Pilgrim extends MovingRobot implements Machine{
     }
 
     public Action ReturnToDropOff(){
-        if ((dropOff.x - robot.me.x) * (dropOff.x - robot.me.x) > 1 || (dropOff.y - robot.me.y) * (dropOff.y - robot.me.y) > 1)
+        if ((dropOff.x - location.x) * (dropOff.x - location.x) > 1 || (dropOff.y - location.y) * (dropOff.y - location.y) > 1)
         {
             //move to dropOff
         }
         
-        return robot.give(dropOff.x - robot.me.x, dropOff.y - robot.me.y, robot.me.karbonite, robot.me.fuel); 
+        return robot.give(dropOff.x - location.x, dropOff.y - location.y, robot.me.karbonite, robot.me.fuel); 
     }
 
     public float FuelToReturn(int[][] path)
     {
-        int tilesFromTarget = path[robot.me.y][robot.me.x];
+        int tilesFromTarget = path[location.y][location.x];
         float amountOfMoves = (float)(tilesFromTarget / Math.sqrt(robot.SPECS.UNITS[robot.SPECS.PILGRIM].SPEED));
         return (float)(amountOfMoves * robot.SPECS.UNITS[robot.SPECS.PILGRIM].FUEL_PER_MOVE);
     }
@@ -80,7 +79,7 @@ public class Pilgrim extends MovingRobot implements Machine{
         Position closest = null;
         for (Map.Entry<Position, int[][]> pair : chosenRoute.entrySet())
         {
-            int distance = pair.getValue()[robot.me.y][robot.me.x];
+            int distance = pair.getValue()[location.y][location.x];
             if (!occupiedResources.contains(pair.getKey()) && distance < lowest)
             {
                 lowest = distance;
@@ -99,7 +98,7 @@ public class Pilgrim extends MovingRobot implements Machine{
             {
                 int yNew = robot.me.y + i, xNew = robot.me.x + i;
                 Position tile = new Position(yNew, xNew);
-                if (Helper.DistanceSquared(tile, new Position(robot.me.y, robot.me.x)) > robot.SPECS.UNITS[robot.SPECS.PILGRIM].VISION_RADIUS)
+                if (Helper.DistanceSquared(tile, location) > robot.SPECS.UNITS[robot.SPECS.PILGRIM].VISION_RADIUS)
                 {
                     continue;
                 }
