@@ -221,13 +221,15 @@ public class Pilgrim extends MovingRobot implements Machine{
             return false;
         }
 
-        int[][] nearest = new int[dropOff.y][dropOff.x];
-        if (FuelToReturn(nearest) > returnFuelThreshold)
+        GetNearestDropOff();
+        if (FuelToReturn(ourDropOffRoutes.get(dropOff)) > returnFuelThreshold)
         {
             return true;
         }
-
-        if ()
+        else
+        {
+            return false;
+        }
     }
     //flee if enemy
     //if find enemy church or castle relay info
