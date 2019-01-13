@@ -1,6 +1,6 @@
 package bc19;
 
-public class Crusader implements Machine{
+public class Crusader extends MovingRobot implements Machine{
 	
 	MyRobot robot;
 

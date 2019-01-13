@@ -1,6 +1,6 @@
 package bc19;
 
-public class Preacher implements Machine{
+public class Preacher extends MovingRobot implements Machine{
 	
 	MyRobot robot;
 	int ourTeam;

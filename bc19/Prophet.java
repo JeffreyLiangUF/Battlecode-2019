@@ -1,6 +1,6 @@
 package bc19;
 
-public class Prophet implements Machine{
+public class Prophet extends MovingRobot implements Machine{
 	
 	MyRobot robot;
 
