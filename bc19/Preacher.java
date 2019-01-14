@@ -7,8 +7,9 @@ public class Preacher extends MovingRobot implements Machine{
     int turn = 0;
 	int ourTeam; //red:0 blue:1
 	Position location;
+	boolean initialized;
 	boolean mapIsHorizontal;
-	ArrayList<Position> castlePositions;
+	ArrayList<Position> castleLocations;
 	Position closestCastle;
  
 	public Preacher(MyRobot robot)
@@ -17,8 +18,25 @@ public class Preacher extends MovingRobot implements Machine{
 	}
 
 	public Action Execute(){
-      
-		return robot.move(1,0);
+		turn++;
+		if (turn == 1)
+		{
+			castleLocations = new ArrayList<>();
+		}
+		if(!initialized)
+		{
+			initialized = ReadInitialSignals(robot, castleLocations);
+		}
+		return null;
+	}
+
+	void Initialize(){
+		if (turn == 1){
+			InitializeVariables();
+		}
+		if (!initialized){
+			initialized = ReadInitialSignals(robot, castleLocations)
+		}
 	}
 
 	void InitializeVariables(){
@@ -64,7 +82,18 @@ public class Preacher extends MovingRobot implements Machine{
 						
 				if (distFromTileToEnemyCastle < distFromCastleToCastle)
 				{
-					
+					if (Helper.IsSurroundingsOccupied(robot, robot.getVisibleRobotMap(), defenceTile) == false)
+					{
+						float moveDistance = Helper.DistanceSquared(defenceTile, location);
+						if (moveDistance <= movespeed)
+						{
+							robot.move(location.x - defenceTile.x, location.y - defenceTile.y);
+						}
+						else
+						{
+							//move to defenceTile
+						}
+					}
 				}
 			}
 		}
@@ -75,7 +104,7 @@ public class Preacher extends MovingRobot implements Machine{
 	{
 		Position closestCastle = null;
 		float least = Integer.MAX_VALUE;
-		for (Position castlePos : castlePositions)
+		for (Position castlePos : castleLocations)
 		{
 			float distance = Helper.DistanceSquared(castlePos, location);
 			if (distance < least)

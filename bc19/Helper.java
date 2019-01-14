@@ -73,7 +73,7 @@ public class Helper{
 		}
 		return null;
 	}
-	//boolean  inVision  robot pos
+	
 	public static boolean PositionInVision(MyRobot robot, Position pos)
 	{
 		Position robotPos = new Position(robot.me.y, robot.me.x);
@@ -83,10 +83,35 @@ public class Helper{
 		}
 		return false;
 	}
-	public static Position ListContains(ArrayList<Position> list, Position pos){
-		for (int i = 0; i < list.size(); i++) {
-			if(list.get(i).x == pos.x && list.get(i).y == pos.y){
-				return list.get(i);
+
+	public static boolean IsSurroundingsOccupied(MyRobot robot, int[][] map, Position pos)
+	{
+		for (int i = -1; i < 1; i++)
+		{
+			for (int j = -1; j < 1; j++)
+			{
+				if (map[pos.y + i][pos.x + j] == 0)
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	public static Position RandomNonResourceAdjacentPosition(MyRobot robot, Position pos)
+	{
+		int[][] robots = robot.getVisibleRobotMap();
+		boolean[][] fuelMap = robot.getFuelMap();
+		boolean[][] karbMap = robot.getKarboniteMap();
+		for (int i = -1; i < 1; i++)
+		{
+			for (int j = -1; j < 1; j++)
+			{
+				if (robots[pos.y + i][pos.x + j] == 0 && fuelMap[pos.y + i][pos.x + j] == false && karbMap[pos.y + i][pos.x + j] == false)
+				{
+					return new Position(pos.y + i, pos.x + j);
+				}
 			}
 		}
 		return null;
