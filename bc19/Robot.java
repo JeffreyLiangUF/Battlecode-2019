@@ -1,6 +1,5 @@
 package bc19;
 
-import java.util.ArrayList;
 
 public class Robot {
 	public int id;
@@ -9,6 +8,7 @@ public class Robot {
 	public int y;
 	public int unit;
     public int turn;
+    public int time;
 
 	public int health;
 	public int karbonite;

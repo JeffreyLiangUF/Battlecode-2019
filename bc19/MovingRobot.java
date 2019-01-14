@@ -6,52 +6,109 @@ import java.util.Queue;
 
 public class MovingRobot {
 
-	public static float[][] UpdateFlood(MyRobot robo, boolean map[][], float[][] floodMap, float stepDistance) {
+	public static float[][] UpdateFlood(MyRobot robo, boolean map[][], float[][] floodMap, int stepDistance,
+			int hopDistance, boolean refine) {
+
 		ArrayList<Position> boundaries = new ArrayList<>();
 		for (int y = 0; y < map.length; y++) {
 			for (int x = 0; x < map[0].length; x++) {
 				if (!map[y][x]) {
-					for (int i = -1; i < 1; i++) {
-						for (int j = -1; j < 1; j++) {
-							Position pos = new Position(y+i, x+j);
-							if(Helper.inMap(map, pos) &&  floodMap[y+i][x+j] > 0){
+					AddBoundary(boundaries, map, floodMap, new Position(y, x));
+				}
+			}
+		}
 
-								boundaries.add(pos);
+		ArrayList<Position> hopPositions = new ArrayList<>();
+		for (int i = 0; i < boundaries.size(); i++) {
+			for (int y = -stepDistance; y < stepDistance; y++) {
+				for (int x = -stepDistance; x <= -stepDistance + 1; x++) {
+					Position pos1 = new Position(boundaries.get(i).y + y, boundaries.get(i).x + x);
+					if (Helper.inMap(map, pos1) && floodMap[pos1.y][pos1.x] > 0) {
+						Position pos2 = boundaries.get(i);
+						float pos1Value = floodMap[pos1.y][pos1.x];
+						float pos2Value = floodMap[pos2.y][pos2.x];
+						if (Math.abs(pos1Value - pos2Value) > hopDistance && Boundary(map, pos1)) {
+							if (Helper.DistanceSquared(pos1, pos2) <= stepDistance * stepDistance) {
+								if (pos1Value > pos2Value) {
+									floodMap[pos1.y][pos1.x] = pos2Value + stepDistance;
+									hopPositions.add(pos1);
+								} else {
+									floodMap[pos2.y][pos2.x] = pos1Value + stepDistance;
+									hopPositions.add(pos2);
+								}
+							}
+						}
+					}
+				}
+				for (int x = stepDistance - 1; x <= stepDistance; x++) {
+					Position pos1 = new Position(boundaries.get(i).y + y, boundaries.get(i).x + x);
+					if (Helper.inMap(map, pos1) && floodMap[pos1.y][pos1.x] > 0) {
+						Position pos2 = boundaries.get(i);
+						float pos1Value = floodMap[pos1.y][pos1.x];
+						float pos2Value = floodMap[pos2.y][pos2.x];
+						if (Math.abs(pos1Value - pos2Value) > hopDistance && Boundary(map, pos1)) {
+							if (Helper.DistanceSquared(pos1, pos2) <= stepDistance * stepDistance) {
+								if (pos1Value > pos2Value) {
+									floodMap[pos1.y][pos1.x] = pos2Value + stepDistance;
+									hopPositions.add(pos1);
+								} else {
+									floodMap[pos2.y][pos2.x] = pos1Value + stepDistance;
+									hopPositions.add(pos2);
+								}
 							}
 						}
 					}
 				}
 			}
 		}
-		ArrayList<Position> hopPositions = new ArrayList<>();
-		for (int i = 0; i < boundaries.size(); i++) {
-			for (int j = i; j < boundaries.size(); j++) {
-				Position pos1 = boundaries.get(i);
-				Position pos2 = boundaries.get(j);
-				if(/*Math.abs(floodMap[pos1.y][pos1.x] - floodMap[pos2.y][pos2.x]) > stepDistance &&*/ Helper.DistanceSquared(pos1, pos2) <= stepDistance * stepDistance){
-					if(floodMap[pos1.y][pos1.x] > floodMap[pos2.y][pos2.x]){
-						floodMap[pos1.y][pos1.x] = floodMap[pos2.y][pos2.x] + 1;
-						hopPositions.add(pos1);
-					}
-					else{
-						floodMap[pos2.y][pos2.x] = floodMap[pos1.y][pos1.x] + 1;
-						hopPositions.add(pos2);
-					}
-				}
+		if (refine) {
+			for (int i = 0; i < hopPositions.size(); i++) {
+				 floodMap = ReiteratePath(robo, map, floodMap, hopPositions.get(i),
+				 floodMap[hopPositions.get(i).y][hopPositions.get(i).x]);
 			}
 		}
-		robo.log(" " + hopPositions.size());/*
-		for(int i = 0; i < hopPositions.size(); i++){
-			floodMap = ReiteratePath(map, floodMap, hopPositions.get(i), floodMap[hopPositions.get(i).y][hopPositions.get(i).x]);
-		}
-		
 
-*/
 		return floodMap;
 	}
 
-	public static float[][] ReiteratePath(boolean[][] map, float[][] floodPath, Position pos, float stopValue){
-		float[][] singleStep = floodPath;//may have a java copy problem
+	public static void AddBoundary(ArrayList<Position> boundaries, boolean[][] map, float[][] floodMap, Position pos) {
+		Position down = new Position(pos.y + 1, pos.x);
+		if (Helper.inMap(map, down) && floodMap[down.y][down.x] > 0) {
+			boundaries.add(down);
+		}
+		Position up = new Position(pos.y - 1, pos.x);
+		if (Helper.inMap(map, up) && floodMap[up.y][up.x] > 0) {
+			boundaries.add(up);
+		}
+		Position right = new Position(pos.y, pos.x + 1);
+		if (Helper.inMap(map, right) && floodMap[right.y][right.x] > 0) {
+			boundaries.add(right);
+		}
+		Position left = new Position(pos.y, pos.x - 1);
+		if (Helper.inMap(map, left) && floodMap[left.y][left.x] > 0) {
+			boundaries.add(left);
+		}
+	}
+
+	public static boolean Boundary(boolean[][] map, Position pos) {
+		if (Helper.inMap(map, new Position(pos.y - 1, pos.x)) && !map[pos.y - 1][pos.x]) {
+			return true;
+		}
+		if (Helper.inMap(map, new Position(pos.y + 1, pos.x)) && !map[pos.y + 1][pos.x]) {
+			return true;
+		}
+		if (Helper.inMap(map, new Position(pos.y, pos.x - 1)) && !map[pos.y][pos.x - 1]) {
+			return true;
+		}
+		if (Helper.inMap(map, new Position(pos.y, pos.x + 1)) && !map[pos.y][pos.x + 1]) {
+			return true;
+		}
+		return false;
+	}
+
+	public static float[][] ReiteratePath(MyRobot robo, boolean[][] map, float[][] floodPath, Position pos,
+			float stopValue) {
+		float[][] singleStep = floodPath;
 		Queue<PathingPosition> toBeVisited = new LinkedList<>();
 		toBeVisited.add(new PathingPosition(pos, stopValue - 1));
 		while (toBeVisited.size() > 0) {
@@ -85,7 +142,9 @@ public class MovingRobot {
 						}
 						Position relativePosition = new Position(removed.pos.y + y, removed.pos.x + x);
 						PathingPosition relative = new PathingPosition(relativePosition, newCumulitive);
-						if (Helper.inMap(map, relative.pos) && singleStep[relative.pos.y][relative.pos.x] > stopValue) {
+
+						if (Helper.inMap(map, relative.pos)
+								&& singleStep[relative.pos.y][relative.pos.x] > singleStep[removed.pos.y][removed.pos.x]) {
 							toBeVisited.add(relative);
 							singleStep[relative.pos.y][relative.pos.x] = -2;
 						}
@@ -93,7 +152,6 @@ public class MovingRobot {
 				}
 			}
 		}
-		singleStep[pos.y][pos.x] = 0;
 		return singleStep;
 	}
 

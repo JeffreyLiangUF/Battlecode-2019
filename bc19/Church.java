@@ -3,7 +3,6 @@ package bc19;
 public class Church implements Machine{
 
 	MyRobot robot;
-	int turn = 0;
 	int ourTeam; //red:0 blue:1
 	Position location;
 	boolean mapIsHorizontal;

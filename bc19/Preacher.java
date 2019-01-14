@@ -4,7 +4,6 @@ import java.util.ArrayList;
 public class Preacher extends MovingRobot implements Machine{
 	
     MyRobot robot;
-    int turn = 0;
 	int ourTeam; //red:0 blue:1
 	Position location;
 	boolean initialized;
@@ -18,8 +17,7 @@ public class Preacher extends MovingRobot implements Machine{
 	}
 
 	public Action Execute(){
-		turn++;
-		if (turn == 1)
+		if (robot.me.turn == 1)
 		{
 			castleLocations = new ArrayList<>();
 		}
@@ -31,7 +29,7 @@ public class Preacher extends MovingRobot implements Machine{
 	}
 
 	void Initialize(){
-		if (turn == 1){
+		if (robot.me.turn == 1){
 			InitializeVariables();
 		}
 		if (!initialized){

@@ -8,7 +8,6 @@ public class Pilgrim extends MovingRobot implements Machine{
   
     MyRobot robot;
     int ourTeam; //red:0 blue:1
-    int turn = 0;
     Position location;
     boolean mapIsHorizontal;
     PilgrimState state;

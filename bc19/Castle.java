@@ -7,7 +7,6 @@ import java.util.Map;
 public class Castle implements Machine {
 
     MyRobot robot;
-    int turn = 0;
     boolean initialized = false;
     boolean mapIsHorizontal;
     int ourTeam;// red: 0 blue: 1
@@ -25,7 +24,6 @@ public class Castle implements Machine {
     }
 
     public Action Execute() {
-        turn++;
 
         if (!initialized) {
             Initialize();
@@ -33,14 +31,14 @@ public class Castle implements Machine {
 
         // these two falses can be info we send
         // 1 bit is gardern 10 karb or fill
-        if(turn < 6){
+        if(robot.me.turn < 6){
         DeclareAllyCastlePositions(false, false, 2);
         }
         return null;
     }
 
     void Initialize() {
-        if (turn == 1) {
+        if (robot.me.turn == 1) {
             InitializeVariables();
         }
         if (!initialized) {
