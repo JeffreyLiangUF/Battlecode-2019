@@ -54,5 +54,20 @@ public class Prophet extends MovingRobot implements Machine{
 		Robot[] robots = robot.getVisibleRobots();
 		Position attackTile = null;
 		int lowestID = Integer.MAX_VALUE;
-	}
+		for (int i = 0; i < robots.length; i++)
+		{
+			Position visibleRobot = new Position(robots[i].y, robots[i].x);
+			float withinRange = Helper.DistanceSquared(visibleRobot, location);
+			if (robots[i].team != ourTeam && withinRange <= robot.SPECS.UNITS[robot.me.unit].VISION_RADIUS)
+			{
+				int robotID = robots[i].id;
+				if (robotID < lowestID)
+				{
+					lowestID = robotID;
+					attackTile = visibleRobot;
+				}
+			}
+		}
+		return robot.attack(attackTile.x - location.x, attackTile.y - location.y);
+	}	
 }
