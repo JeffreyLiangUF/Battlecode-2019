@@ -13,9 +13,9 @@ public class Pilgrim extends MovingRobot implements Machine{
     boolean mapIsHorizontal;
     PilgrimState state;
     boolean initialized;
-    HashMap<Position, int[][]> karbRoutes;
-    HashMap<Position, int[][]> fuelRoutes;
-    HashMap<Position, int[][]> ourDropOffRoutes;
+    HashMap<Position, float[][]> karbRoutes;
+    HashMap<Position, float[][]> fuelRoutes;
+    HashMap<Position, float[][]> ourDropOffRoutes;
     Position dropOff;
     int waitCounter = 0;
     int waitMax = 2;
