@@ -146,7 +146,7 @@ public class Pilgrim extends MovingRobot implements Machine{
             }
         }
     }
-
+/*
     public Action GoToMine(boolean karbResource)
     {
         Position nearest = GetNearestResource(karbResource);
@@ -177,7 +177,7 @@ public class Pilgrim extends MovingRobot implements Machine{
             //move towards
         }
     }
-
+*/
     public void WhatToMine()
     {
         if (maxKarb == emergencyAmount)

@@ -29,7 +29,8 @@ public class MyRobot extends BCAbstractRobot {
 
 		if (debugTurn == 1) {
 			Position tester = new Position(30, 10);
-			float[][] test = MovingRobot.CreateSingleStepFlood(map, tester);
+			float[][] test = MovingRobot.CreateLayeredFloodPath(map, tester);
+			MovingRobot.UpdateFlood(this, map, test, 3);
 			for (int i = 0; i < test.length; i++) {
 				String cat = "";
 				for (int j = 0; j < test.length; j++) {
@@ -46,14 +47,16 @@ public class MyRobot extends BCAbstractRobot {
 				}
 				log(cat);
 			}
-
+		}	
+	
 			
-		}return robot.Execute();
+		return robot.Execute();
 	}
 }
 class Position {
 	int y;
 	int x;
+
 
 	public Position(int y, int x) {
 		this.y = y;

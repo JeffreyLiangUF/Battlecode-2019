@@ -47,7 +47,7 @@ public class Preacher extends MovingRobot implements Machine{
 		}
 		return robot.attack(visibleRobots[closestIndex].y - location.y, visibleRobots[closestIndex].x - location.x);	
 	}
-
+/*
 	public Action MoveToDefend()
 	{
 		Position enemyCastle = Helper.FindEnemyCastle(robot.map, mapIsHorizontal, closestCastle);
@@ -70,7 +70,7 @@ public class Preacher extends MovingRobot implements Machine{
 		}
 
 	}
-
+*/
 	void GetClosestCastle()
 	{
 		Position closestCastle = null;

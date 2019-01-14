@@ -6,45 +6,98 @@ import java.util.Queue;
 
 public class MovingRobot {
 
-	public static float[][] CreateLayeredFloodPath(boolean[][] map, Position pos, float stepDistance) {
-		float[][] singleStep = CreateSingleStepFlood(map, pos);
-		return singleStep;
-	}
+	public static float[][] UpdateFlood(MyRobot robo, boolean map[][], float[][] floodMap, float stepDistance) {
+		ArrayList<Position> boundaries = new ArrayList<>();
+		for (int y = 0; y < map.length; y++) {
+			for (int x = 0; x < map[0].length; x++) {
+				if (!map[y][x]) {
+					for (int i = -1; i < 1; i++) {
+						for (int j = -1; j < 1; j++) {
+							Position pos = new Position(y+i, x+j);
+							if(Helper.inMap(map, pos) &&  floodMap[y+i][x+j] > 0){
 
-	public static int[][] CreateStepFlood(boolean[][] map, Position pos, int stepDistance) {
-		int[][] multiStep = new int[map.length][map[0].length];
-		Queue<Position> toBeVisited = new LinkedList<>();
-		toBeVisited.add(pos);
-		int currentMapValue = 0;
-		while (toBeVisited.size() > 0) {
-			Position removed = toBeVisited.poll();
-			float distance = Helper.DistanceSquared(removed, pos);
-			if (distance > currentMapValue * currentMapValue) {
-				currentMapValue += stepDistance;
-			}
-			multiStep[removed.y][removed.x] = map[removed.y][removed.x] ? currentMapValue : -1;
-
-			for (int y = -stepDistance; y <= stepDistance; y++) {
-				for (int x = -stepDistance; x <= stepDistance; x++) {
-					Position relative = new Position(removed.y + y, removed.x + x);
-					float dist = Helper.DistanceSquared(removed, relative);
-					if (dist > stepDistance * stepDistance) {
-						continue;
+								boundaries.add(pos);
+							}
+						}
 					}
-					if (Helper.inMap(map, relative) && multiStep[relative.y][relative.x] == 0
-							&& Helper.DistanceSquared(pos, relative) > Helper.DistanceSquared(removed, pos)
-									+ (stepDistance - 1) * (stepDistance - 1)) {
-						toBeVisited.add(relative);
-						multiStep[relative.y][relative.x] = -2;
-					}
-
 				}
 			}
 		}
-		return multiStep;
+		ArrayList<Position> hopPositions = new ArrayList<>();
+		for (int i = 0; i < boundaries.size(); i++) {
+			for (int j = i; j < boundaries.size(); j++) {
+				Position pos1 = boundaries.get(i);
+				Position pos2 = boundaries.get(j);
+				if(/*Math.abs(floodMap[pos1.y][pos1.x] - floodMap[pos2.y][pos2.x]) > stepDistance &&*/ Helper.DistanceSquared(pos1, pos2) <= stepDistance * stepDistance){
+					if(floodMap[pos1.y][pos1.x] > floodMap[pos2.y][pos2.x]){
+						floodMap[pos1.y][pos1.x] = floodMap[pos2.y][pos2.x] + 1;
+						hopPositions.add(pos1);
+					}
+					else{
+						floodMap[pos2.y][pos2.x] = floodMap[pos1.y][pos1.x] + 1;
+						hopPositions.add(pos2);
+					}
+				}
+			}
+		}
+		robo.log(" " + hopPositions.size());/*
+		for(int i = 0; i < hopPositions.size(); i++){
+			floodMap = ReiteratePath(map, floodMap, hopPositions.get(i), floodMap[hopPositions.get(i).y][hopPositions.get(i).x]);
+		}
+		
+
+*/
+		return floodMap;
 	}
 
-	public static float[][] CreateSingleStepFlood(boolean[][] map, Position pos) {
+	public static float[][] ReiteratePath(boolean[][] map, float[][] floodPath, Position pos, float stopValue){
+		float[][] singleStep = floodPath;//may have a java copy problem
+		Queue<PathingPosition> toBeVisited = new LinkedList<>();
+		toBeVisited.add(new PathingPosition(pos, stopValue - 1));
+		while (toBeVisited.size() > 0) {
+			PathingPosition removed = toBeVisited.poll();
+			float cum = removed.cumulative;
+
+			for (int y = -1; y <= 1; y++) {
+				for (int x = -1; x <= 1; x++) {
+					if ((x * x + y * y) == 1 && Helper.inMap(map, new Position(removed.pos.y + y, removed.pos.x + x))) {
+						if (singleStep[removed.pos.y + y][removed.pos.x + x] > 0
+								&& (removed.cumulative - singleStep[removed.pos.y + y][removed.pos.x + x]) > 1) {
+							cum = singleStep[removed.pos.y + y][removed.pos.x + x] + 1;
+						}
+					}
+				}
+			}
+
+			singleStep[removed.pos.y][removed.pos.x] = map[removed.pos.y][removed.pos.x] ? cum : -1;
+
+			if (map[removed.pos.y][removed.pos.x]) {
+				for (int y = -1; y <= 1; y++) {
+					for (int x = -1; x <= 1; x++) {
+						float newCumulitive = cum;
+						if (x == 0 && y == 0) {
+							continue;
+						}
+						if (x * x == 1 && y * y == 1) {
+							newCumulitive += 1.4f;
+						} else {
+							newCumulitive += 1;
+						}
+						Position relativePosition = new Position(removed.pos.y + y, removed.pos.x + x);
+						PathingPosition relative = new PathingPosition(relativePosition, newCumulitive);
+						if (Helper.inMap(map, relative.pos) && singleStep[relative.pos.y][relative.pos.x] > stopValue) {
+							toBeVisited.add(relative);
+							singleStep[relative.pos.y][relative.pos.x] = -2;
+						}
+					}
+				}
+			}
+		}
+		singleStep[pos.y][pos.x] = 0;
+		return singleStep;
+	}
+
+	public static float[][] CreateLayeredFloodPath(boolean[][] map, Position pos) {
 		float[][] singleStep = new float[map.length][map[0].length];
 		Queue<PathingPosition> toBeVisited = new LinkedList<>();
 		toBeVisited.add(new PathingPosition(pos, 0));
@@ -52,13 +105,13 @@ public class MovingRobot {
 			PathingPosition removed = toBeVisited.poll();
 			float cum = removed.cumulative;
 
-			
 			for (int y = -1; y <= 1; y++) {
 				for (int x = -1; x <= 1; x++) {
 					if ((x * x + y * y) == 1 && Helper.inMap(map, new Position(removed.pos.y + y, removed.pos.x + x))) {
-							if (singleStep[removed.pos.y + y][removed.pos.x + x] > 0 && (removed.cumulative - singleStep[removed.pos.y + y][removed.pos.x + x]) > 2) {
-								cum = singleStep[removed.pos.y + y][removed.pos.x + x] + 1;
-							}
+						if (singleStep[removed.pos.y + y][removed.pos.x + x] > 0
+								&& (removed.cumulative - singleStep[removed.pos.y + y][removed.pos.x + x]) > 1) {
+							cum = singleStep[removed.pos.y + y][removed.pos.x + x] + 1;
+						}
 					}
 				}
 			}
@@ -95,7 +148,7 @@ public class MovingRobot {
 		return path[robot.me.y][robot.me.x];
 	}
 
-	Position FloodPathing(MyRobot robot, int[][] path)
+	Position FloodPathing(MyRobot robot, float[][] path)
 
 	{// needs to include use closest to goal of lowest number
 		if (path == null) {
@@ -103,8 +156,8 @@ public class MovingRobot {
 		}
 
 		Position[] validPositions = Helper.AllPassableInRange(robot.map, new Position(robot.me.y, robot.me.x),
-				robot.SPECS.UNITS[robot.me.unit].ATTACK_RADIUS);
-		int lowest = Integer.MAX_VALUE;
+				robot.SPECS.UNITS[robot.me.unit].SPEED);
+		float lowest = Integer.MAX_VALUE;
 		Position lowestPos = null;
 
 		for (int i = 0; i < validPositions.length; i++) {

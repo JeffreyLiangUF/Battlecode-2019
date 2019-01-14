@@ -12,12 +12,12 @@ public class Helper{
 		return true;	
 	}
 
-	public static Position[] AllPassableInRange(boolean[][] map, Position pos, int[] r)
+	public static Position[] AllPassableInRange(boolean[][] map, Position pos, int r)
 	{
 		ArrayList<Position> validPositions = new ArrayList<>();
-		for (int i = -r[1]; i <= r[1]; i++)
+		for (int i = -r; i <= r; i++)
 		{
-			for (int j = -r[1]; j <= r[1]; j++)
+			for (int j = -r; j <= r; j++)
 			{
 				int y = (pos.y + i);
 				int x = (pos.x + j);
@@ -29,7 +29,7 @@ public class Helper{
 					continue;
 				}
 				int distanceSquared = (y - pos.y) * (y - pos.y) + (x - pos.x) * (x - pos.x);
-				if (distanceSquared > r[1] || distanceSquared < r[0])
+				if (distanceSquared > r)
 				{
 					continue;
 				}
@@ -82,5 +82,13 @@ public class Helper{
 			return true;
 		}
 		return false;
+	}
+	public static Position ListContains(ArrayList<Position> list, Position pos){
+		for (int i = 0; i < list.size(); i++) {
+			if(list.get(i).x == pos.x && list.get(i).y == pos.y){
+				return list.get(i);
+			}
+		}
+		return null;
 	}
 }
