@@ -26,7 +26,6 @@ public class Prophet extends MovingRobot implements Machine{
 		initialized = ReadInitialSignals(robot, castleLocations);}
 		if(initialized && turn == 5){
 		for(int i = 0; i < castleLocations.size(); i++){
-			robot.log("I think a castle is at:  " + castleLocations.get(i).toString());
 		}}return null;
 	}
 

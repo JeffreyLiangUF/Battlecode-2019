@@ -130,7 +130,6 @@ public class Castle implements Machine {
 
     void DeclareAllyCastlePositions(boolean bit1, boolean bit2, int radius) {
         for(Map.Entry<Integer, Position> entry: ourCastles.entrySet()){
-            robot.log("We know: " + entry.getKey() + "   " + entry.getValue() + "  Our Castle is" + robot.id + "  "+ location.toString());
         }
 
         if (numCastles == 1) {
@@ -145,7 +144,6 @@ public class Castle implements Machine {
                 }
             }
             if (other.x >= 0 && other.y >= 0) {
-                robot.log(other.toString() + "  " + BinarySignalsForInitialization(bit1, bit2, other));
                 robot.signal(BinarySignalsForInitialization(bit1, bit2, other), radius);
             }
         } else {
@@ -158,8 +156,6 @@ public class Castle implements Machine {
                     }
                 }
                 if (other.x >= 0 && other.y >= 0) {
-                    robot.log(other.toString() + "  " + BinarySignalsForInitialization(bit1, bit2, other));
-
                     robot.signal(BinarySignalsForInitialization(bit1, bit2, other), radius);
                 }
             } else {
@@ -171,8 +167,6 @@ public class Castle implements Machine {
                     }
                 }
                 if (other.x >= 0 && other.y >= 0) {
-                    robot.log(other.toString() + "  " + BinarySignalsForInitialization(bit1, bit2, other));
-
                     robot.signal(BinarySignalsForInitialization(bit1, bit2, other), radius);
                 }
             }
