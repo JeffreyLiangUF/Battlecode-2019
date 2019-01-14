@@ -48,8 +48,10 @@ public class Preacher extends MovingRobot implements Machine{
 
 	public Action AttackClosest()
 	{
+		/*
 		Robot[] visibleRobots = robot.getVisibleRobots();
 		float leastDistance = Integer.MAX_VALUE;
+		int mostEnemies;
 		int closestIndex = -1;
 		for (int i = 0; i < visibleRobots.length; i++)
 		{
@@ -63,8 +65,70 @@ public class Preacher extends MovingRobot implements Machine{
 				}
 			}
 		}
-		return robot.attack(visibleRobots[closestIndex].y - location.y, visibleRobots[closestIndex].x - location.x);	
+		return robot.attack(visibleRobots[closestIndex].y - location.y, visibleRobots[closestIndex].x - location.x);
+		*/
+		int most = Integer.MIN_VALUE;
+		Position attackTile = null;
+		int visionRange = robot.SPECS.UNITS[robot.me.unit].VISION_RADIUS;
+		int visionRadius = (int)Math.sqrt(visionRange);
+		for (int i = -visionRadius; i <= visionRadius; i++)
+		{
+			for (int j = -visionRadius; j <= visionRadius; j++)
+			{
+				Position checkTile = new Position(location.y + i, location.x + j);
+				if (Helper.inMap(robot.map, attackTile) && Helper.DistanceSquared(attackTile, location) <= visionRange)
+				{
+					int mostEnemies = NumAdjacentEnemies(attackTile);
+					if (mostEnemies > most)
+					{
+						most = mostEnemies;
+						attackTile = checkTile;
+					}
+				}
+				else
+				{
+					continue;
+				}
+			}
+		}
+		return robot.attack(attackTile.x - location.x, attackTile.y - location.y);
 	}
+
+	public int NumAdjacentEnemies(Position pos)
+	{
+		int numEnemies = 0;
+		Robot[] robots = robot.getVisibleRobots();
+		for (int i = -1; i <= 1; i++)
+		{
+			for (int j = -1; j <= 1; j++)
+			{
+				for (int k = 0; k < robots.length; k++)
+				{
+					if (pos.y + i == robots[k].y && pos.x + j == robots[k].x)
+					{
+						if (robots[k].team == ourTeam && robots[k].unit == robot.SPECS.CASTLE)
+						{
+							numEnemies -= 8;
+						}
+						else if (robots[k].team == ourTeam)
+						{
+							numEnemies--;
+						}
+						else
+						{
+							numEnemies++;
+						}
+					}
+					else
+					{
+						continue;
+					}
+				}
+			}
+		}
+		return numEnemies;
+	}
+
 /*
 	public Action MoveToDefend()
 	{
