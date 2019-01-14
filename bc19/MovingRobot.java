@@ -95,7 +95,7 @@ public class MovingRobot {
 		return path[robot.me.y][robot.me.x];
 	}
 
-	Position FloodPathing(MyRobot robot, int[][] path)
+	Action FloodPathing(MyRobot robot, int[][] path)
 
 	{// needs to include use closest to goal of lowest number
 		if (path == null) {
@@ -114,7 +114,7 @@ public class MovingRobot {
 				lowestPos = validPositions[i];
 			}
 		}
-		return lowestPos;
+		return robot.move(lowestPos.x - robot.me.x, lowestPos.y - robot.me.y);
 	}
 
 	boolean ReadInitialSignals(MyRobot robot, ArrayList<Position> castleLocations) {

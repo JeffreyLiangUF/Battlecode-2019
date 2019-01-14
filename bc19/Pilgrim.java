@@ -72,7 +72,7 @@ public class Pilgrim extends MovingRobot implements Machine{
     public Action ReturnToDropOff(){
         if ((dropOff.x - location.x) * (dropOff.x - location.x) > 1 || (dropOff.y - location.y) * (dropOff.y - location.y) > 1)
         {
-            //move to dropOff
+            return FloodPathing(robot, ourDropOffRoutes.get(dropOff));
         }
         
         return robot.give(dropOff.x - location.x, dropOff.y - location.y, robot.me.karbonite, robot.me.fuel); 
@@ -174,7 +174,14 @@ public class Pilgrim extends MovingRobot implements Machine{
         else
         {
             state = PilgrimState.GoingToResource;
-            //move towards
+            if (karbResource == true)
+            {
+                return FloodPathing(robot, karbRoutes.get(nearest));
+            }
+            else
+            {
+                return FloodPathing(robot, fuelRoutes.get(nearest));
+            }
         }
     }
 

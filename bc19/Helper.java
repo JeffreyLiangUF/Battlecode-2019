@@ -73,7 +73,7 @@ public class Helper{
 		}
 		return null;
 	}
-	//boolean  inVision  robot pos
+	
 	public static boolean PositionInVision(MyRobot robot, Position pos)
 	{
 		Position robotPos = new Position(robot.me.y, robot.me.x);
@@ -82,5 +82,20 @@ public class Helper{
 			return true;
 		}
 		return false;
+	}
+
+	public static boolean IsSurroundingsOccupied(MyRobot robot, int[][] map, Position pos)
+	{
+		for (int i = -1; i < 1; i++)
+		{
+			for (int j = -1; j < 1; j++)
+			{
+				if (map[pos.y + i][pos.x + j] == 0)
+				{
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 }
