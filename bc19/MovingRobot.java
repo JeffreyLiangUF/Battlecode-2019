@@ -3,6 +3,7 @@ package bc19;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.HashMap;
 
 public class MovingRobot {
 
@@ -217,13 +218,31 @@ public class MovingRobot {
 		return singleStep;
 	}
 
+	float[][] GetOrCreateMap(MyRobot robot, HashMap<Position, float[][]> maps, Position pos){
+		if(maps.containsKey(pos)){
+			if(maps.get(pos)[pos.y][pos.x] <= 0){
+				float[][] newMap  = CreateLayeredFloodPath(robot.map, new Position(robot.me.y, robot.me.x), pos);
+				maps.put(pos, newMap);
+				return newMap;
+			}
+			else{
+				return maps.get(pos);
+			}
+		}
+		else{
+			float[][] newMap  = CreateLayeredFloodPath(robot.map, new Position(robot.me.y, robot.me.x), pos);
+			maps.put(pos, newMap);
+			return newMap;
+		}
+	}
+
 	int PathingDistance(MyRobot robot, int[][] path) {
 		return path[robot.me.y][robot.me.x];
 	}
 
 	Action FloodPathing(MyRobot robot, float[][] path)
 
-	{// needs to include use closest to goal of lowest number
+	{
 		if (path == null) {
 			return null;
 		}
