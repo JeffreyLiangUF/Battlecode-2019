@@ -1,1 +1,8 @@
+not stacking one tower
+move needs to move to second closest if in range
+
+
+
+
+
 maps going to tiles close to each other should be shared

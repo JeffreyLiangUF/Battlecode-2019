@@ -35,6 +35,9 @@ public class Pilgrim extends MovingRobot implements Machine{
         if (!initialized)
         {
             Initialize();
+            if(initialized){
+                state = PilgrimState.GoingToResource;
+            }
         }
         //IMPROVE ROUTES METHOD
         else
@@ -42,19 +45,20 @@ public class Pilgrim extends MovingRobot implements Machine{
             UpdateOccupiedResources();
             if (state == PilgrimState.GoingToResource)
             {
-                GoToMine();
+                return GoToMine();
             }
             if (state == PilgrimState.Mining)
             {
-                Mining();
+                return Mining();
             }
             if (state == PilgrimState.Returning)
             {
-                ReturnToDropOff();
+                return ReturnToDropOff();
             }  
         }
         
-		return robot.move(0, 1);
+        robot.log("My turn " + robot.me.turn + " No logic :(");
+		return null;
 
     }
 
@@ -63,6 +67,9 @@ public class Pilgrim extends MovingRobot implements Machine{
         mapIsHorizontal = Helper.FindSymmetry(robot.map);
         karbRoutes = new HashMap<>();
         fuelRoutes = new HashMap<>();
+        karbLocations = new ArrayList<>();
+        fuelLocations = new ArrayList<>();
+        dropOffLocations = new ArrayList<>();
         ourDropOffRoutes = new HashMap<>();
         location = new Position(robot.me.y, robot.me.x);
         state = PilgrimState.Initializing;
@@ -100,7 +107,7 @@ public class Pilgrim extends MovingRobot implements Machine{
             boolean[] signals = ReadInitialSignals(robot, dropOffLocations);
             initialized = signals[0];
             maxKarb = signals[2] ? emergencyAmount : karbThreshold;
-        }
+       }
     }
     void UpdateOccupiedResources()
     {
@@ -111,6 +118,7 @@ public class Pilgrim extends MovingRobot implements Machine{
             {
                 int yNew = robot.me.y + i, xNew = robot.me.x + i;
                 Position tile = new Position(yNew, xNew);
+                if(Helper.inMap(robot.map, tile)){
                 if (Helper.DistanceSquared(tile, location) > robot.SPECS.UNITS[robot.SPECS.PILGRIM].VISION_RADIUS)
                 {
                     continue;
@@ -128,6 +136,7 @@ public class Pilgrim extends MovingRobot implements Machine{
                 {
                     occupiedResources[yNew][xNew] = 2;
                 }
+            }
 
             }
         }
@@ -155,13 +164,14 @@ public class Pilgrim extends MovingRobot implements Machine{
         Position dropOff = GetNearestDropOff();       
         if ((dropOff.x - location.x) * (dropOff.x - location.x) > 1 || (dropOff.y - location.y) * (dropOff.y - location.y) > 1)
         {            
-            return FloodPathing(robot, GetOrCreateMap(robot, ourDropOffRoutes, dropOff));
+            return FloodPathing(robot, GetOrCreateMap(robot, ourDropOffRoutes, dropOff), dropOff);
         }
         state = PilgrimState.Dropoff;
         WhatToMine();
         ArrayList<Position> throwAway = new ArrayList<>();
         boolean[] signals = ReadInitialSignals(robot, throwAway);//ignores castle positions already know them
         maxKarb = signals[2] ? emergencyAmount : karbThreshold;//just updates mining style
+        state = PilgrimState.GoingToResource;
         return robot.give(dropOff.x - location.x, dropOff.y - location.y, robot.me.karbonite, robot.me.fuel); 
     }
 
@@ -190,6 +200,7 @@ public class Pilgrim extends MovingRobot implements Machine{
                 closest = pos;
             }
         }
+        robot.log("CLosest Resource Position : " + closest.toString());
         return closest;
     }
 
@@ -200,18 +211,19 @@ public class Pilgrim extends MovingRobot implements Machine{
     {
         Position nearest = GetNearestResource();
 
-
-
-        int movespeed = (int)robot.SPECS.UNITS[robot.me.unit].SPEED;
+        int movespeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
         if (nearest.y - location.y == 0 && nearest.x - location.x == 0)
         {
+            robot.log("1");
             state = PilgrimState.Mining;
             return robot.mine();
         }
-        else if (Helper.DistanceSquared(nearest, location) < movespeed)
-        {
+        else if (Helper.DistanceSquared(nearest, location) <= movespeed * movespeed)
+        {            robot.log("2");
+
             if (occupiedResources[nearest.y][nearest.x] == 2)
             {
+                robot.log("5");
                 waitCounter++;
                 if(waitCounter >= waitMax)
                 {
@@ -219,20 +231,24 @@ public class Pilgrim extends MovingRobot implements Machine{
                     GoToMine();
                 }
                 return null;
-            }
-
+            }else
+            
+            {
+                robot.log("6");
             return robot.move(nearest.x - location.x, nearest.y - location.y);
+            }
         }
         else
-        {
+        {            robot.log("3");
+
             state = PilgrimState.GoingToResource;
             if (miningKarb == true)
             {
-                return FloodPathing(robot, GetOrCreateMap(robot, karbRoutes, nearest));
+                return FloodPathing(robot, GetOrCreateMap(robot, karbRoutes, nearest), nearest);
             }
             else
             {
-                return FloodPathing(robot, GetOrCreateMap(robot, fuelRoutes, nearest));
+                return FloodPathing(robot, GetOrCreateMap(robot, fuelRoutes, nearest), nearest);
             }
         }
     }
@@ -282,7 +298,7 @@ public class Pilgrim extends MovingRobot implements Machine{
         }
 
         GetNearestDropOff();
-        if (FuelToReturn(ourDropOffRoutes.get(dropOff)) > returnFuelThreshold)
+        if (FuelToReturn(ourDropOffRoutes.get(GetNearestDropOff())) > returnFuelThreshold)
         {
             return true;
         }

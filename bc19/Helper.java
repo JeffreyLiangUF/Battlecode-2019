@@ -98,6 +98,25 @@ public class Helper{
 		}
 		return true;
 	}
+	public static Position RandomNonResourceAdjacentPositionInMoveRange(MyRobot robot, Position pos)
+	{
+		int[][] robots = robot.getVisibleRobotMap();
+		boolean[][] fuelMap = robot.getFuelMap();
+		boolean[][] karbMap = robot.getKarboniteMap();
+		for (int i = -1; i <= 1; i++)
+		{
+			for (int j = -1; j <= 1; j++)
+			{
+				Position adjacent = new Position(pos.y + i, pos.x + j);
+				if(Helper.inMap(robot.map, adjacent) && Helper.DistanceSquared(pos, adjacent) < robot.SPECS.UNITS[robot.me.unit].SPEED){
+					if (robot.map[adjacent.y][adjacent.x] && robots[adjacent.y][adjacent.x] == 0 && fuelMap[adjacent.y][adjacent.x] == false && karbMap[adjacent.y][adjacent.x] == false)
+				{
+					return new Position(pos.y + i, pos.x + j);
+				}}
+			}
+		}
+		return null;
+	}
 
 	public static Position RandomNonResourceAdjacentPosition(MyRobot robot, Position pos)
 	{
@@ -108,10 +127,12 @@ public class Helper{
 		{
 			for (int j = -1; j <= 1; j++)
 			{
-				if (robots[pos.y + i][pos.x + j] == 0 && fuelMap[pos.y + i][pos.x + j] == false && karbMap[pos.y + i][pos.x + j] == false)
+				if(Helper.inMap(robot.map, new Position(pos.y + i, pos.x + j))){
+				if (robot.map[pos.y + i][pos.x + j] && robots[pos.y + i][pos.x + j] == 0 && fuelMap[pos.y + i][pos.x + j] == false && karbMap[pos.y + i][pos.x + j] == false)
 				{
 					return new Position(pos.y + i, pos.x + j);
 				}
+			}
 			}
 		}
 		return null;

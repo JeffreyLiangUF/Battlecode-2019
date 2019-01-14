@@ -240,11 +240,25 @@ public class MovingRobot {
 		return path[robot.me.y][robot.me.x];
 	}
 
-	Action FloodPathing(MyRobot robot, float[][] path)
+	Action FloodPathing(MyRobot robot, float[][] path, Position goal)
 
 	{
 		if (path == null) {
 			return null;
+		}
+		int moveSpeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
+		if(Helper.DistanceSquared(new Position(robot.me.y, robot.me.x), goal) <= moveSpeed){
+			if(robot.getVisibleRobotMap()[goal.y][goal.x] == 0){
+				return robot.move(goal.x - robot.me.x, goal.y - robot.me.y);
+			}
+			Position adj = Helper.RandomNonResourceAdjacentPositionInMoveRange(robot, goal);
+			if(adj != null){
+				return robot.move(adj.x - robot.me.x, adj.y - robot.me.y);
+			}
+			else{
+				robot.log("Rare Case Shouldn't be occuring");
+				return null;
+			}
 		}
 
 		Position[] validPositions = Helper.AllPassableInRange(robot.map, new Position(robot.me.y, robot.me.x),
@@ -276,19 +290,18 @@ public class MovingRobot {
 			castleLocations.add(spawnCastlePos);
 		}
 		int signal = spawnCastle.signal;
-		if (signal == -1) {
-			outputRead[0] = true;
-			return outputRead;
-		}
+		
 		int x = signal & 63;
 		signal -= x;
 		signal >>= 6;
 		int y = signal & 63;
 		signal -= y;
 		signal >>= 6;
-
 		int numCastle = signal & 3;
-
+		if (numCastle == 1) {
+			outputRead[0] = true;
+			return outputRead;
+		}
 		signal -= numCastle;
 		signal >>= 2;
 		outputRead[2] = (signal & 1) == 1 ? true : false;

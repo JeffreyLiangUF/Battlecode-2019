@@ -44,7 +44,7 @@ public class Prophet extends MovingRobot implements Machine{
 		castleLocations = new ArrayList<>();
 		initialized = false;
 	}
-	
+	/*
 	public Action AttackClosest()
 	{
 		//get robots in vision
@@ -54,5 +54,5 @@ public class Prophet extends MovingRobot implements Machine{
 		Robot[] robots = robot.getVisibleRobots();
 		Position attackTile = null;
 		int lowestID = Integer.MAX_VALUE;
-	}
+	}*/
 }

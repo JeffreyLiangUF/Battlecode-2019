@@ -18,8 +18,7 @@ public class Castle implements Machine {
     int idDone;
     int positionInSpawnOrder = 0;
     CastleState state;
-    int[] spawnOrder = {robot.SPECS.PILGRIM, robot.SPECS.PREACHER, robot.SPECS.PREACHER , robot.SPECS.PREACHER, robot.SPECS.PILGRIM};
-
+    int[] spawnOrder;
     // hashmap of ids and unit types to keep track of number of assualt units and
     // such
 
@@ -32,7 +31,7 @@ public class Castle implements Machine {
         if (!initialized) {
             Initialize();
         }
-        if(state == CastleState.DisabledInitial){
+        if(initialized && state == CastleState.DisabledInitial){
             Position closest = ClosestCastleToKarb();
             if(closest.y == location.y && closest.x == location.x){
                 state = CastleState.EnabledInitial;
@@ -49,8 +48,9 @@ public class Castle implements Machine {
         if(positionInSpawnOrder < spawnOrder.length){
             Position spawnPosition = Helper.RandomNonResourceAdjacentPosition(robot, location);
             if(Helper.CanAfford(robot, spawnOrder[positionInSpawnOrder])){
-                positionInSpawnOrder++;
-                return robot.buildUnit(spawnOrder[positionInSpawnOrder], spawnPosition.x - location.x, spawnPosition.y - location.y);
+                int robotType = spawnOrder[positionInSpawnOrder];
+                positionInSpawnOrder++;                
+                return robot.buildUnit(robotType, spawnPosition.x - location.x, spawnPosition.y - location.y);
                 
             }
         }
@@ -62,7 +62,7 @@ public class Castle implements Machine {
             //if alot set state to attacking
         }
         if(state == CastleState.Mobilizing){
-            robot.signal(65535, 100);
+            //robot.signal(65535, 100);
         }
         boolean Attacking = state == CastleState.Mobilizing ? true : false;
         boolean EmergencyMining = positionInSpawnOrder < spawnOrder.length ? true : false;
@@ -83,6 +83,7 @@ public class Castle implements Machine {
     }
 
     void InitializeVariables() {
+        spawnOrder = new int[]{robot.SPECS.PILGRIM, robot.SPECS.PREACHER, robot.SPECS.PREACHER , robot.SPECS.PREACHER, robot.SPECS.PILGRIM};
         mapIsHorizontal = Helper.FindSymmetry(robot.map);
         ourTeam = robot.me.team == robot.SPECS.RED ? 0 : 1;
         ourCastles = new HashMap<>();
@@ -161,9 +162,6 @@ public class Castle implements Machine {
     }
 
     void DeclareAllyCastlePositions(boolean bit1, boolean bit2, int radius) {
-        for(Map.Entry<Integer, Position> entry: ourCastles.entrySet()){
-        }
-
         if (numCastles == 1) {
             return;
         }
@@ -206,13 +204,13 @@ public class Castle implements Machine {
     }
 
     int BinarySignalsForInitialization(boolean bit1, boolean bit2, Position pos) {
-        short output = (short)(bit1 ? 1 : 0);
+        int output = bit1 ? 1 : 0;
         output <<= 1;
         output += bit2 ? 1 : 0;
-        output <<= 1;
-        output += numCastles;
 
         output <<= 2;
+        output += numCastles;
+        
         output <<= 6;
         output += pos.y;
         output <<= 6;
