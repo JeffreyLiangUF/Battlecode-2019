@@ -17,6 +17,7 @@ public class Castle implements Machine {
     HashMap<Integer, Position> enemyCastles;// ids are just ourCastles ID's
     int idDone;
     int positionInSpawnOrder = 0;
+    CastleState state;
     int[] spawnOrder = {robot.SPECS.PILGRIM, robot.SPECS.PREACHER, robot.SPECS.PREACHER , robot.SPECS.PREACHER, robot.SPECS.PILGRIM};
 
     // hashmap of ids and unit types to keep track of number of assualt units and
@@ -31,6 +32,18 @@ public class Castle implements Machine {
         if (!initialized) {
             Initialize();
         }
+        if(state == CastleState.DisabledInitial){
+            Position closest = ClosestCastleToKarb();
+            if(closest.y == location.y && closest.x == location.x){
+                state = CastleState.EnabledInitial;
+            }
+            else state = CastleState.DisabledInitial;
+        }
+       // else if(){
+          // castle gets eneabled
+            //metric that we are doing fine
+        //}
+
 
 
         if(positionInSpawnOrder < spawnOrder.length){
@@ -41,9 +54,19 @@ public class Castle implements Machine {
                 
             }
         }
-
-        //first false not used yet    second false is to tell miners its early game
-        DeclareAllyCastlePositions(false, false, 2);
+        else{
+            state = CastleState.Fortifying;
+        }
+        if(state == CastleState.Fortifying){
+            //check how many units nearby if a few then build more 
+            //if alot set state to attacking
+        }
+        if(state == CastleState.Mobilizing){
+            robot.signal(65535, 100);
+        }
+        boolean Attacking = state == CastleState.Mobilizing ? true : false;
+        boolean EmergencyMining = positionInSpawnOrder < spawnOrder.length ? true : false;
+        DeclareAllyCastlePositions(Attacking, EmergencyMining, 2);
         
         return null;
     }
@@ -51,6 +74,7 @@ public class Castle implements Machine {
     void Initialize() {
         if (robot.me.turn == 1) {
             InitializeVariables();
+            state = CastleState.DisabledInitial;
         }
         if (!initialized) {
             initialized = SetupAllyCastles();
