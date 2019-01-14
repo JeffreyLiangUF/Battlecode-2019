@@ -99,21 +99,21 @@ public class Pilgrim extends MovingRobot implements Machine{
         return robot.give(dropOff.x - location.x, dropOff.y - location.y, robot.me.karbonite, robot.me.fuel); 
     }
 
-    public float FuelToReturn(int[][] path)
+    public float FuelToReturn(float[][] path)
     {
-        int tilesFromTarget = path[location.y][location.x];
+        float tilesFromTarget = path[location.y][location.x];
         float amountOfMoves = (float)(tilesFromTarget / Math.sqrt(robot.SPECS.UNITS[robot.SPECS.PILGRIM].SPEED));
         return (float)(amountOfMoves * robot.SPECS.UNITS[robot.SPECS.PILGRIM].FUEL_PER_MOVE);
     }
 
     public Position GetNearestResource()
     {
-        HashMap<Position, int[][]> chosenRoute = miningKarb ? karbRoutes : fuelRoutes;
-        int lowest = Integer.MAX_VALUE;
+        HashMap<Position, float[][]> chosenRoute = miningKarb ? karbRoutes : fuelRoutes;
+        float lowest = Integer.MAX_VALUE;
         Position closest = null;
-        for (Map.Entry<Position, int[][]> pair : chosenRoute.entrySet())
+        for (Map.Entry<Position, float[][]> pair : chosenRoute.entrySet())
         {
-            int distance = pair.getValue()[location.y][location.x];
+            float distance = pair.getValue()[location.y][location.x];
             if (occupiedResources[pair.getKey().y][pair.getKey().x] != 1 && distance < lowest)
             {
                 lowest = distance;

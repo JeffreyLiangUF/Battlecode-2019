@@ -35,7 +35,7 @@ public class Preacher extends MovingRobot implements Machine{
 			InitializeVariables();
 		}
 		if (!initialized){
-			initialized = ReadInitialSignals(robot, castleLocations)
+			initialized = ReadInitialSignals(robot, castleLocations);
 		}
 	}
 
@@ -102,7 +102,6 @@ public class Preacher extends MovingRobot implements Machine{
 */
 	void GetClosestCastle()
 	{
-		Position closestCastle = null;
 		float least = Integer.MAX_VALUE;
 		for (Position castlePos : castleLocations)
 		{
