@@ -246,6 +246,7 @@ public class MovingRobot {
 		if (path == null) {
 			return null;
 		}
+		robot.log("Flood Pathing, Current Position is " + robot.me.y + ", " + robot.me.x + " and the goal is : " + goal.toString());
 		int moveSpeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
 		if(Helper.DistanceSquared(new Position(robot.me.y, robot.me.x), goal) <= moveSpeed){
 			if(robot.getVisibleRobotMap()[goal.y][goal.x] == 0){

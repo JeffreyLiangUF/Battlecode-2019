@@ -195,7 +195,7 @@ public class Pilgrim extends MovingRobot implements Machine{
                 chosenMaps.get(pos)[location.y][location.x] : 
                 Helper.DistanceSquared(pos, location);
 
-            if (occupiedResources[pos.y][pos.x] != 1 && distance < lowest)
+            if ((occupiedResources[pos.y][pos.x] != 1 || (location.y == pos.y && location.x == pos.x)) && distance < lowest)
             {
                 lowest = distance;
                 closest = pos;
@@ -215,16 +215,15 @@ public class Pilgrim extends MovingRobot implements Machine{
         int movespeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
         if (nearest.y - location.y == 0 && nearest.x - location.x == 0)
         {
-            robot.log("1");
+            robot.log("11111111111111");
             state = PilgrimState.Mining;
             return robot.mine();
         }
-        else if (Helper.DistanceSquared(nearest, location) <= movespeed * movespeed)
-        {            robot.log("2");
-
+        else if (Helper.DistanceSquared(nearest, location) <= movespeed)
+        { 
+            robot.log("22222222222222");
             if (occupiedResources[nearest.y][nearest.x] == 2)
             {
-                robot.log("5");
                 waitCounter++;
                 if(waitCounter >= waitMax)
                 {
@@ -235,13 +234,13 @@ public class Pilgrim extends MovingRobot implements Machine{
             }else
             
             {
-                robot.log("6");
-            return robot.move(nearest.x - location.x, nearest.y - location.y);
+                state = PilgrimState.Mining;
+                return robot.move(nearest.x - location.x, nearest.y - location.y);
             }
         }
         else
-        {            robot.log("3");
-
+        {
+            robot.log("333333333333333");
             state = PilgrimState.GoingToResource;
             if (miningKarb == true)
             {
