@@ -116,4 +116,11 @@ public class Helper{
 		}
 		return null;
 	}
+	public static boolean CanAfford(MyRobot robot, int unit){
+		if(robot.karbonite > robot.SPECS.UNITS[unit].CONSTRUCTION_KARBONITE && robot.fuel > robot.SPECS.UNITS[unit].CONSTRUCTION_FUEL){
+			return true;
+		}
+		return false;
+		
+	}
 }

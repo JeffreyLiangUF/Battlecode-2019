@@ -157,10 +157,10 @@ public class MovingRobot {
 		return singleStep;
 	}
 
-	public static float[][] CreateLayeredFloodPath(boolean[][] map, Position pos) {
+	public static float[][] CreateLayeredFloodPath(boolean[][] map, Position startPos, Position endPos) {
 		float[][] singleStep = new float[map.length][map[0].length];
 		Queue<PathingPosition> toBeVisited = new LinkedList<>();
-		toBeVisited.add(new PathingPosition(pos, 0));
+		toBeVisited.add(new PathingPosition(startPos, 0));
 		while (toBeVisited.size() > 0) {
 			PathingPosition removed = toBeVisited.poll();
 			float cum = removed.cumulative;
@@ -187,6 +187,10 @@ public class MovingRobot {
 
 			singleStep[removed.pos.y][removed.pos.x] = map[removed.pos.y][removed.pos.x] ? cum : -1;
 
+			if(removed.pos.y == endPos.y && removed.pos.x == endPos.x){
+				return singleStep;
+			}
+
 			if (map[removed.pos.y][removed.pos.x]) {
 				for (int y = -1; y <= 1; y++) {
 					for (int x = -1; x <= 1; x++) {
@@ -209,7 +213,7 @@ public class MovingRobot {
 				}
 			}
 		}
-		singleStep[pos.y][pos.x] = 0;
+		singleStep[startPos.y][startPos.x] = 0;
 		return singleStep;
 	}
 

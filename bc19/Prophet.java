@@ -21,7 +21,8 @@ public class Prophet extends MovingRobot implements Machine{
 			castleLocations = new ArrayList<>();
 		}
 		if(!initialized){
-		initialized = ReadInitialSignals(robot, castleLocations);}
+			boolean[] signals = ReadInitialSignals(robot, castleLocations);
+			initialized = signals[0];;}
 	
 		return null;
 	}
@@ -31,7 +32,8 @@ public class Prophet extends MovingRobot implements Machine{
             InitializeVariables();
         }
         if (!initialized) {
-            initialized = ReadInitialSignals(robot, castleLocations);
+            boolean[] signals = ReadInitialSignals(robot, castleLocations);
+			initialized = signals[0];
         }
     }
 

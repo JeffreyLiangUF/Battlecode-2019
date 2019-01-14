@@ -23,7 +23,8 @@ public class Preacher extends MovingRobot implements Machine{
 		}
 		if(!initialized)
 		{
-			initialized = ReadInitialSignals(robot, castleLocations);
+			boolean[] signals = ReadInitialSignals(robot, castleLocations);
+			initialized = signals[0];
 		}
 		return null;
 	}
@@ -33,7 +34,8 @@ public class Preacher extends MovingRobot implements Machine{
 			InitializeVariables();
 		}
 		if (!initialized){
-			initialized = ReadInitialSignals(robot, castleLocations);
+			boolean[] signals = ReadInitialSignals(robot, castleLocations);
+			initialized = signals[0];
 		}
 	}
 

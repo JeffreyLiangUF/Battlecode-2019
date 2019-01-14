@@ -8,7 +8,7 @@ public class MyRobot extends BCAbstractRobot {
 
 	public Action turn() {
 		debugTurn++;
-
+/*
 		if (robot == null) {
 			if (me.unit == SPECS.CASTLE) {
 				robot = new Castle(this);
@@ -24,10 +24,39 @@ public class MyRobot extends BCAbstractRobot {
 				robot = new Preacher(this);
 			}
 		}
-		
+		*/
 
-		return robot.Execute();
+		// return robot.Execute();
 
+		if (debugTurn == 1) {
+			for(int z = 0; z < 1; z++){
+			Position tester = new Position(30, 10);
+			float[][] test = MovingRobot.CreateLayeredFloodPath(map, tester, new Position(30,30));
+			MovingRobot.UpdateFlood(this, map, test, 3, 10, true);
+			for (int i = 0; i < test.length; i++) {
+				String cat = "";
+				for (int j = 0; j < test.length; j++) {
+					String out = "";
+					if (test[i][j] == -3) {
+						out = " " + " ";
+					} else {
+						out = " " + Math.round(test[i][j]);
+					}
+					if (out.length() < 3) {
+						out = " " + out;
+					}
+					cat += out;
+				}
+				log(cat);
+			}
+		log(" " + z);}
+		}	
+		if(debugTurn == 2){
+			log("Time : " + me.time);
+		}
+	
+		return null;	
+		//return robot.Execute();
 	}
 }
 class Position {

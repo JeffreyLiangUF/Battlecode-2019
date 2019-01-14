@@ -12,10 +12,12 @@ public class Castle implements Machine {
     int ourTeam;// red: 0 blue: 1
     int numCastles;
     Position location;
+
     HashMap<Integer, Position> ourCastles;
     HashMap<Integer, Position> enemyCastles;// ids are just ourCastles ID's
     int idDone;
-    int[] spawnOrder = {robot.SPECS.PILGRIM, robot.SPECS.PREACHER, robot.SPECS.PREACHER , robot.SPECS.PREACHER};
+    int positionInSpawnOrder = 0;
+    int[] spawnOrder = {robot.SPECS.PILGRIM, robot.SPECS.PREACHER, robot.SPECS.PREACHER , robot.SPECS.PREACHER, robot.SPECS.PILGRIM};
 
     // hashmap of ids and unit types to keep track of number of assualt units and
     // such
@@ -31,7 +33,16 @@ public class Castle implements Machine {
         }
 
 
+        if(positionInSpawnOrder < spawnOrder.length){
+            Position spawnPosition = Helper.RandomNonResourceAdjacentPosition(robot, location);
+            if(Helper.CanAfford(robot, spawnOrder[positionInSpawnOrder])){
+                positionInSpawnOrder++;
+                return robot.buildUnit(spawnOrder[positionInSpawnOrder], spawnPosition.x - location.x, spawnPosition.y - location.y);
+                
+            }
+        }
 
+        //first false not used yet    second false is to tell miners its early game
         DeclareAllyCastlePositions(false, false, 2);
         
         return null;
@@ -221,6 +232,9 @@ public class Castle implements Machine {
     }
     
 
+}
+enum CastleState{
+   EnabledInitial, DisabledInitial, Mobilizing, Fortifying     
 }
 
 class CastleLocation {
