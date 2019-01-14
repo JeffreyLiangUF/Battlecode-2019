@@ -10,6 +10,7 @@ public class Preacher extends MovingRobot implements Machine{
 	boolean mapIsHorizontal;
 	ArrayList<Position> castleLocations;
 	Position closestCastle;
+	PreacherState state;
  
 	public Preacher(MyRobot robot)
 	{
@@ -48,25 +49,6 @@ public class Preacher extends MovingRobot implements Machine{
 
 	public Action AttackClosest()
 	{
-		/*
-		Robot[] visibleRobots = robot.getVisibleRobots();
-		float leastDistance = Integer.MAX_VALUE;
-		int mostEnemies;
-		int closestIndex = -1;
-		for (int i = 0; i < visibleRobots.length; i++)
-		{
-			if (visibleRobots[i].team != ourTeam)
-			{
-				float distance = Helper.DistanceSquared(new Position(visibleRobots[i].y, visibleRobots[i].x), location);
-				if (distance < leastDistance)
-				{
-					leastDistance = distance; 
-					closestIndex = i;
-				}
-			}
-		}
-		return robot.attack(visibleRobots[closestIndex].y - location.y, visibleRobots[closestIndex].x - location.x);
-		*/
 		int most = Integer.MIN_VALUE;
 		Position attackTile = null;
 		int visionRange = robot.SPECS.UNITS[robot.me.unit].VISION_RADIUS;
@@ -132,6 +114,7 @@ public class Preacher extends MovingRobot implements Machine{
 /*
 	public Action MoveToDefend()
 	{
+		state = PreacherState.Fortifying;
 		Position enemyCastle = Helper.FindEnemyCastle(robot.map, mapIsHorizontal, closestCastle);
 		float distFromCastleToCastle = Helper.DistanceSquared(closestCastle, enemyCastle);
 		int movespeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
@@ -177,4 +160,9 @@ public class Preacher extends MovingRobot implements Machine{
 			}
 		}
 	}
+}
+
+enum PreacherState
+{
+	Fortifying, UnderSiege, Mobilizing
 }
