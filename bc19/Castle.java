@@ -15,6 +15,7 @@ public class Castle implements Machine {
     HashMap<Integer, Position> ourCastles;
     HashMap<Integer, Position> enemyCastles;// ids are just ourCastles ID's
     int idDone;
+    int[] spawnOrder = {robot.SPECS.PILGRIM, robot.SPECS.PREACHER, robot.SPECS.PREACHER , robot.SPECS.PREACHER};
 
     // hashmap of ids and unit types to keep track of number of assualt units and
     // such
@@ -29,11 +30,10 @@ public class Castle implements Machine {
             Initialize();
         }
 
-        // these two falses can be info we send
-        // 1 bit is gardern 10 karb or fill
-        if(robot.me.turn < 6){
+
+
         DeclareAllyCastlePositions(false, false, 2);
-        }
+        
         return null;
     }
 

@@ -26,37 +26,8 @@ public class MyRobot extends BCAbstractRobot {
 		}
 		
 
-		// return robot.Execute();
-
-		if (debugTurn == 1) {
-			for(int z = 0; z < 1; z++){
-			Position tester = new Position(30, 10);
-			float[][] test = MovingRobot.CreateLayeredFloodPath(map, tester);
-			MovingRobot.UpdateFlood(this, map, test, 3, 10, true);
-			/*for (int i = 0; i < test.length; i++) {
-				String cat = "";
-				for (int j = 0; j < test.length; j++) {
-					String out = "";
-					if (test[i][j] == -3) {
-						out = " " + " ";
-					} else {
-						out = " " + Math.round(test[i][j]);
-					}
-					if (out.length() < 3) {
-						out = " " + out;
-					}
-					cat += out;
-				}
-				log(cat);
-			}*/
-		log(" " + z);}
-		}	
-		if(debugTurn == 2){
-			log("Time : " + me.time);
-		}
-	
-			
 		return robot.Execute();
+
 	}
 }
 class Position {

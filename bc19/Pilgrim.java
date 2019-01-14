@@ -85,6 +85,7 @@ public class Pilgrim extends MovingRobot implements Machine{
 
     void Initialize()
     {
+        
         //10 karb or fuel bit sets max karb
     }
 

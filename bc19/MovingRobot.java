@@ -6,6 +6,8 @@ import java.util.Queue;
 
 public class MovingRobot {
 
+	
+
 	public static float[][] UpdateFlood(MyRobot robo, boolean map[][], float[][] floodMap, int stepDistance,
 			int hopDistance, boolean refine) {
 
@@ -163,16 +165,25 @@ public class MovingRobot {
 			PathingPosition removed = toBeVisited.poll();
 			float cum = removed.cumulative;
 
-			for (int y = -1; y <= 1; y++) {
-				for (int x = -1; x <= 1; x++) {
-					if ((x * x + y * y) == 1 && Helper.inMap(map, new Position(removed.pos.y + y, removed.pos.x + x))) {
-						if (singleStep[removed.pos.y + y][removed.pos.x + x] > 0
-								&& (removed.cumulative - singleStep[removed.pos.y + y][removed.pos.x + x]) > 1) {
-							cum = singleStep[removed.pos.y + y][removed.pos.x + x] + 1;
-						}
-					}
-				}
+			
+
+			Position down = new Position(removed.pos.y + 1, removed.pos.x);
+			Position up = new Position(removed.pos.y - 1, removed.pos.x);
+			Position right = new Position(removed.pos.y, removed.pos.x + 1);
+			Position left = new Position(removed.pos.y, removed.pos.x - 1);
+			if (Helper.inMap(map, down) && singleStep[down.y][down.x] > 0 && (removed.cumulative - singleStep[down.y][down.x]) > 1) {
+				cum = singleStep[down.y][down.x] + 1;
 			}
+			else if (Helper.inMap(map, up) && singleStep[up.y][up.x] > 0 && (removed.cumulative - singleStep[up.y][up.x]) > 1) {
+				cum = singleStep[up.y][up.x] + 1;
+			}
+			else if (Helper.inMap(map, right) && singleStep[right.y][right.x] > 0 && (removed.cumulative - singleStep[right.y][right.x]) > 1) {
+				cum = singleStep[right.y][right.x] + 1;
+			}
+			else if (Helper.inMap(map, left) && singleStep[left.y][left.x] > 0 && (removed.cumulative - singleStep[left.y][left.x]) > 1) {
+				cum = singleStep[left.y][left.x] + 1;
+			}		
+			
 
 			singleStep[removed.pos.y][removed.pos.x] = map[removed.pos.y][removed.pos.x] ? cum : -1;
 
@@ -228,7 +239,8 @@ public class MovingRobot {
 		return robot.move(lowestPos.x - robot.me.x, lowestPos.y - robot.me.y);
 	}
 
-	boolean ReadInitialSignals(MyRobot robot, ArrayList<Position> castleLocations) {
+	boolean[] ReadInitialSignals(MyRobot robot, ArrayList<Position> castleLocations) {
+		boolean[] outputRead = new boolean[3];
 		Robot spawnCastle = robot.me;
 		for (Robot r : robot.getVisibleRobots()) {
 			if (r.unit == robot.SPECS.CASTLE
@@ -242,7 +254,8 @@ public class MovingRobot {
 		}
 		int signal = spawnCastle.signal;
 		if (signal == -1) {
-			return true;
+			outputRead[0] = true;
+			return outputRead;
 		}
 		int x = signal & 63;
 		signal -= x;
@@ -250,13 +263,24 @@ public class MovingRobot {
 		int y = signal & 63;
 		signal -= y;
 		signal >>= 6;
+
 		int numCastle = signal & 3;
+
+		signal -= numCastle;
+		signal >>= 2;
+		outputRead[2] = (signal & 1) == 1 ? true : false;
+		signal -= signal & 1;
+		signal >>= 1;
+		outputRead[1] = (signal & 1) == 1 ? true : false;
+
 		if (numCastle == 2) {
 			castleLocations.add(new Position(y, x));
-			return true;
+			outputRead[0] = true;
+			return outputRead;
 		} else {
 			castleLocations.add(new Position(y, x));
-			return false;
+			outputRead[0] = false;
+			return outputRead;
 		}
 	}
 
