@@ -86,9 +86,9 @@ public class Helper{
 
 	public static boolean IsSurroundingsOccupied(MyRobot robot, int[][] map, Position pos)
 	{
-		for (int i = -1; i < 1; i++)
+		for (int i = -1; i <= 1; i++)
 		{
-			for (int j = -1; j < 1; j++)
+			for (int j = -1; j <= 1; j++)
 			{
 				if (map[pos.y + i][pos.x + j] == 0)
 				{
@@ -104,9 +104,9 @@ public class Helper{
 		int[][] robots = robot.getVisibleRobotMap();
 		boolean[][] fuelMap = robot.getFuelMap();
 		boolean[][] karbMap = robot.getKarboniteMap();
-		for (int i = -1; i < 1; i++)
+		for (int i = -1; i <= 1; i++)
 		{
-			for (int j = -1; j < 1; j++)
+			for (int j = -1; j <= 1; j++)
 			{
 				if (robots[pos.y + i][pos.x + j] == 0 && fuelMap[pos.y + i][pos.x + j] == false && karbMap[pos.y + i][pos.x + j] == false)
 				{
