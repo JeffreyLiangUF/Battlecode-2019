@@ -9,6 +9,7 @@ public class Pilgrim extends MovingRobot implements Machine{
     MyRobot robot;
     int ourTeam; //red:0 blue:1
     Position location;
+    Position dropOff;
     boolean mapIsHorizontal;
     PilgrimState state;
     boolean initialized;
@@ -152,7 +153,7 @@ public class Pilgrim extends MovingRobot implements Machine{
         return closest;
     }
     public Action ReturnToDropOff(){ 
-        Position dropOff = GetNearestDropOff();       
+        dropOff = GetNearestDropOff();       
         if ((dropOff.x - location.x) * (dropOff.x - location.x) > 1 || (dropOff.y - location.y) * (dropOff.y - location.y) > 1)
         {            
             return FloodPathing(robot, GetOrCreateMap(robot, ourDropOffRoutes, dropOff));
