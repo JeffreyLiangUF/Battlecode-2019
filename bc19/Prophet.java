@@ -24,10 +24,18 @@ public class Prophet extends MovingRobot implements Machine{
 		}
 		if(!initialized){
 		initialized = ReadInitialSignals(robot, castleLocations);}
-		if(initialized && turn == 5){
-		for(int i = 0; i < castleLocations.size(); i++){
-		}}return null;
+	
+		return null;
 	}
+
+	void Initialize() {
+        if (turn == 1) {
+            InitializeVariables();
+        }
+        if (!initialized) {
+            initialized = ReadInitialSignals(robot, castleLocations);
+        }
+    }
 
 	void InitializeVariables(){
         ourTeam = robot.me.team == robot.SPECS.RED ? 0 : 1;
@@ -35,5 +43,7 @@ public class Prophet extends MovingRobot implements Machine{
 		location = new Position(robot.me.y, robot.me.x);
 		castleLocations = new ArrayList<>();
 		initialized = false;
-    }
+	}
+	
+
 }

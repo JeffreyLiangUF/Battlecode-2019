@@ -15,7 +15,6 @@ public class Castle implements Machine {
     Position location;
     HashMap<Integer, Position> ourCastles;
     HashMap<Integer, Position> enemyCastles;// ids are just ourCastles ID's
-
     int idDone;
 
     // hashmap of ids and unit types to keep track of number of assualt units and
@@ -187,6 +186,42 @@ public class Castle implements Machine {
         output += pos.x;
         return output;
     }
+
+    Position ClosestCastleToKarb()
+    {
+        boolean[][] karbMap = robot.getKarboniteMap();
+        float lowestCastleDistance = Integer.MAX_VALUE;
+        Position closestCastle = null;
+        for (Position castlePos : ourCastles.values())
+        {
+            float lowestDist = Integer.MAX_VALUE;            
+            for (int i = 0; i < karbMap.length; i++)
+            {
+                for (int j = 0; j < karbMap[0].length; j++)
+                {
+                    if (karbMap[i][j] == true)
+                    {
+                        Position karb = new Position(i, j);
+                        float least = Helper.DistanceSquared(castlePos, karb);
+                        if (least < lowestDist)
+                        {
+                            lowestDist = least;
+                        }
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+            if(lowestDist < lowestCastleDistance){
+                lowestCastleDistance = lowestDist;
+                closestCastle = castlePos;
+            }
+        }
+        return closestCastle;
+    }
+    
 
 }
 
