@@ -45,5 +45,14 @@ public class Prophet extends MovingRobot implements Machine{
 		initialized = false;
 	}
 	
-
+	public Action AttackClosest()
+	{
+		//get robots in vision
+		//check if robots are enemy and in range
+		//loop to get position of lowest id robot
+		//attack lowest enemy id robot
+		Robot[] robots = robot.getVisibleRobots();
+		Position attackTile = null;
+		int lowestID = Integer.MAX_VALUE;
+	}
 }
