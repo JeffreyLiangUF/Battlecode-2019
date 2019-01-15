@@ -89,15 +89,7 @@ public class Preacher extends MovingRobot implements Machine{
 		previousHealth = robot.me.health;
 	}
 
-	public boolean EnemiesAround(){
-		Robot[] robots = robot.getVisibleRobots();
-		for(int i =0; i < robots.length; i++){
-			if(robots[i].team != ourTeam){
-				return true;
-			}
-		}
-		return false;
-	}
+	
 
 	public Action AttackEnemies()
 	{

@@ -239,6 +239,7 @@ public class MovingRobot {
 	int PathingDistance(MyRobot robot, int[][] path) {
 		return path[robot.me.y][robot.me.x];
 	}
+	
 
 	Action FloodPathing(MyRobot robot, float[][] path, Position goal)
 
@@ -323,6 +324,15 @@ public class MovingRobot {
 			outputRead[0] = false;
 			return outputRead;
 		}
+	}
+	public boolean EnemiesAround(MyRobot robot, int ourTeam){
+		Robot[] robots = robot.getVisibleRobots();
+		for(int i =0; i < robots.length; i++){
+			if(robots[i].team != ourTeam){
+				return true;
+			}
+		}
+		return false;
 	}
 	Action MoveCloser(MyRobot robot, Position pos){
 		int moveSpeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
