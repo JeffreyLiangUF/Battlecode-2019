@@ -38,18 +38,22 @@ public class Castle implements Machine {
             }
             else state = CastleState.DisabledInitial;
         }
+        
        // else if(){
           // castle gets eneabled
             //metric that we are doing fine
         //}
 
 
-
+        boolean Attacking = state == CastleState.Mobilizing ? true : false;
+        boolean EmergencyMining = positionInSpawnOrder < spawnOrder.length ? true : false;
         if(positionInSpawnOrder < spawnOrder.length){
             Position spawnPosition = Helper.RandomNonResourceAdjacentPosition(robot, location);
             if(Helper.CanAfford(robot, spawnOrder[positionInSpawnOrder])){
                 int robotType = spawnOrder[positionInSpawnOrder];
-                positionInSpawnOrder++;                
+                positionInSpawnOrder++;   
+                DeclareAllyCastlePositions(Attacking, EmergencyMining, 2);   
+                robot.log("declared ");          
                 return robot.buildUnit(robotType, spawnPosition.x - location.x, spawnPosition.y - location.y);
                 
             }
@@ -64,9 +68,9 @@ public class Castle implements Machine {
         if(state == CastleState.Mobilizing){
             //robot.signal(65535, 100);
         }
-        boolean Attacking = state == CastleState.Mobilizing ? true : false;
-        boolean EmergencyMining = positionInSpawnOrder < spawnOrder.length ? true : false;
+        
         DeclareAllyCastlePositions(Attacking, EmergencyMining, 2);
+        robot.log("declared ");
         
         return null;
     }
@@ -167,13 +171,13 @@ public class Castle implements Machine {
         }
 
         else if (numCastles == 2) {
-            Position other = new Position(-1, -1);
+            Position other = null;
             for (Integer id : ourCastles.keySet()) {
                 if (id != robot.id) {
                     other = ourCastles.get(id);
                 }
             }
-            if (other.x >= 0 && other.y >= 0) {
+            if (other != null && other.x >= 0 && other.y >= 0) {
                 robot.signal(BinarySignalsForInitialization(bit1, bit2, other), radius);
             }
         } else {
@@ -185,7 +189,7 @@ public class Castle implements Machine {
                         other = ourCastles.get(id);
                     }
                 }
-                if (other.x >= 0 && other.y >= 0) {
+                if (other != null && other.x >= 0 && other.y >= 0) {
                     robot.signal(BinarySignalsForInitialization(bit1, bit2, other), radius);
                 }
             } else {
@@ -196,7 +200,7 @@ public class Castle implements Machine {
                         other = ourCastles.get(id);
                     }
                 }
-                if (other.x >= 0 && other.y >= 0) {
+                if (other != null && other.x >= 0 && other.y >= 0) {
                     robot.signal(BinarySignalsForInitialization(bit1, bit2, other), radius);
                 }
             }

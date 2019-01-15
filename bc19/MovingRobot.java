@@ -249,11 +249,14 @@ public class MovingRobot {
 		robot.log("Flood Pathing, Current Position is " + robot.me.y + ", " + robot.me.x + " and the goal is : " + goal.toString());
 		int moveSpeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
 		if(Helper.DistanceSquared(new Position(robot.me.y, robot.me.x), goal) <= moveSpeed){
+			
 			if(robot.getVisibleRobotMap()[goal.y][goal.x] == 0){
+				
 				return robot.move(goal.x - robot.me.x, goal.y - robot.me.y);
 			}
 			Position adj = Helper.RandomNonResourceAdjacentPositionInMoveRange(robot, goal);
 			if(adj != null){
+				
 				return robot.move(adj.x - robot.me.x, adj.y - robot.me.y);
 			}
 			else{
@@ -262,7 +265,7 @@ public class MovingRobot {
 			}
 		}
 
-		Position[] validPositions = Helper.AllPassableInRange(robot.map, new Position(robot.me.y, robot.me.x),
+		Position[] validPositions = Helper.AllOpenInRange(robot, robot.map, new Position(robot.me.y, robot.me.x),
 				robot.SPECS.UNITS[robot.me.unit].SPEED);
 		float lowest = Integer.MAX_VALUE;
 		Position lowestPos = null;
@@ -274,6 +277,7 @@ public class MovingRobot {
 				lowestPos = validPositions[i];
 			}
 		}
+		robot.log("LOWEST : " + lowestPos.toString());
 		return robot.move(lowestPos.x - robot.me.x, lowestPos.y - robot.me.y);
 	}
 
@@ -282,34 +286,37 @@ public class MovingRobot {
 		Robot spawnCastle = robot.me;
 		for (Robot r : robot.getVisibleRobots()) {
 			if (r.unit == robot.SPECS.CASTLE
-					&& Helper.DistanceSquared(new Position(robot.me.y, robot.me.x), new Position(r.y, r.x)) < 2) {
+					&& Helper.DistanceSquared(new Position(robot.me.y, robot.me.x), new Position(r.y, r.x)) <= 3) {
 				spawnCastle = r;
 			}
 		}
 		Position spawnCastlePos = new Position(spawnCastle.y, spawnCastle.x);
+		robot.log("Positions : " + spawnCastlePos.toString() + "  " + robot.me.y + ", " + robot.me.x);
 		if (castleLocations.size() == 0) {
 			castleLocations.add(spawnCastlePos);
 		}
 		int signal = spawnCastle.signal;
-		
+		if(signal <= 0){
+			outputRead[0] = false;
+			return outputRead;
+		}
+		robot.log("Signal " + Position.convertBinary(signal));
 		int x = signal & 63;
-		signal -= x;
 		signal >>= 6;
 		int y = signal & 63;
-		signal -= y;
+		robot.log("CORDS " + y + " " + x);
 		signal >>= 6;
 		int numCastle = signal & 3;
+		robot.log("NUMBER OF CASTLES " + numCastle);
 		if (numCastle == 1) {
 			outputRead[0] = true;
 			return outputRead;
 		}
-		signal -= numCastle;
 		signal >>= 2;
 		outputRead[2] = (signal & 1) == 1 ? true : false;
-		signal -= signal & 1;
 		signal >>= 1;
 		outputRead[1] = (signal & 1) == 1 ? true : false;
-
+		
 		if (numCastle == 2) {
 			castleLocations.add(new Position(y, x));
 			outputRead[0] = true;

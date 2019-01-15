@@ -12,7 +12,7 @@ public class Helper{
 		return true;	
 	}
 
-	public static Position[] AllPassableInRange(boolean[][] map, Position pos, int r)
+	public static Position[] AllOpenInRange(MyRobot robot, boolean[][] map, Position pos, int r)
 	{
 		ArrayList<Position> validPositions = new ArrayList<>();
 		for (int i = -r; i <= r; i++)
@@ -21,11 +21,8 @@ public class Helper{
 			{
 				int y = (pos.y + i);
 				int x = (pos.x + j);
-				if (!inMap(map, new Position(y, x)))
+				if (!inMap(map, new Position(y, x)) || robot.getVisibleRobotMap()[y][x] != 0)
 				{
-					continue;
-				}
-				if(!map[y][x]){
 					continue;
 				}
 				int distanceSquared = (y - pos.y) * (y - pos.y) + (x - pos.x) * (x - pos.x);
