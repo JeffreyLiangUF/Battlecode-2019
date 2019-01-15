@@ -71,6 +71,7 @@ public class Helper{
 		return (pos2.y - pos1.y) * (pos2.y - pos1.y)  + (pos2.x - pos1.x) * (pos2.x - pos1.x);
 	}
 	
+	
     public static boolean FindSymmetry(boolean[][] map){
         boolean mapIsHorizontal = true;
 		for(int i = 0; i < map.length / 2; i++){
@@ -86,6 +87,13 @@ public class Helper{
 	
     public static Position FindEnemyCastle(boolean[][] map, boolean mapIsHorizontal, Position ourCastle){
         return mapIsHorizontal ? new Position(ourCastle.y, (map[0].length - 1) - ourCastle.x) : new Position((map.length - 1) - ourCastle.y, ourCastle.x);
+	}
+	public static ArrayList<Position> FindEnemyCastles(MyRobot robot, boolean mapIsHorizontal, ArrayList<Position> ourCastles){
+		ArrayList<Position> outputs = new ArrayList<>();
+		for(int i = 0 ; i < ourCastles.size(); i++){
+			outputs.add(FindEnemyCastle(robot.map, mapIsHorizontal, ourCastles.get(i)));
+		}
+		return outputs;
 	}
 	
 	public static Robot RobotAtPosition(MyRobot robot, Position pos)

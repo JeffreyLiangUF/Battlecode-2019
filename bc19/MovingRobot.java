@@ -2,6 +2,7 @@ package bc19;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 import java.util.HashMap;
 
@@ -216,6 +217,32 @@ public class MovingRobot {
 		}
 		singleStep[startPos.y][startPos.x] = 0;
 		return singleStep;
+	}
+
+	Position ClosestEnemyCastle(MyRobot robot, HashMap<Position, float[][]> maps){
+		float lowest = Integer.MAX_VALUE;
+		Position output = null;
+		for(Map.Entry<Position, float[][]> entry : maps.entrySet()){
+			if(entry.getValue()[robot.me.y][robot.me.x] < lowest){
+				lowest = entry.getValue()[robot.me.y][robot.me.x];
+				output = entry.getKey();
+			}
+		}
+		return output;
+	}
+
+	void UpgradeMaps(MyRobot robot, HashMap<Position, float[][]> maps){
+		if(robot.me.time > 100){
+			for(Map.Entry<Position, float[][]> entry : maps.entrySet()){
+				maps.put(entry.getKey(), CreateLayeredFloodPath(robot.map, entry.getKey(), new Position(200, 200)));
+			}
+		}
+		if(robot.me.time > 200){
+			for(Map.Entry<Position, float[][]> entry : maps.entrySet()){
+				int tileDistance = robot.SPECS.UNITS[robot.me.unit].SPEED;
+				maps.put(entry.getKey(), UpdateFlood(robot, robot.map, entry.getValue(), tileDistance, 8, true));
+			}
+		}
 	}
 
 	float[][] GetOrCreateMap(MyRobot robot, HashMap<Position, float[][]> maps, Position pos){
@@ -452,6 +479,15 @@ public class MovingRobot {
 		{
 			if (robots[i].signal == signal)
 			{
+				return true;
+			}
+		}
+		return false;
+	}
+	public boolean EnemiesAround(MyRobot robot, int ourTeam){
+		Robot[] robots = robot.getVisibleRobots();
+		for(int i =0; i < robots.length; i++){
+			if(robots[i].team != ourTeam){
 				return true;
 			}
 		}

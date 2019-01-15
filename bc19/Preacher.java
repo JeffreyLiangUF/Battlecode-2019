@@ -23,33 +23,34 @@ public class Preacher extends MovingRobot implements Machine{
 
 	public Action Execute(){	//Initializing, Fortifying, MovingToDefencePosition, UnderSiege, Mobilizing
 		location = new Position(robot.me.y, robot.me.x);
-
-		if(EnemiesAround()){
+	
+		if(EnemiesAround(robot, ourTeam)){
 			AttackEnemies();
-		}
+		}		
 		if(!initialized)
 		{
 			Initialize();
 		}
+		UpgradeMaps(robot, routesToEnemies);
 		UnderSiege();
 		if(state == PreacherState.UnderSiege){
-
+			//do underseige shit
 		}
 		if(state == PreacherState.Fortifying || state == PreacherState.MovingToDefencePosition){
-			//method to read battlecry;
-				//set to mobilizing
-				//check if getting attacked
-				//enter undersiege
+			if(WatchForSignal(robot, 65535)){
+				state= PreacherState.Mobilizing;
+			}
 			if(state == PreacherState.MovingToDefencePosition){
-				//If position is a valid spot
-					//set state to fortifying
-				// else try to find defence position
+				if(Helper.IsSurroundingsOccupied(robot, robot.getVisibleRobotMap(), location)){
+					state = PreacherState.Fortifying;
+				}
 			}		
 		}
-		
+		else if(state == PreacherState.Mobilizing){
+			Position closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);
+			CombatFloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle), closestEnemyCastle);
+		}
 
-
-		
 		return null;
 	}
 
@@ -61,6 +62,12 @@ public class Preacher extends MovingRobot implements Machine{
 		if (!initialized){
 			boolean[] signals = ReadInitialSignals(robot, castleLocations);			
 			initialized = signals[0];
+			if(initialized){
+				enemyCastleLocations = Helper.FindEnemyCastles(robot, mapIsHorizontal, castleLocations);
+				for(int i = 0; i < enemyCastleLocations.size(); i++){
+					GetOrCreateMap(robot, routesToEnemies, enemyCastleLocations.get(i));
+				}
+			}
 			if(initialized && signals[1]){
 				state = PreacherState.Mobilizing;
 			}
@@ -82,14 +89,13 @@ public class Preacher extends MovingRobot implements Machine{
 	}
 	
 	public void UnderSiege(){
-		if(previousHealth != robot.me.health && !EnemiesAround()){
+		if((previousHealth != robot.me.health && !EnemiesAround(robot, ourTeam)) || WatchForSignal(robot, 0)){
 			robot.signal(0, 9);
 			state = PreacherState.UnderSiege;
 		}		
 		previousHealth = robot.me.health;
 	}
 
-	
 
 	public Action AttackEnemies()
 	{
