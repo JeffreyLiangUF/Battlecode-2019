@@ -84,6 +84,7 @@ public class Preacher extends MovingRobot implements Machine{
 		castleLocations = new ArrayList<>();
 		enemyCastleLocations = new ArrayList<>();
 		routesToEnemies = new HashMap<>();
+		initialized = false;
 		previousHealth = robot.SPECS.UNITS[robot.me.unit].STARTING_HP;
 		GetClosestCastle();
 	}
@@ -160,7 +161,7 @@ public class Preacher extends MovingRobot implements Machine{
 		}
 		return numEnemies;
 	}
-/*
+
 	public Action MoveToDefend()
 	{
 		state = PreacherState.Fortifying;
@@ -195,7 +196,7 @@ public class Preacher extends MovingRobot implements Machine{
 		}
 		return null;
 	}
-*/
+
 	void GetClosestCastle()
 	{
 		float least = Integer.MAX_VALUE;
