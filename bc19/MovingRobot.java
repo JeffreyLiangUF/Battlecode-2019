@@ -379,6 +379,19 @@ public class MovingRobot {
 		}
 		return MoveCloser(robot, enemyCastle);
 	}
+
+	boolean WatchForSignal(MyRobot robot, int signal)
+	{
+		Robot[] robots = robot.getVisibleRobots();
+		for (int i = 0; i < robots.length; i++)
+		{
+			if (robots[i].signal == signal)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 }
 
 class PathingPosition {
