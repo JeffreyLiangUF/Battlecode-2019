@@ -231,7 +231,7 @@ public class Pilgrim extends MovingRobot implements Machine{
     {
         Position nearest = GetNearestResource();
 
-        robot.log("" + occupiedResources[nearest.y][nearest.x]);
+        robot.log("Nearest : " + nearest.toString() + "  Value :" + occupiedResources[nearest.y][nearest.x] + "X");
         int movespeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
         if (nearest.y - location.y == 0 && nearest.x - location.x == 0)
         {

@@ -276,6 +276,7 @@ public class MovingRobot {
 				lowestPos = validPositions[i];
 			}
 		}
+		robot.log("Lowest " + lowestPos.toString() + " " + robot.me.y + ", " + robot.me.x);
 		return robot.move(lowestPos.x - robot.me.x, lowestPos.y - robot.me.y);
 	}
 
