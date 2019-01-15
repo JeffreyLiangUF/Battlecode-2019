@@ -26,8 +26,12 @@ public class Preacher extends MovingRobot implements Machine {
 	public Action Execute() { // Initializing, Fortifying, MovingToDefencePosition, UnderSiege, Mobilizing
 		location = new Position(robot.me.y, robot.me.x);
 
+		if (robot.me.turn == 1) {
+			InitializeVariables();
+		}
+
 		if (EnemiesAround(robot, ourTeam)) {
-			AttackEnemies();
+			return AttackEnemies();
 		}
 		if (!initialized) {
 			Initialize();
@@ -44,13 +48,33 @@ public class Preacher extends MovingRobot implements Machine {
 				state = PreacherState.Mobilizing;
 			}
 			if (state == PreacherState.MovingToDefencePosition) {
-				if (Helper.IsSurroundingsOccupied(robot, robot.getVisibleRobotMap(), location)) {
+				if (Helper.IsSurroundingsOccupied(robot, robot.getVisibleRobotMap(), location, ourTeam) < 2) {
 					state = PreacherState.Fortifying;
+				} else {
+					GetClosestCastle();
+					return MoveToDefend();
 				}
 			}
 		} else if (state == PreacherState.Mobilizing) {
 			Position closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);
-			CombatFloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle), closestEnemyCastle);
+			Robot[] robots = robot.getVisibleRobots();
+			if (Helper.DistanceSquared(new Position(robot.me.y, robot.me.x),
+					closestEnemyCastle) <= robot.SPECS.UNITS[robot.me.unit].VISION_RADIUS) {
+				boolean absent = true;
+				for (int j = 0; j < robots.length; j++) {
+					if (robots[j].y == closestEnemyCastle.y && robots[j].x == closestEnemyCastle.x
+							&& robots[j].unit == robot.SPECS.CASTLE) {
+						absent = false;
+					}
+				}
+				if (absent) {
+					enemyCastleLocations.remove(closestEnemyCastle);
+					closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);
+				}
+			}
+
+			return CombatFloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle),
+					closestEnemyCastle, ourTeam);
 		}
 
 		return null;
@@ -58,7 +82,6 @@ public class Preacher extends MovingRobot implements Machine {
 
 	void Initialize() {
 		if (robot.me.turn == 1) {
-			InitializeVariables();
 			state = PreacherState.Initializing;
 		}
 		if (!initialized) {
@@ -92,7 +115,7 @@ public class Preacher extends MovingRobot implements Machine {
 	}
 
 	public void UnderSiege() {
-		if ((previousHealth != robot.me.health && !EnemiesAround(robot, ourTeam)) || WatchForSignal(robot, 0)) {
+		if (previousHealth != robot.me.health && (!EnemiesAround(robot, ourTeam) || WatchForSignal(robot, 0))) {
 			robot.signal(0, 9);
 			state = PreacherState.UnderSiege;
 		}
@@ -144,23 +167,23 @@ public class Preacher extends MovingRobot implements Machine {
 		return numEnemies;
 	}
 
-	public Action MoveToDefend() {
-		state = PreacherState.Fortifying;
+	Action MoveToDefend() {
+		Position robotPos = new Position(robot.me.y, robot.me.x);
 		Position enemyCastle = Helper.FindEnemyCastle(robot.map, mapIsHorizontal, closestCastle);
 		float distFromCastleToCastle = Helper.DistanceSquared(closestCastle, enemyCastle);
 		int movespeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
-		int visionRange = (int) Math.sqrt(robot.SPECS.UNITS[robot.me.unit].VISION_RADIUS);
+		int moveRange = (int) Math.sqrt(robot.SPECS.UNITS[robot.me.unit].SPEED);
 
-		for (int i = -visionRange; i < visionRange; i++) {
-			for (int j = -visionRange; j < visionRange; j++) {
-				Position defenceTile = new Position(location.y + i, location.x + j);
+		for (int i = -moveRange; i <= moveRange; i++) {
+			for (int j = -moveRange; j <= moveRange; j++) {
+				Position defenceTile = new Position(robot.me.y + i, robot.me.x + j);
 				float distFromTileToEnemyCastle = Helper.DistanceSquared(defenceTile, enemyCastle);
-
-				if (distFromTileToEnemyCastle < distFromCastleToCastle) {
-					if (Helper.IsSurroundingsOccupied(robot, robot.getVisibleRobotMap(), defenceTile) == false) {
-						float moveDistance = Helper.DistanceSquared(defenceTile, location);
+				if (Helper.inMap(robot.map, defenceTile) && robot.map[defenceTile.y][defenceTile.x]
+						&& distFromTileToEnemyCastle < distFromCastleToCastle) {
+					if (Helper.IsSurroundingsOccupied(robot, robot.getVisibleRobotMap(), defenceTile, ourTeam) < 2) {
+						float moveDistance = Helper.DistanceSquared(defenceTile, robotPos);
 						if (moveDistance <= movespeed) {
-							return robot.move(location.x - defenceTile.x, location.y - defenceTile.y);
+							return robot.move(defenceTile.x - robot.me.x, defenceTile.y - robot.me.y);
 						} else {
 							return MoveCloser(robot, defenceTile);
 						}
@@ -168,7 +191,7 @@ public class Preacher extends MovingRobot implements Machine {
 				}
 			}
 		}
-		return null;
+		return MoveCloser(robot, enemyCastle);
 	}
 
 	void GetClosestCastle() {

@@ -11,7 +11,7 @@ public class Church implements Machine{
 		this.robot = robot;
 	}
 
-	public Action Execute(){
+	public Action Execute(){/*
 		ourTeam = robot.me.team == robot.SPECS.RED ? 0 : 1;
 		location = new Position(robot.me.y, robot.me.x);
 
@@ -21,22 +21,22 @@ public class Church implements Machine{
 		if (resources > pilgrims)
 		{
 			Position buildHere = Helper.RandomNonResourceAdjacentPosition(robot, location);
-			if (buildHere != null)
+			if (buildHere != null && robot.karbonite >= 50 && robot.fuel > 250)
 			{
-				robot.buildUnit(robot.SPECS.PILGRIM, buildHere.x - location.x, buildHere.y - location.y);
+				return robot.buildUnit(robot.SPECS.PILGRIM, buildHere.x - location.x, buildHere.y - location.y);
 			}
-		}
+		}*/
 		return null;
 	}
 	
 	int ResourcesAround(){
-		int visionRadius = (int)Math.sqrt(robot.SPECS.UNITS[robot.me.unit].VISION_RADIUS);
+		int visionRadius = (int)Math.sqrt(robot.SPECS.UNITS[robot.me.unit].VISION_RADIUS) - 5;
 		int numResources = 0;
 		for (int i = -visionRadius; i <= visionRadius; i++)
 		{
 			for (int j = -visionRadius; j <= visionRadius; j++)
 				if (Helper.inMap(robot.map, new Position(location.y + i, location.x + j)) 
-				&& robot.getFuelMap()[location.y + i][location.x + j] && robot.getKarboniteMap()[location.y + i][location.x + j])
+				&& (robot.getFuelMap()[location.y + i][location.x + j] || robot.getKarboniteMap()[location.y + i][location.x + j]))
 				{
 					numResources++;
 				}
@@ -45,23 +45,13 @@ public class Church implements Machine{
 	}
 
 	int PilgrimsAround(){
-		int visionRadius = (int)Math.sqrt(robot.SPECS.UNITS[robot.me.unit].VISION_RADIUS);
 		Robot[] robots = robot.getVisibleRobots();
 		int numPilgrims = 0;
-		for (int i = -visionRadius; i <= visionRadius; i++)
-		{
-			for (int j = -visionRadius; j <= visionRadius; j++)
-			{
-				for (int k = 0; k < robots.length; k++)
-				{
-					Position robotPos = new Position(robots[k].y, robots[k].x);
-					if (Helper.inMap(robot.map, robotPos) && robots[k].unit == robot.SPECS.PILGRIM && robots[k].team == ourTeam)
-					{
-						numPilgrims++;
-					}
-				}
-			}	
-		}
+		for(int i = 0; i < robots.length; i++){
+			if(robots[i].unit == robot.SPECS.PILGRIM){
+				numPilgrims++;
+			}
+		}		
 		return numPilgrims;
 	}
 	

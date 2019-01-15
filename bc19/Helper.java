@@ -37,7 +37,7 @@ public class Helper{
 		return validPositions.toArray(new Position[validPositions.size()]);
 	}
 
-	public static Position[] AllOpenInRangeInFormation(MyRobot robot, boolean[][] map, Position pos, int r)
+	public static Position[] AllOpenInRangeInFormation(MyRobot robot, boolean[][] map, Position pos, int r, int ourTeam)
 	{
 		ArrayList<Position> validPositions = new ArrayList<>();
 		for (int i = -r; i <= r; i++)
@@ -57,7 +57,7 @@ public class Helper{
 				}
 				
 				Position valid = new Position(y, x);
-				if (IsSurroundingsOccupied(robot, robot.getVisibleRobotMap(), valid))
+				if (IsSurroundingsOccupied(robot, robot.getVisibleRobotMap(), valid, ourTeam) > 1)
 				{
 					continue;
 				}
@@ -86,7 +86,7 @@ public class Helper{
 	}
 	
     public static Position FindEnemyCastle(boolean[][] map, boolean mapIsHorizontal, Position ourCastle){
-        return mapIsHorizontal ? new Position(ourCastle.y, (map[0].length - 1) - ourCastle.x) : new Position((map.length - 1) - ourCastle.y, ourCastle.x);
+        return mapIsHorizontal ? new Position((map.length - 1) - ourCastle.y, ourCastle.x) : new Position(ourCastle.y, (map[0].length - 1) - ourCastle.x);
 	}
 	public static ArrayList<Position> FindEnemyCastles(MyRobot robot, boolean mapIsHorizontal, ArrayList<Position> ourCastles){
 		ArrayList<Position> outputs = new ArrayList<>();
@@ -119,19 +119,31 @@ public class Helper{
 		return false;
 	}
 
-	public static boolean IsSurroundingsOccupied(MyRobot robot, int[][] map, Position pos)
+	public static int IsSurroundingsOccupied(MyRobot robot, int[][] map, Position pos, int ourTeam)
 	{
+		int highest = 0;
 		for (int i = -2; i <= 2; i++)
 		{
 			for (int j = -2; j <= 2; j++)
 			{
-				if (map[pos.y + i][pos.x + j] > 0)
-				{
-					return true;
+				int numAllies = -1;
+				Position relative = new Position(pos.y + i, pos.x + j);
+				Robot[] robots = robot.getVisibleRobots();
+				for (int k = -1; k <= 1; k++) {
+					for (int l = -1; l <= 1; l++) {
+						for (int m = 0; m < robots.length; m++) {
+							if (relative.y + k == robots[m].y && relative.x + l == robots[m].x && robots[m].team == ourTeam) {
+								numAllies++;
+							}
+						}
+					}
 				}
-			}
+				if(numAllies > highest){
+					highest = numAllies;
+				}
+			}			
 		}
-		return false;
+		return highest;
 	}
 	public static Position RandomNonResourceAdjacentPositionInMoveRange(MyRobot robot, Position pos)
 	{

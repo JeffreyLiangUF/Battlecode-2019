@@ -16,7 +16,7 @@ public class MyRobot extends BCAbstractRobot {
 				log("I am a Castle");
 				robot = new Castle(this);
 			} else if (me.unit == SPECS.CHURCH) {
-				log("I am a Church");				
+				log("I am a ChuUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUrch");				
 				robot = new Church(this);
 			} else if (me.unit == SPECS.PILGRIM) {
 				log("I am a Pilgrim");

@@ -35,35 +35,44 @@ public class Pilgrim extends MovingRobot implements Machine {
     public Action Execute() {
         location = new Position(robot.me.y, robot.me.x);
         if (!initialized) {
-           // robot.log("Not intitialized Properly");
-            Initialize();
-            if (initialized) {
-                state = PilgrimState.GoingToResource;
+            if (!CheckForChurch()) {
+                Initialize();
+                if (initialized) {
+                    state = PilgrimState.GoingToResource;
+                }
+            }
+            else{
+                InitializeVariables();
+                maxKarb = 20;
+                initialized = true;
+                if (initialized) {
+                    state = PilgrimState.GoingToResource;
+                }
             }
         }
         // IMPROVE ROUTES METHOD
         else {
             UpdateOccupiedResources();
-            if(EnemiesAround(robot, ourTeam)){
+            if (EnemiesAround(robot, ourTeam)) {
                 return ReturnToDropOff();
             }
             if (state == PilgrimState.GoingToResource) {
-             //   robot.log("Off to Mine");
+             //    robot.log("Off to Mine");
                 return GoToMine();
             }
             if (state == PilgrimState.Mining) {
-             //   robot.log("Mining");
+           //      robot.log("Mining");
 
                 return Mining();
             }
             if (state == PilgrimState.Returning) {
-             //   robot.log("Returning to Dropoff");
+          //       robot.log("Returning to Dropoff");
                 CheckForChurch();
                 return ReturnToDropOff();
             }
         }
 
-   //     robot.log("My turn " + robot.me.turn + " No logic :(");
+        // robot.log("My turn " + robot.me.turn + " No logic :(");
         return null;
 
     }
@@ -201,6 +210,7 @@ public class Pilgrim extends MovingRobot implements Machine {
     Action GoToMine() {
         Position nearest = GetNearestResource();
 
+
         int movespeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
         if (nearest.y - location.y == 0 && nearest.x - location.x == 0) {
             state = PilgrimState.Mining;
@@ -235,17 +245,16 @@ public class Pilgrim extends MovingRobot implements Machine {
             miningKarb = true;
         } else if (robot.fuel < fuelThreshold) {
             miningKarb = false;
-        }
-        else if(robot.fuel > robot.karbonite * 8){
+        } else if (robot.fuel > robot.karbonite * 8) {
             miningKarb = true;
-        }
-        else{
+        } else {
             miningKarb = false;
         }
     }
 
     Action Mining() {
-        if (occupiedResources[location.y][location.x] == -1) {
+        if (occupiedResources[location.y][location.x] == -1
+                || (!robot.getKarboniteMap()[location.y][location.x] && !robot.getFuelMap()[location.y][location.x])) {
             state = PilgrimState.GoingToResource;
         }
         if (robot.me.karbonite >= maxKarb || robot.me.fuel >= maxFuel) {
@@ -295,17 +304,25 @@ public class Pilgrim extends MovingRobot implements Machine {
         return cost;
     }
 
-    void CheckForChurch() {
+    boolean CheckForChurch() {
         Robot[] robots = robot.getVisibleRobots();
         for (int i = 0; i < robots.length; i++) {
+            ourTeam = robot.me.team == robot.SPECS.RED ? 0 : 1;
             if (robots[i].unit == robot.SPECS.CHURCH && robots[i].team == ourTeam) {
+                if(dropOffLocations == null){
+                    dropOffLocations = new ArrayList<>();
+                    dropOffLocations.add(new Position(robots[i].y, robots[i].x));
+                    return true;
+                }
                 for (int j = 0; j < dropOffLocations.size(); j++) {
-                    if (robots[i].y != dropOffLocations.get(j).y && robots[i].x != dropOffLocations.get(j).x) {
+                    if (robots[i].y != dropOffLocations.get(j).y || robots[i].x != dropOffLocations.get(j).x) {
                         dropOffLocations.add(new Position(robots[i].y, robots[i].x));
+                        return true;
                     }
                 }
             }
         }
+        return false;
     }
 }
 
