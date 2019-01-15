@@ -32,7 +32,7 @@ public class Church implements Machine{
 
 	}
 
-	int PilgrimsArond(){
+	int PilgrimsAround(){
 		int visionRadius = (int)Math.sqrt(robot.SPECS.UNITS[robot.me.unit].VISION_RADIUS);
 	}
 	

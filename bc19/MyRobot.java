@@ -6,10 +6,11 @@ import java.util.HashMap;
 public class MyRobot extends BCAbstractRobot {
 	public Machine robot;
 	int debugTurn = 0;
+	float[][] test;
 
 	public Action turn() {
 		debugTurn++;
-
+/*
 		if (robot == null) {
 			if (me.unit == SPECS.CASTLE) {
 				robot = new Castle(this);
@@ -26,37 +27,40 @@ public class MyRobot extends BCAbstractRobot {
 				robot = new Preacher(this);
 			}
 		}
-		return robot.Execute();
-/*
+		return robot.Execute();*/
+		Position tester = new Position(50, 50);
+		Position test2 = new Position(26,20);
 		if (debugTurn == 1) {
-			for(int z = 0; z < 10; z++){
-			Position tester = new Position(50, 50);
-			Position test2 = new Position(26,20);
-			float[][] test = MovingRobot.CreateLayeredFloodPath(map, tester,test2);
-			MovingRobot.UpdateFlood(this, map, test, 3, 10, true);
-			/*for (int i = 0; i < test.length; i++) {
-				String cat = "";
-				for (int j = 0; j < test.length; j++) {
-					String out = "";
-					if (test[i][j] == -3) {
-						out = " " + " ";
-					} else {
-						out = " " + Math.round(test[i][j]);
-					}
-					if (out.length() < 3) {
-						out = " " + out;
-					}
-					cat += out;
-				}
-				log(cat);
+			for(int z = 0; z < 3; z++){			
+				test = MovingRobot.CreateLayeredFloodPath(map, tester,test2);
+				log("drawn " + z);
 			}
-		log(" " + z);}
-	}	
+		}
 		if(debugTurn == 2){
 			log("Time : " + me.time);
+			log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 		}
-	
-		return null;	*/
+		if (debugTurn == 3) {
+			for(int z = 0; z < 3; z++){			
+				test = MovingRobot.CreateLayeredFloodPath(map, tester,new Position(1000, 1000));
+				log("drawn " + z);
+			}
+		}
+		if(debugTurn == 4){
+			log("Time : " + me.time);
+			log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+		}
+		if (debugTurn == 5) {
+			for(int z = 0; z < 3; z++){			
+				test = MovingRobot.UpdateFlood(this, map, test, 3, 8, true);
+				log("drawn " + z);
+			}
+		}
+		if(debugTurn == 6){
+			log("Time : " + me.time);
+		}
+
+		return null;	
 	}
 }
 class Position {
