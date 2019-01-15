@@ -19,14 +19,10 @@ public class Preacher extends MovingRobot implements Machine{
 
 	public Action Execute(){
 		location = new Position(robot.me.y, robot.me.x);
-		if (robot.me.turn == 1)
-		{
-			castleLocations = new ArrayList<>();
-		}
+
 		if(!initialized)
 		{
-			boolean[] signals = ReadInitialSignals(robot, castleLocations);
-			initialized = signals[0];
+			Initialize();
 		}
 		return null;
 	}
@@ -164,5 +160,5 @@ public class Preacher extends MovingRobot implements Machine{
 
 enum PreacherState
 {
-	Fortifying, UnderSiege, Mobilizing
+	Fortifying, MovingToDefencePosition, UnderSiege, Mobilizing
 }

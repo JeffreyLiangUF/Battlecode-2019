@@ -87,13 +87,13 @@ public class Helper{
 		{
 			for (int j = -2; j <= 2; j++)
 			{
-				if (map[pos.y + i][pos.x + j] == 0)
+				if (map[pos.y + i][pos.x + j] > 0)
 				{
-					return false;
+					return true;
 				}
 			}
 		}
-		return true;
+		return false;
 	}
 	public static Position RandomNonResourceAdjacentPositionInMoveRange(MyRobot robot, Position pos)
 	{
