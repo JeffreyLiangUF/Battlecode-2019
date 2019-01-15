@@ -323,10 +323,11 @@ public class MovingRobot {
 	}
 	Action MoveCloser(MyRobot robot, Position pos){
 		int moveSpeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
+		int tile = (int)Math.sqrt(moveSpeed);
 		float closest = Integer.MAX_VALUE;
 		Position output = null;
-		for (int y = -moveSpeed; y <= moveSpeed; y++) {
-			for (int x = -moveSpeed; x <= moveSpeed; x++) {
+		for (int y = -tile; y <= tile; y++) {
+			for (int x = -tile; x <= tile; x++) {
 				Position possible = new Position(robot.me.y + y, robot.me.x + x);
 				if(Helper.inMap(robot.map, possible) && robot.map[possible.y][possible.x] && 
 				Helper.DistanceSquared(new Position(robot.me.y, robot.me.x), possible) <= moveSpeed &&
