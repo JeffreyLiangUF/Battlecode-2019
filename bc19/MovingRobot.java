@@ -221,7 +221,7 @@ public class MovingRobot {
 	float[][] GetOrCreateMap(MyRobot robot, HashMap<Position, float[][]> maps, Position pos){
 		if(maps.containsKey(pos)){
 			if(maps.get(pos)[pos.y][pos.x] <= 0){
-				float[][] newMap  = CreateLayeredFloodPath(robot.map, new Position(robot.me.y, robot.me.x), pos);
+				float[][] newMap  = CreateLayeredFloodPath(robot.map, pos, new Position(robot.me.y, robot.me.x));
 				maps.put(pos, newMap);
 				return newMap;
 			}
@@ -230,7 +230,7 @@ public class MovingRobot {
 			}
 		}
 		else{
-			float[][] newMap  = CreateLayeredFloodPath(robot.map, new Position(robot.me.y, robot.me.x), pos);
+			float[][] newMap  = CreateLayeredFloodPath(robot.map, pos, new Position(robot.me.y, robot.me.x));
 			maps.put(pos, newMap);
 			return newMap;
 		}
@@ -259,7 +259,6 @@ public class MovingRobot {
 				return robot.move(adj.x - robot.me.x, adj.y - robot.me.y);
 			}
 			else{
-				robot.log("Rare Case Shouldn't be occuring");
 				return null;
 			}
 		}
@@ -276,7 +275,6 @@ public class MovingRobot {
 				lowestPos = validPositions[i];
 			}
 		}
-		robot.log("Lowest " + lowestPos.toString() + " " + robot.me.y + ", " + robot.me.x);
 		return robot.move(lowestPos.x - robot.me.x, lowestPos.y - robot.me.y);
 	}
 
@@ -288,30 +286,34 @@ public class MovingRobot {
 					&& Helper.DistanceSquared(new Position(robot.me.y, robot.me.x), new Position(r.y, r.x)) <= 3) {
 				spawnCastle = r;
 			}
+			else if(r.unit == robot.SPECS.CHURCH){
+				castleLocations.add(new Position(r.y, r.x));
+				outputRead[0] = true;
+				return outputRead;
+			}
 		}
 		Position spawnCastlePos = new Position(spawnCastle.y, spawnCastle.x);
 		if (castleLocations.size() == 0) {
 			castleLocations.add(spawnCastlePos);
 		}
 		int signal = spawnCastle.signal;
-		if(signal <= 0){
-			outputRead[0] = false;
+		if(signal <= 0 || castleLocations.size() == 3){
+			outputRead[0] = true;
 			return outputRead;
 		}
 		int x = signal & 63;
 		signal >>= 6;
 		int y = signal & 63;
 		signal >>= 6;
-		int numCastle = signal & 3;
-		if (numCastle == 1) {
-			outputRead[0] = true;
-			return outputRead;
-		}
+		int numCastle = signal & 3;		
 		signal >>= 2;
 		outputRead[2] = (signal & 1) == 1 ? true : false;
 		signal >>= 1;
 		outputRead[1] = (signal & 1) == 1 ? true : false;
-		
+		if (numCastle == 1) {
+			outputRead[0] = true;
+			return outputRead;
+		}
 		if (numCastle == 2) {
 			castleLocations.add(new Position(y, x));
 			outputRead[0] = true;
@@ -339,6 +341,7 @@ public class MovingRobot {
 				}
 			}
 		}
+		robot.log("HERE : " + output.toString() + "   " + robot.me.y + " " + robot.me.x);
 		if(output != null){
 			return robot.move(robot.me.x - output.x, robot.me.y - output.y);
 		}		

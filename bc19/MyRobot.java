@@ -14,6 +14,7 @@ public class MyRobot extends BCAbstractRobot {
 			if (me.unit == SPECS.CASTLE) {
 				robot = new Castle(this);
 			} else if (me.unit == SPECS.CHURCH) {
+				log("LET THE RELIGION SPREAD");
 				robot = new Church(this);
 			} else if (me.unit == SPECS.PILGRIM) {
 				robot = new Pilgrim(this);
@@ -69,7 +70,7 @@ class Position {
 	}
 
 	public String toString() {
-		return Integer.toString(y) + " " + Integer.toString(x);
+		return "(" + Integer.toString(y) + ", " + Integer.toString(x) + ")";
 	}
 
 	public static String convertBinary(int num) {

@@ -13,7 +13,8 @@ public class Church implements Machine{
 	}
 
 	public Action Execute(){
-		return robot.buildUnit(robot.SPECS.PILGRIM,1,0);
+		//return robot.buildUnit(robot.SPECS.PILGRIM,1,0);
+		return null;
 	}
 
 	void InitializeVariables(){

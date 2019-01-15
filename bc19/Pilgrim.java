@@ -4,12 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
 
-public class Pilgrim extends MovingRobot implements Machine{
-  
+public class Pilgrim extends MovingRobot implements Machine {
+
     MyRobot robot;
-    int ourTeam; //red:0 blue:1
+    int ourTeam; // red:0 blue:1
     Position location;
-    Position dropOff;
     boolean mapIsHorizontal;
     PilgrimState state;
     boolean initialized;
@@ -23,54 +22,50 @@ public class Pilgrim extends MovingRobot implements Machine{
     int waitMax = 2;
     int maxKarb, maxFuel;
     int emergencyAmount = 10;
-    int karbThreshold = 20, fuelThreshold = 500;
-    int returnFuelThreshold = 22;
-    boolean miningKarb; //true for karb, false for fuel
-    int[][] occupiedResources; //-1 if not resource, 0 unoccupied, 1 occupied by PILGRIM, 2 occupied by any other unit
-	
-	public Pilgrim(MyRobot robot){
-		this.robot = robot;
-	}
+    int karbThreshold = 100, fuelThreshold = 500;// changed this by mistake
+    int oportunityKarbLostThreshold = 10;
+    boolean miningKarb; // true for karb, false for fuel
+    int[][] occupiedResources; // -1 if not resource, 0 unoccupied, 1 occupied by PILGRIM, 2 occupied by any
+                               // other unit
 
-	public Action Execute(){        
+    public Pilgrim(MyRobot robot) {
+        this.robot = robot;
+    }
+
+    public Action Execute() {
         location = new Position(robot.me.y, robot.me.x);
-        if (!initialized)
-        {
-            robot.log("not intialized");
+        if (!initialized) {
+           // robot.log("Not intitialized Properly");
             Initialize();
-            if(initialized){
+            if (initialized) {
                 state = PilgrimState.GoingToResource;
             }
         }
-        //IMPROVE ROUTES METHOD
-        else
-        {
+        // IMPROVE ROUTES METHOD
+        else {
             UpdateOccupiedResources();
-            if (state == PilgrimState.GoingToResource)
-            {
-                robot.log("Off to Mine");
+            if (state == PilgrimState.GoingToResource) {
+             //   robot.log("Off to Mine");
                 return GoToMine();
             }
-            if (state == PilgrimState.Mining)
-            {
-                robot.log("Mining");
+            if (state == PilgrimState.Mining) {
+             //   robot.log("Mining");
 
                 return Mining();
             }
-            if (state == PilgrimState.Returning)
-            {
-                robot.log("Returning to Dropoff");
-
+            if (state == PilgrimState.Returning) {
+             //   robot.log("Returning to Dropoff");
+                CheckForChurch();
                 return ReturnToDropOff();
-            }  
+            }
         }
-        
-        robot.log("My turn " + robot.me.turn + " No logic :(");
-		return null;
+
+   //     robot.log("My turn " + robot.me.turn + " No logic :(");
+        return null;
 
     }
 
-    void InitializeVariables(){
+    void InitializeVariables() {
         ourTeam = robot.me.team == robot.SPECS.RED ? 0 : 1;
         mapIsHorizontal = Helper.FindSymmetry(robot.map);
         karbRoutes = new HashMap<>();
@@ -84,139 +79,115 @@ public class Pilgrim extends MovingRobot implements Machine{
         maxFuel = robot.SPECS.UNITS[robot.me.unit].FUEL_CAPACITY;
         miningKarb = true;
         occupiedResources = new int[robot.map.length][robot.map[0].length];
-        for (int i = 0; i < robot.map.length; i++)
-        {
-            for (int j = 0; j < robot.map[0].length; j++)
-            {
-                if (robot.getKarboniteMap()[i][j] == true)
-                {
+        for (int i = 0; i < robot.map.length; i++) {
+            for (int j = 0; j < robot.map[0].length; j++) {
+                if (robot.getKarboniteMap()[i][j] == true) {
                     karbLocations.add(new Position(i, j));
                     occupiedResources[i][j] = 0;
-                }
-                else if(robot.getFuelMap()[i][j] == true){
+                } else if (robot.getFuelMap()[i][j] == true) {
                     fuelLocations.add(new Position(i, j));
                     occupiedResources[i][j] = 0;
-                }
-                else
-                {
+                } else {
                     occupiedResources[i][j] = -1;
                 }
             }
         }
     }
 
-    void Initialize()
-    {
+    void Initialize() {
         if (robot.me.turn == 1) {
             InitializeVariables();
         }
         if (!initialized) {
             boolean[] signals = ReadInitialSignals(robot, dropOffLocations);
             initialized = signals[0];
-            maxKarb = signals[2] ? emergencyAmount : karbThreshold;
-       }
+            maxKarb = signals[2] ? emergencyAmount : robot.SPECS.UNITS[robot.me.unit].KARBONITE_CAPACITY;
+        }
     }
-    void UpdateOccupiedResources()
-    {
-        int visionRadius = (int)Math.sqrt(robot.SPECS.UNITS[robot.me.unit].VISION_RADIUS);
-        for (int i = -visionRadius; i <= visionRadius; i++)
-        {
-            for (int j = -visionRadius; j <= visionRadius; j++)
-            {
-                int yNew = robot.me.y + i, xNew = robot.me.x + i;
-                Position tile = new Position(yNew, xNew);
-                if(Helper.inMap(robot.map, tile)){
-                if (Helper.DistanceSquared(tile, location) > robot.SPECS.UNITS[robot.SPECS.PILGRIM].VISION_RADIUS)
-                {
-                    continue;
-                }
 
-                if (Helper.RobotAtPosition(robot, tile) == null) //0 if position is unoccupied
-                {
-                    occupiedResources[yNew][xNew] = 0;
+    void UpdateOccupiedResources() {
+        int visionRadius = (int) Math.sqrt(robot.SPECS.UNITS[robot.me.unit].VISION_RADIUS);
+        for (int i = -visionRadius; i <= visionRadius; i++) {
+            for (int j = -visionRadius; j <= visionRadius; j++) {
+                int yNew = robot.me.y + i, xNew = robot.me.x + j;
+                Position tile = new Position(yNew, xNew);
+                if (Helper.inMap(robot.map, tile)) {
+                    if (Helper.DistanceSquared(tile, location) > robot.SPECS.UNITS[robot.SPECS.PILGRIM].VISION_RADIUS) {
+                        continue;
+                    }
+                    if (!robot.getKarboniteMap()[yNew][xNew] && !robot.getFuelMap()[yNew][xNew]) {
+                        occupiedResources[yNew][xNew] = -1;
+                    }
+                    // robot.log(tile.toString());
+                    if (Helper.RobotAtPosition(robot, tile) == null) // 0 if position is unoccupied
+                    {
+                        occupiedResources[yNew][xNew] = 0;
+                    } else if (Helper.RobotAtPosition(robot, tile).unit == robot.SPECS.PILGRIM) // 1 if occupied by
+                                                                                                // PILGRIM
+                    {
+                        occupiedResources[yNew][xNew] = 1;
+                    } else // 2 if occupied by any other unit
+                    {
+                        occupiedResources[yNew][xNew] = 2;
+                    }
                 }
-                else if (Helper.RobotAtPosition(robot, tile).unit == robot.SPECS.PILGRIM) //1 if occupied by PILGRIM
-                {
-                    occupiedResources[yNew][xNew] = 1;
-                }
-                else //2 if occupied by any other unit
-                {
-                    occupiedResources[yNew][xNew] = 2;
-                }
-            }
 
             }
         }
     }
 
-    public Position GetNearestDropOff()
-    {
+    Position GetNearestDropOff() {
         float lowest = Integer.MAX_VALUE;
         Position closest = null;
-        for(int i = 0; i < dropOffLocations.size(); i++){
+        for (int i = 0; i < dropOffLocations.size(); i++) {
             Position pos = dropOffLocations.get(i);
-            float distance = ourDropOffRoutes.containsKey(pos) ? 
-            ourDropOffRoutes.get(pos)[location.y][location.x] : 
-                Helper.DistanceSquared(pos, location);
+            float distance = ourDropOffRoutes.containsKey(pos) ? ourDropOffRoutes.get(pos)[location.y][location.x]
+                    : Helper.DistanceSquared(pos, location);
 
-            if (occupiedResources[pos.y][pos.x] != 1 && distance < lowest)
-            {
+            if (occupiedResources[pos.y][pos.x] != 1 && distance < lowest) {
                 lowest = distance;
                 closest = pos;
             }
         }
         return closest;
     }
-    public Action ReturnToDropOff(){ 
-        dropOff = GetNearestDropOff();  
 
-       // robot.log("KARB: " + robot.me.karbonite + " turn " + robot.me.turn + " Me "+ location.toString() + "   "+ dropOff.toString());
-
-        if (Helper.DistanceSquared(dropOff, location) < 3)
-        {
+    Action ReturnToDropOff() {
+        Position dropOff = GetNearestDropOff();
+        if (Helper.DistanceSquared(dropOff, location) < 3) {
             WhatToMine();
             ArrayList<Position> throwAway = new ArrayList<>();
-            boolean[] signals = ReadInitialSignals(robot, throwAway);//ignores castle positions already know them
-            maxKarb = signals[2] ? emergencyAmount : karbThreshold;//just updates mining style
+            boolean[] signals = ReadInitialSignals(robot, throwAway);// ignores castle positions already know them
+            maxKarb = signals[2] ? emergencyAmount : robot.SPECS.UNITS[robot.me.unit].KARBONITE_CAPACITY;// just updates
+                                                                                                         // mining style
             state = PilgrimState.GoingToResource;
-            return robot.give(dropOff.x - location.x, dropOff.y - location.y, robot.me.karbonite, robot.me.fuel); 
+            return robot.give(dropOff.x - location.x, dropOff.y - location.y, robot.me.karbonite, robot.me.fuel);
         }
-        else if (Helper.DistanceSquared(dropOff, location) <= robot.SPECS.UNITS[robot.me.unit].SPEED)
-        { 
-            Position nextToDropoff = Helper.RandomNonResourceAdjacentPositionInMoveRange(robot, dropOff); 
-            if(nextToDropoff != null){
+
+        else if (Helper.DistanceSquared(dropOff, location) <= robot.SPECS.UNITS[robot.me.unit].SPEED) {
+            Position nextToDropoff = Helper.RandomNonResourceAdjacentPositionInMoveRange(robot, dropOff);
+            if (nextToDropoff != null) {
                 return robot.move(nextToDropoff.x - location.x, nextToDropoff.y - location.y);
             }
             return MoveCloser(robot, dropOff);
+        } else {
+            return FloodPathing(robot, GetOrCreateMap(robot, karbRoutes, dropOff), dropOff);
         }
-        else
-        {
-            return FloodPathing(robot, GetOrCreateMap(robot, karbRoutes, dropOff), dropOff);            
-        }
-        
+
     }
 
-    public float FuelToReturn(float[][] path)
-    {
-        float tilesFromTarget = path[location.y][location.x];
-        float amountOfMoves = (float)(tilesFromTarget / Math.sqrt(robot.SPECS.UNITS[robot.SPECS.PILGRIM].SPEED));
-        return (float)(amountOfMoves * robot.SPECS.UNITS[robot.SPECS.PILGRIM].FUEL_PER_MOVE);
-    }
-
-    public Position GetNearestResource()
-    {
+    Position GetNearestResource() {
         ArrayList<Position> chosenPositions = miningKarb ? karbLocations : fuelLocations;
         HashMap<Position, float[][]> chosenMaps = miningKarb ? karbRoutes : fuelRoutes;
         float lowest = Integer.MAX_VALUE;
         Position closest = null;
-        for(int i = 0; i < chosenPositions.size(); i++){
+        for (int i = 0; i < chosenPositions.size(); i++) {
             Position pos = chosenPositions.get(i);
-            float distance = chosenMaps.containsKey(pos) ? 
-                chosenMaps.get(pos)[location.y][location.x] : 
-                Helper.DistanceSquared(pos, location);
+            float distance = chosenMaps.containsKey(pos) ? chosenMaps.get(pos)[location.y][location.x]
+                    : Helper.DistanceSquared(pos, location);
 
-            if ((occupiedResources[pos.y][pos.x] != 1 || (location.y == pos.y && location.x == pos.x)) && distance < lowest)
-            {
+            if ((occupiedResources[pos.y][pos.x] != 1 || (location.y == pos.y && location.x == pos.x))
+                    && distance < lowest) {
                 lowest = distance;
                 closest = pos;
             }
@@ -224,121 +195,117 @@ public class Pilgrim extends MovingRobot implements Machine{
         return closest;
     }
 
-
-    
-
-    public Action GoToMine()
-    {
+    Action GoToMine() {
         Position nearest = GetNearestResource();
 
         int movespeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
-        if (nearest.y - location.y == 0 && nearest.x - location.x == 0)
-        {
+        if (nearest.y - location.y == 0 && nearest.x - location.x == 0) {
             state = PilgrimState.Mining;
             return robot.mine();
-        }
-        else if (Helper.DistanceSquared(nearest, location) <= movespeed)
-        { 
-            if (occupiedResources[nearest.y][nearest.x] == 2)
-            {
+        } else if (Helper.DistanceSquared(nearest, location) <= movespeed) {
+            if (occupiedResources[nearest.y][nearest.x] == 2) {
                 waitCounter++;
-                if(waitCounter >= waitMax)
-                {
+                if (waitCounter >= waitMax) {
                     occupiedResources[nearest.y][nearest.x] = 1;
                     GoToMine();
                 }
                 return null;
-            }else
-            
-            {
+            } else {
                 state = PilgrimState.Mining;
                 return robot.move(nearest.x - location.x, nearest.y - location.y);
             }
-        }
-        else
-        {
+        } else {
             state = PilgrimState.GoingToResource;
-            if (miningKarb == true)
-            {
+            if (miningKarb == true) {
                 return FloodPathing(robot, GetOrCreateMap(robot, karbRoutes, nearest), nearest);
-            }
-            else
-            {
+            } else {
                 return FloodPathing(robot, GetOrCreateMap(robot, fuelRoutes, nearest), nearest);
             }
         }
     }
 
-    public void WhatToMine() //Need to change proportions in mining
+    void WhatToMine() // Need to change proportions in mining
     {
-        if (maxKarb == emergencyAmount)
-        {
+        if (maxKarb == emergencyAmount) {
+            miningKarb = true;
+        } else if (robot.karbonite < karbThreshold) {
+            miningKarb = true;
+        } else if (robot.fuel < fuelThreshold) {
+            miningKarb = false;
+        }
+        else if(robot.fuel > robot.karbonite * 8){
             miningKarb = true;
         }
-        else if (robot.karbonite < karbThreshold)
-        {
-            miningKarb = true;
-        }
-        else if (robot.fuel < fuelThreshold)
-        {
+        else{
             miningKarb = false;
         }
     }
 
-    public Action Mining()
-    {
-        if (occupiedResources[location.y][location.x] == -1)
-        {
+    Action Mining() {
+        if (occupiedResources[location.y][location.x] == -1) {
             state = PilgrimState.GoingToResource;
         }
-        
-        int max = miningKarb ? maxKarb : maxFuel;
-        int current = miningKarb ? robot.me.karbonite : robot.me.fuel;
-        if (current >= max)
-        {
+        if (robot.me.karbonite >= maxKarb || robot.me.fuel >= maxFuel) {
             state = PilgrimState.Returning;
             Action church = BuildChurch();
             return church == null ? ReturnToDropOff() : church;
-        }
-        else
-        {
+        } else {
             return robot.mine();
         }
     }
 
-    public boolean ShouldBuildChurch()
-    {
-        if (maxKarb == emergencyAmount)
-        {
+    boolean ShouldBuildChurch() {
+        CheckForChurch();
+        Position dropOff = GetNearestDropOff();
+        if (maxKarb == emergencyAmount) {
             return false;
         }
-        if (FuelToReturn(ourDropOffRoutes.get(GetNearestDropOff())) > returnFuelThreshold)
-        {
+        float cost = FuelToReturn(GetOrCreateMap(robot, ourDropOffRoutes, dropOff));
+        if (cost > oportunityKarbLostThreshold) {
             return true;
-        }
-        else
-        {
+        } else {
             return false;
         }
     }
 
-    public Action BuildChurch()
-    {
-        
-        if (ShouldBuildChurch() == true)
-        {
-            Position buildChurchHere = Helper.RandomNonResourceAdjacentPosition(robot, location);
-            int dx = buildChurchHere.x - location.x;
-            int dy = buildChurchHere.y - location.y;
-            state = PilgrimState.Returning;
-            dropOffLocations.add(buildChurchHere);
-            return robot.buildUnit(robot.SPECS.CHURCH, dx, dy);
+    Action BuildChurch() {
+        if (ShouldBuildChurch()) {
+            if (Helper.CanAfford(robot, robot.SPECS.CHURCH)) {
+                Position buildChurchHere = Helper.RandomNonResourceAdjacentPosition(robot, location);
+                int dx = buildChurchHere.x - location.x;
+                int dy = buildChurchHere.y - location.y;
+                state = PilgrimState.Returning;
+                dropOffLocations.add(buildChurchHere);
+                return robot.buildUnit(robot.SPECS.CHURCH, dx, dy);
+            }
         }
         return null;
     }
+
+    float FuelToReturn(float[][] path) {
+
+        float valueUnderTile = path[location.y][location.x];
+        float tileMovementSpeed = (float) Math.sqrt(robot.SPECS.UNITS[robot.SPECS.PILGRIM].SPEED);
+        float amountOfMoves = valueUnderTile / tileMovementSpeed;
+        float cost = amountOfMoves * robot.SPECS.KARBONITE_YIELD;
+
+        return cost;
+    }
+
+    void CheckForChurch() {
+        Robot[] robots = robot.getVisibleRobots();
+        for (int i = 0; i < robots.length; i++) {
+            if (robots[i].unit == robot.SPECS.CHURCH && robots[i].team == ourTeam) {
+                for (int j = 0; j < dropOffLocations.size(); j++) {
+                    if (robots[i].y != dropOffLocations.get(j).y && robots[i].x != dropOffLocations.get(j).x) {
+                        dropOffLocations.add(new Position(robots[i].y, robots[i].x));
+                    }
+                }
+            }
+        }
+    }
 }
 
-enum PilgrimState
-{
+enum PilgrimState {
     Initializing, GoingToResource, Mining, Returning
 }
