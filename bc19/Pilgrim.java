@@ -44,6 +44,9 @@ public class Pilgrim extends MovingRobot implements Machine {
         // IMPROVE ROUTES METHOD
         else {
             UpdateOccupiedResources();
+            if(EnemiesAround(robot, ourTeam)){
+                return ReturnToDropOff();
+            }
             if (state == PilgrimState.GoingToResource) {
              //   robot.log("Off to Mine");
                 return GoToMine();
