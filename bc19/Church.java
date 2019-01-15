@@ -24,6 +24,16 @@ public class Church implements Machine{
 	}
 	
 	int ResourcesAround(){
-		int visionRadius = Math.sqrt(.SPECS.UNITS[robot.me.unit].VISION_RADIUS;
+		int visionRadius = (int)Math.sqrt(robot.SPECS.UNITS[robot.me.unit].VISION_RADIUS);
+		int numResources = 0;
+		
+
+
+
 	}
+
+	int PilgrimsArond(){
+		int visionRadius = (int)Math.sqrt(robot.SPECS.UNITS[robot.me.unit].VISION_RADIUS);
+	}
+	
 }
