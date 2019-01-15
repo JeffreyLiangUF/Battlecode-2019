@@ -111,7 +111,6 @@ public class Preacher extends MovingRobot implements Machine{
 		}
 		return numEnemies;
 	}
-
 /*
 	public Action MoveToDefend()
 	{
@@ -135,17 +134,17 @@ public class Preacher extends MovingRobot implements Machine{
 						float moveDistance = Helper.DistanceSquared(defenceTile, location);
 						if (moveDistance <= movespeed)
 						{
-							robot.move(location.x - defenceTile.x, location.y - defenceTile.y);
+							return robot.move(location.x - defenceTile.x, location.y - defenceTile.y);
 						}
 						else
 						{
-							//move to defenceTile
+							return MoveCloser(robot, defenceTile);
 						}
 					}
 				}
 			}
 		}
-
+		return null;
 	}
 */
 	void GetClosestCastle()

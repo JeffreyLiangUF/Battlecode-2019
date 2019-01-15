@@ -324,11 +324,10 @@ public class MovingRobot {
 	}
 	Action MoveCloser(MyRobot robot, Position pos){
 		int moveSpeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
-		int tile = (int)Math.sqrt(moveSpeed);
 		float closest = Integer.MAX_VALUE;
 		Position output = null;
-		for (int y = -tile; y <= tile; y++) {
-			for (int x = -tile; x <= tile; x++) {
+		for (int y = -moveSpeed; y <= moveSpeed; y++) {
+			for (int x = -moveSpeed; x <= moveSpeed; x++) {
 				Position possible = new Position(robot.me.y + y, robot.me.x + x);
 				if(Helper.inMap(robot.map, possible) && robot.map[possible.y][possible.x] && 
 				Helper.DistanceSquared(new Position(robot.me.y, robot.me.x), possible) <= moveSpeed &&
@@ -343,6 +342,42 @@ public class MovingRobot {
 		if(output != null){
 			return robot.move(robot.me.x - output.x, robot.me.y - output.y);
 		}		
+		return null;
+	}
+
+	Action MoveToDefend(MyRobot robot, boolean mapIsHorizontal, Position closestCastle, PreacherState state)
+	{
+		state = PreacherState.Fortifying;
+		Position robotPos = new Position(robot.me.y, robot.me.x);
+		Position enemyCastle = Helper.FindEnemyCastle(robot.map, mapIsHorizontal, closestCastle);
+		float distFromCastleToCastle = Helper.DistanceSquared(closestCastle, enemyCastle);
+		int movespeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
+		int visionRange = (int)Math.sqrt(robot.SPECS.UNITS[robot.me.unit].VISION_RADIUS);
+
+		for (int i = -visionRange; i < visionRange; i++)
+		{
+			for (int j = -visionRange; j < visionRange; j++)
+			{
+				Position defenceTile = new Position (robot.me.y + i, robot.me.x + j);
+				float distFromTileToEnemyCastle = Helper.DistanceSquared(defenceTile, enemyCastle);
+						
+				if (distFromTileToEnemyCastle < distFromCastleToCastle)
+				{
+					if (Helper.IsSurroundingsOccupied(robot, robot.getVisibleRobotMap(), defenceTile) == false)
+					{
+						float moveDistance = Helper.DistanceSquared(defenceTile, robotPos);
+						if (moveDistance <= movespeed)
+						{
+							return robot.move(robot.me.x - defenceTile.x, robot.me.y - defenceTile.y);
+						}
+						else
+						{
+							return MoveCloser(robot, defenceTile);
+						}
+					}
+				}
+			}
+		}
 		return null;
 	}
 }
