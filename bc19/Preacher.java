@@ -1,5 +1,6 @@
 package bc19;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Preacher extends MovingRobot implements Machine{
 	
@@ -9,6 +10,8 @@ public class Preacher extends MovingRobot implements Machine{
 	boolean initialized;
 	boolean mapIsHorizontal;
 	ArrayList<Position> castleLocations;
+	ArrayList<Position> enemyCastleLocations;
+	HashMap<Position, float[][]> routesToEnemies;
 	Position closestCastle;
 	PreacherState state;
  
@@ -17,24 +20,44 @@ public class Preacher extends MovingRobot implements Machine{
 		this.robot = robot;
 	}
 
-	public Action Execute(){
-		
-		/*location = new Position(robot.me.y, robot.me.x);
-robot.log("This is a Preacher.");
+	public Action Execute(){	//Initializing, Fortifying, MovingToDefencePosition, UnderSiege, Mobilizing
+		location = new Position(robot.me.y, robot.me.x);
 		if(!initialized)
 		{
 			Initialize();
-		}*/
+		}
+		if(state == PreacherState.Fortifying || state == PreacherState.MovingToDefencePosition){
+			//method to read battlecry;
+				//set to mobilizing
+				//check if getting attacked
+				//enter undersiege
+			if(state == PreacherState.MovingToDefencePosition){
+				//If position is a valid spot
+					//set state to fortifying
+				// else try to find defence position
+			}		
+		}
+		
+
+
+		
 		return null;
 	}
 
 	void Initialize(){
 		if (robot.me.turn == 1){
 			InitializeVariables();
+			state = PreacherState.Initializing;
 		}
 		if (!initialized){
-			boolean[] signals = ReadInitialSignals(robot, castleLocations);
+			boolean[] signals = ReadInitialSignals(robot, castleLocations);			
 			initialized = signals[0];
+			if(initialized && signals[1]){
+				state = PreacherState.Mobilizing;
+			}
+			else if(initialized){
+				state = PreacherState.MovingToDefencePosition;
+			}
 		}
 	}
 
@@ -42,6 +65,9 @@ robot.log("This is a Preacher.");
         ourTeam = robot.me.team == robot.SPECS.RED ? 0 : 1;
 		mapIsHorizontal = Helper.FindSymmetry(robot.map);
 		location = new Position(robot.me.y, robot.me.x);
+		castleLocations = new ArrayList<>();
+		enemyCastleLocations = new ArrayList<>();
+		routesToEnemies = new HashMap<>();
 		GetClosestCastle();
     }
 
@@ -161,5 +187,5 @@ robot.log("This is a Preacher.");
 
 enum PreacherState
 {
-	Fortifying, MovingToDefencePosition, UnderSiege, Mobilizing
+	Initializing, Fortifying, MovingToDefencePosition, UnderSiege, Mobilizing
 }
