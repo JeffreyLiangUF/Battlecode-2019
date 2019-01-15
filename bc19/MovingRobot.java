@@ -8,8 +8,6 @@ import java.util.HashMap;
 
 public class MovingRobot {
 
-	
-
 	public static float[][] UpdateFlood(MyRobot robo, boolean map[][], float[][] floodMap, int stepDistance,
 			int hopDistance, boolean refine) {
 
@@ -67,8 +65,8 @@ public class MovingRobot {
 		}
 		if (refine) {
 			for (int i = 0; i < hopPositions.size(); i++) {
-				 floodMap = ReiteratePath(robo, map, floodMap, hopPositions.get(i),
-				 floodMap[hopPositions.get(i).y][hopPositions.get(i).x]);
+				floodMap = ReiteratePath(robo, map, floodMap, hopPositions.get(i),
+						floodMap[hopPositions.get(i).y][hopPositions.get(i).x]);
 			}
 		}
 
@@ -167,29 +165,27 @@ public class MovingRobot {
 			PathingPosition removed = toBeVisited.poll();
 			float cum = removed.cumulative;
 
-			
-
 			Position down = new Position(removed.pos.y + 1, removed.pos.x);
 			Position up = new Position(removed.pos.y - 1, removed.pos.x);
 			Position right = new Position(removed.pos.y, removed.pos.x + 1);
 			Position left = new Position(removed.pos.y, removed.pos.x - 1);
-			if (Helper.inMap(map, down) && singleStep[down.y][down.x] > 0 && (removed.cumulative - singleStep[down.y][down.x]) > 1) {
+			if (Helper.inMap(map, down) && singleStep[down.y][down.x] > 0
+					&& (removed.cumulative - singleStep[down.y][down.x]) > 1) {
 				cum = singleStep[down.y][down.x] + 1;
-			}
-			else if (Helper.inMap(map, up) && singleStep[up.y][up.x] > 0 && (removed.cumulative - singleStep[up.y][up.x]) > 1) {
+			} else if (Helper.inMap(map, up) && singleStep[up.y][up.x] > 0
+					&& (removed.cumulative - singleStep[up.y][up.x]) > 1) {
 				cum = singleStep[up.y][up.x] + 1;
-			}
-			else if (Helper.inMap(map, right) && singleStep[right.y][right.x] > 0 && (removed.cumulative - singleStep[right.y][right.x]) > 1) {
+			} else if (Helper.inMap(map, right) && singleStep[right.y][right.x] > 0
+					&& (removed.cumulative - singleStep[right.y][right.x]) > 1) {
 				cum = singleStep[right.y][right.x] + 1;
-			}
-			else if (Helper.inMap(map, left) && singleStep[left.y][left.x] > 0 && (removed.cumulative - singleStep[left.y][left.x]) > 1) {
+			} else if (Helper.inMap(map, left) && singleStep[left.y][left.x] > 0
+					&& (removed.cumulative - singleStep[left.y][left.x]) > 1) {
 				cum = singleStep[left.y][left.x] + 1;
-			}		
-			
+			}
 
 			singleStep[removed.pos.y][removed.pos.x] = map[removed.pos.y][removed.pos.x] ? cum : -1;
 
-			if(removed.pos.y == endPos.y && removed.pos.x == endPos.x){
+			if (removed.pos.y == endPos.y && removed.pos.x == endPos.x) {
 				return singleStep;
 			}
 
@@ -219,11 +215,11 @@ public class MovingRobot {
 		return singleStep;
 	}
 
-	Position ClosestEnemyCastle(MyRobot robot, HashMap<Position, float[][]> maps){
+	Position ClosestEnemyCastle(MyRobot robot, HashMap<Position, float[][]> maps) {
 		float lowest = Integer.MAX_VALUE;
 		Position output = null;
-		for(Map.Entry<Position, float[][]> entry : maps.entrySet()){
-			if(entry.getValue()[robot.me.y][robot.me.x] < lowest){
+		for (Map.Entry<Position, float[][]> entry : maps.entrySet()) {
+			if (entry.getValue()[robot.me.y][robot.me.x] < lowest) {
 				lowest = entry.getValue()[robot.me.y][robot.me.x];
 				output = entry.getKey();
 			}
@@ -231,33 +227,35 @@ public class MovingRobot {
 		return output;
 	}
 
-	void UpgradeMaps(MyRobot robot, HashMap<Position, float[][]> maps){
-		if(robot.me.time > 100){
-			for(Map.Entry<Position, float[][]> entry : maps.entrySet()){
-				maps.put(entry.getKey(), CreateLayeredFloodPath(robot.map, entry.getKey(), new Position(200, 200)));
+	boolean UpgradeMaps(MyRobot robot, HashMap<Position, float[][]> maps, ArrayList<Position> upgradedMaps) {
+		if (robot.me.time > 200) {
+			if (upgradedMaps.size() > 0) {
+				maps.put(upgradedMaps.get(upgradedMaps.size() - 1), CreateLayeredFloodPath(robot.map,
+						upgradedMaps.get(upgradedMaps.size() - 1), new Position(200, 200)));
+				upgradedMaps.remove(upgradedMaps.get(upgradedMaps.size() - 1));
+			} else {
+				for (Map.Entry<Position, float[][]> entry : maps.entrySet()) {
+					int tileDistance = robot.SPECS.UNITS[robot.me.unit].SPEED;
+					maps.put(entry.getKey(), UpdateFlood(robot, robot.map, entry.getValue(), tileDistance, 8, true));
+
+				}
+				return true;
 			}
 		}
-		if(robot.me.time > 200){
-			for(Map.Entry<Position, float[][]> entry : maps.entrySet()){
-				int tileDistance = robot.SPECS.UNITS[robot.me.unit].SPEED;
-				maps.put(entry.getKey(), UpdateFlood(robot, robot.map, entry.getValue(), tileDistance, 8, true));
-			}
-		}
+		return false;
 	}
 
-	float[][] GetOrCreateMap(MyRobot robot, HashMap<Position, float[][]> maps, Position pos){
-		if(maps.containsKey(pos)){
-			if(maps.get(pos)[pos.y][pos.x] <= 0){
-				float[][] newMap  = CreateLayeredFloodPath(robot.map, pos, new Position(robot.me.y, robot.me.x));
+	float[][] GetOrCreateMap(MyRobot robot, HashMap<Position, float[][]> maps, Position pos) {
+		if (maps.containsKey(pos)) {
+			if (maps.get(pos)[pos.y][pos.x] <= 0) {
+				float[][] newMap = CreateLayeredFloodPath(robot.map, pos, new Position(robot.me.y, robot.me.x));
 				maps.put(pos, newMap);
 				return newMap;
-			}
-			else{
+			} else {
 				return maps.get(pos);
 			}
-		}
-		else{
-			float[][] newMap  = CreateLayeredFloodPath(robot.map, pos, new Position(robot.me.y, robot.me.x));
+		} else {
+			float[][] newMap = CreateLayeredFloodPath(robot.map, pos, new Position(robot.me.y, robot.me.x));
 			maps.put(pos, newMap);
 			return newMap;
 		}
@@ -267,24 +265,22 @@ public class MovingRobot {
 		return path[robot.me.y][robot.me.x];
 	}
 
-	Action FloodPathing(MyRobot robot, float[][] path, Position goal)
-	{
+	Action FloodPathing(MyRobot robot, float[][] path, Position goal) {
 		if (path == null) {
 			return null;
 		}
 		int moveSpeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
-		if(Helper.DistanceSquared(new Position(robot.me.y, robot.me.x), goal) <= moveSpeed){
-			
-			if(robot.getVisibleRobotMap()[goal.y][goal.x] == 0){
-				
+		if (Helper.DistanceSquared(new Position(robot.me.y, robot.me.x), goal) <= moveSpeed) {
+
+			if (robot.getVisibleRobotMap()[goal.y][goal.x] == 0) {
+
 				return robot.move(goal.x - robot.me.x, goal.y - robot.me.y);
 			}
 			Position adj = Helper.RandomNonResourceAdjacentPositionInMoveRange(robot, goal);
-			if(adj != null){
-				
+			if (adj != null) {
+
 				return robot.move(adj.x - robot.me.x, adj.y - robot.me.y);
-			}
-			else{
+			} else {
 				return null;
 			}
 		}
@@ -296,8 +292,7 @@ public class MovingRobot {
 
 		for (int i = 0; i < validPositions.length; i++) {
 			if (path[validPositions[i].y][validPositions[i].x] < lowest
-					&& path[validPositions[i].y][validPositions[i].x] > 0) 
-			{
+					&& path[validPositions[i].y][validPositions[i].x] > 0) {
 				lowest = path[validPositions[i].y][validPositions[i].x];
 				lowestPos = validPositions[i];
 			}
@@ -305,64 +300,56 @@ public class MovingRobot {
 		return robot.move(lowestPos.x - robot.me.x, lowestPos.y - robot.me.y);
 	}
 
-	Action CombatFloodPathing(MyRobot robot, float[][] path, Position goal)
-	{
+	Action CombatFloodPathing(MyRobot robot, float[][] path, Position goal) {
 		if (path == null) {
 			return null;
 		}
 		int moveSpeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
-		if(Helper.DistanceSquared(new Position(robot.me.y, robot.me.x), goal) <= moveSpeed){
-			
-			if(robot.getVisibleRobotMap()[goal.y][goal.x] == 0){
-				
+		if (Helper.DistanceSquared(new Position(robot.me.y, robot.me.x), goal) <= moveSpeed) {
+
+			if (robot.getVisibleRobotMap()[goal.y][goal.x] == 0) {
+
 				return robot.move(goal.x - robot.me.x, goal.y - robot.me.y);
 			}
 			Position adj = Helper.RandomNonResourceAdjacentPositionInMoveRange(robot, goal);
-			if(adj != null){
-				
+			if (adj != null) {
+
 				return robot.move(adj.x - robot.me.x, adj.y - robot.me.y);
-			}
-			else{
+			} else {
 				return null;
 			}
 		}
-		Position[] validFormations = Helper.AllOpenInRangeInFormation(robot, robot.map, new Position(robot.me.y, robot.me.x), robot.SPECS.UNITS[robot.me.unit].SPEED);
+		Position[] validFormations = Helper.AllOpenInRangeInFormation(robot, robot.map,
+				new Position(robot.me.y, robot.me.x), robot.SPECS.UNITS[robot.me.unit].SPEED);
 		Position[] validPositions = Helper.AllOpenInRange(robot, robot.map, new Position(robot.me.y, robot.me.x),
 				robot.SPECS.UNITS[robot.me.unit].SPEED);
 		float lowest = path[robot.me.y][robot.me.x];
-		if (lowest <= 0)
-		{
+		if (lowest <= 0) {
 			lowest = Integer.MAX_VALUE;
 		}
 		Position lowestPos = null;
 
 		for (int i = 0; i < validFormations.length; i++) {
 			if (path[validFormations[i].y][validFormations[i].x] < lowest
-					&& path[validFormations[i].y][validFormations[i].x] > 0) 
-			{
+					&& path[validFormations[i].y][validFormations[i].x] > 0) {
 				lowest = path[validFormations[i].y][validFormations[i].x];
 				lowestPos = validFormations[i];
 			}
 		}
 
-		if (lowestPos == null)
-		{
+		if (lowestPos == null) {
 			for (int i = 0; i < validPositions.length; i++) {
 				if (path[validPositions[i].y][validPositions[i].x] < lowest
-						&& path[validPositions[i].y][validPositions[i].x] > 0) 
-				{
+						&& path[validPositions[i].y][validPositions[i].x] > 0) {
 					lowest = path[validPositions[i].y][validPositions[i].x];
 					lowestPos = validPositions[i];
 				}
 			}
 		}
-		
-		if (lowestPos != null)
-		{
+
+		if (lowestPos != null) {
 			return robot.move(lowestPos.x - robot.me.x, lowestPos.y - robot.me.y);
-		}
-		else
-		{
+		} else {
 			return MoveCloser(robot, goal);
 		}
 	}
@@ -374,8 +361,7 @@ public class MovingRobot {
 			if (r.unit == robot.SPECS.CASTLE
 					&& Helper.DistanceSquared(new Position(robot.me.y, robot.me.x), new Position(r.y, r.x)) <= 3) {
 				spawnCastle = r;
-			}
-			else if(r.unit == robot.SPECS.CHURCH){
+			} else if (r.unit == robot.SPECS.CHURCH) {
 				castleLocations.add(new Position(r.y, r.x));
 				outputRead[0] = true;
 				return outputRead;
@@ -386,7 +372,7 @@ public class MovingRobot {
 			castleLocations.add(spawnCastlePos);
 		}
 		int signal = spawnCastle.signal;
-		if(signal <= 0 || castleLocations.size() == 3){
+		if (signal <= 0 || castleLocations.size() == 3) {
 			outputRead[0] = true;
 			return outputRead;
 		}
@@ -394,7 +380,7 @@ public class MovingRobot {
 		signal >>= 6;
 		int y = signal & 63;
 		signal >>= 6;
-		int numCastle = signal & 3;		
+		int numCastle = signal & 3;
 		signal >>= 2;
 		outputRead[2] = (signal & 1) == 1 ? true : false;
 		signal >>= 1;
@@ -413,17 +399,18 @@ public class MovingRobot {
 			return outputRead;
 		}
 	}
-	Action MoveCloser(MyRobot robot, Position pos){
+
+	Action MoveCloser(MyRobot robot, Position pos) {
 		int moveSpeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
 		float closest = Integer.MAX_VALUE;
 		Position output = null;
 		for (int y = -moveSpeed; y <= moveSpeed; y++) {
 			for (int x = -moveSpeed; x <= moveSpeed; x++) {
 				Position possible = new Position(robot.me.y + y, robot.me.x + x);
-				if(Helper.inMap(robot.map, possible) && robot.map[possible.y][possible.x] && 
-				Helper.DistanceSquared(new Position(robot.me.y, robot.me.x), possible) <= moveSpeed &&
-				robot.getVisibleRobotMap()[possible.y][possible.x] == 0){
-					if(Helper.DistanceSquared(pos, possible) < closest){
+				if (Helper.inMap(robot.map, possible) && robot.map[possible.y][possible.x]
+						&& Helper.DistanceSquared(new Position(robot.me.y, robot.me.x), possible) <= moveSpeed
+						&& robot.getVisibleRobotMap()[possible.y][possible.x] == 0) {
+					if (Helper.DistanceSquared(pos, possible) < closest) {
 						closest = Helper.DistanceSquared(pos, possible);
 						output = possible;
 					}
@@ -431,38 +418,31 @@ public class MovingRobot {
 			}
 		}
 		robot.log("HERE : " + output.toString() + "   " + robot.me.y + " " + robot.me.x);
-		if(output != null){
+		if (output != null) {
 			return robot.move(robot.me.x - output.x, robot.me.y - output.y);
-		}		
+		}
 		return null;
 	}
 
-	Action MoveToDefend(MyRobot robot, boolean mapIsHorizontal, Position closestCastle)
-	{
+	Action MoveToDefend(MyRobot robot, boolean mapIsHorizontal, Position closestCastle) {
 		Position robotPos = new Position(robot.me.y, robot.me.x);
 		Position enemyCastle = Helper.FindEnemyCastle(robot.map, mapIsHorizontal, closestCastle);
 		float distFromCastleToCastle = Helper.DistanceSquared(closestCastle, enemyCastle);
 		int movespeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
-		int visionRange = (int)Math.sqrt(robot.SPECS.UNITS[robot.me.unit].VISION_RADIUS);
+		int visionRange = (int) Math.sqrt(robot.SPECS.UNITS[robot.me.unit].VISION_RADIUS);
 
-		for (int i = -visionRange; i <= visionRange; i++)
-		{
-			for (int j = -visionRange; j <= visionRange; j++)
-			{
-				Position defenceTile = new Position (robot.me.y + i, robot.me.x + j);
+		for (int i = -visionRange; i <= visionRange; i++) {
+			for (int j = -visionRange; j <= visionRange; j++) {
+				Position defenceTile = new Position(robot.me.y + i, robot.me.x + j);
 				float distFromTileToEnemyCastle = Helper.DistanceSquared(defenceTile, enemyCastle);
-						
-				if (Helper.inMap(robot.map, defenceTile) && robot.map[defenceTile.y][defenceTile.x] && distFromTileToEnemyCastle < distFromCastleToCastle)
-				{
-					if (!Helper.IsSurroundingsOccupied(robot, robot.getVisibleRobotMap(), defenceTile))
-					{
+
+				if (Helper.inMap(robot.map, defenceTile) && robot.map[defenceTile.y][defenceTile.x]
+						&& distFromTileToEnemyCastle < distFromCastleToCastle) {
+					if (!Helper.IsSurroundingsOccupied(robot, robot.getVisibleRobotMap(), defenceTile)) {
 						float moveDistance = Helper.DistanceSquared(defenceTile, robotPos);
-						if (moveDistance <= movespeed)
-						{
+						if (moveDistance <= movespeed) {
 							return robot.move(robot.me.x - defenceTile.x, robot.me.y - defenceTile.y);
-						}
-						else
-						{
+						} else {
 							return MoveCloser(robot, defenceTile);
 						}
 					}
@@ -472,22 +452,20 @@ public class MovingRobot {
 		return MoveCloser(robot, enemyCastle);
 	}
 
-	boolean WatchForSignal(MyRobot robot, int signal)
-	{
+	boolean WatchForSignal(MyRobot robot, int signal) {
 		Robot[] robots = robot.getVisibleRobots();
-		for (int i = 0; i < robots.length; i++)
-		{
-			if (robots[i].signal == signal)
-			{
+		for (int i = 0; i < robots.length; i++) {
+			if (robots[i].signal == signal) {
 				return true;
 			}
 		}
 		return false;
 	}
-	public boolean EnemiesAround(MyRobot robot, int ourTeam){
+
+	public boolean EnemiesAround(MyRobot robot, int ourTeam) {
 		Robot[] robots = robot.getVisibleRobots();
-		for(int i =0; i < robots.length; i++){
-			if(robots[i].team != ourTeam){
+		for (int i = 0; i < robots.length; i++) {
+			if (robots[i].team != ourTeam) {
 				return true;
 			}
 		}

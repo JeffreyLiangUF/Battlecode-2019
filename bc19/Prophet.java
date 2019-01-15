@@ -15,6 +15,8 @@ public class Prophet extends MovingRobot implements Machine{
 	HashMap<Position, float[][]> routesToEnemies;
 	int previousHealth;
 	ProphetState state;
+	ArrayList<Position> toBeUpgraded;
+	boolean doneUpgrading = false;
 
 	public Prophet(MyRobot robot)
 	{
@@ -30,6 +32,9 @@ public class Prophet extends MovingRobot implements Machine{
 		}
 		if(!initialized){
 			Initialize();
+		}
+		if (!doneUpgrading) {
+			doneUpgrading = UpgradeMaps(robot, routesToEnemies, toBeUpgraded);
 		}
 		
 		if(state == ProphetState.Fortifying || state == ProphetState.MovingToDefencePosition){
@@ -52,12 +57,25 @@ public class Prophet extends MovingRobot implements Machine{
 
 	void Initialize() {
         if (robot.me.turn == 1) {
-            InitializeVariables();
-        }
-        if (!initialized) {
-            boolean[] signals = ReadInitialSignals(robot, castleLocations);
+			InitializeVariables();
+			state = ProphetState.Initializing;
+		}
+		if (!initialized) {
+			boolean[] signals = ReadInitialSignals(robot, castleLocations);
 			initialized = signals[0];
-        }
+			if (initialized) {
+				enemyCastleLocations = Helper.FindEnemyCastles(robot, mapIsHorizontal, castleLocations);
+				toBeUpgraded = new ArrayList<>(enemyCastleLocations);
+				for (int i = 0; i < enemyCastleLocations.size(); i++) {
+					GetOrCreateMap(robot, routesToEnemies, enemyCastleLocations.get(i));
+				}
+			}
+			if (initialized && signals[1]) {
+				state = ProphetState.Mobilizing;
+			} else if (initialized) {
+				state = ProphetState.MovingToDefencePosition;
+			}
+		}
     }
 
 	void InitializeVariables(){

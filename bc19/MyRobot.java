@@ -10,63 +10,34 @@ public class MyRobot extends BCAbstractRobot {
 
 	public Action turn() {
 		debugTurn++;
-/*
+
 		if (robot == null) {
 			if (me.unit == SPECS.CASTLE) {
+				log("I am a Castle");
 				robot = new Castle(this);
 			} else if (me.unit == SPECS.CHURCH) {
-				log("LET THE RELIGION SPREAD");
+				log("I am a Church");				
 				robot = new Church(this);
 			} else if (me.unit == SPECS.PILGRIM) {
+				log("I am a Pilgrim");
 				robot = new Pilgrim(this);
 			} else if (me.unit == SPECS.CRUSADER) {
 				robot = new Crusader(this);
 			} else if (me.unit == SPECS.PROPHET) {
+				log("I am a Prophet");
 				robot = new Prophet(this);
 			} else if (me.unit == SPECS.PREACHER) {
+				log("I am a Preacher");
 				robot = new Preacher(this);
 			}
 		}
-		return robot.Execute();*/
-		Position tester = new Position(50, 50);
-		Position test2 = new Position(26,20);
-		if (debugTurn == 1) {
-			for(int z = 0; z < 3; z++){			
-				test = MovingRobot.CreateLayeredFloodPath(map, tester,test2);
-				log("drawn " + z);
-			}
-		}
-		if(debugTurn == 2){
-			log("Time : " + me.time);
-			log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-		}
-		if (debugTurn == 3) {
-			for(int z = 0; z < 3; z++){			
-				test = MovingRobot.CreateLayeredFloodPath(map, tester,new Position(1000, 1000));
-				log("drawn " + z);
-			}
-		}
-		if(debugTurn == 4){
-			log("Time : " + me.time);
-			log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-		}
-		if (debugTurn == 5) {
-			for(int z = 0; z < 3; z++){			
-				test = MovingRobot.UpdateFlood(this, map, test, 3, 8, true);
-				log("drawn " + z);
-			}
-		}
-		if(debugTurn == 6){
-			log("Time : " + me.time);
-		}
-
-		return null;	
+		return robot.Execute();
 	}
 }
+
 class Position {
 	int y;
 	int x;
-
 
 	public Position(int y, int x) {
 		this.y = y;
@@ -75,19 +46,5 @@ class Position {
 
 	public String toString() {
 		return "(" + Integer.toString(y) + ", " + Integer.toString(x) + ")";
-	}
-
-	public static String convertBinary(int num) {
-		int binary[] = new int[40];
-		int index = 0;
-		while (num > 0) {
-			binary[index++] = num % 2;
-			num = num / 2;
-		}
-		String cat = "";
-		for (int i = index - 1; i >= 0; i--) {
-			cat += binary[i];
-		}
-		return cat;
 	}
 }
