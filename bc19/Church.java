@@ -22,8 +22,9 @@ public class Church implements Machine{
 		location = new Position(robot.me.y, robot.me.x);
 		
 	}
-	
+	/*
 	int ResourcesAround(){
 		int visionRadius = Math.sqrt(.SPECS.UNITS[robot.me.unit].VISION_RADIUS;
 	}
+	*/
 }
