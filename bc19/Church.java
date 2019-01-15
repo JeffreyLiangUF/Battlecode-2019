@@ -8,12 +8,11 @@ public class Church implements Machine{
 	boolean mapIsHorizontal;
 
 	public Church(MyRobot robot)
-	{
+	{ 
 		this.robot = robot;
 	}
 
 	public Action Execute(){
-		//return robot.buildUnit(robot.SPECS.PILGRIM,1,0);
 		return null;
 	}
 
@@ -22,5 +21,9 @@ public class Church implements Machine{
 		mapIsHorizontal = Helper.FindSymmetry(robot.map);
 		location = new Position(robot.me.y, robot.me.x);
 		
-    }
+	}
+	
+	int ResourcesAround(){
+		int visionRadius = Math.sqrt(.SPECS.UNITS[robot.me.unit].VISION_RADIUS;
+	}
 }

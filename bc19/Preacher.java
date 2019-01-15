@@ -34,7 +34,7 @@ public class Preacher extends MovingRobot implements Machine{
 		UpgradeMaps(robot, routesToEnemies);
 		UnderSiege();
 		if(state == PreacherState.UnderSiege){
-			//do underseige shit
+			state = PreacherState.Mobilizing;
 		}
 		if(state == PreacherState.Fortifying || state == PreacherState.MovingToDefencePosition){
 			if(WatchForSignal(robot, 65535)){
