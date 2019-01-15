@@ -1,15 +1,18 @@
 package bc19;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Prophet extends MovingRobot implements Machine{
 	
 	MyRobot robot;
-	boolean initialized;
 	int ourTeam; //red:0 blue:1
 	Position location;
+	boolean initialized;
 	boolean mapIsHorizontal;
 	ArrayList<Position> castleLocations;
+	ArrayList<Position> enemyCastleLocations;
+	HashMap<Position, float[][]> routesToEnemies;
 	int previousHealth;
 	ProphetState state;
 
@@ -21,7 +24,7 @@ public class Prophet extends MovingRobot implements Machine{
 	public Action Execute(){
 		location = new Position(robot.me.y, robot.me.x);
 		
-		if(EnemiesAround())
+		if(EnemiesAround(robot, ourTeam))
 		{
 			AttackEnemies();
 		}
@@ -30,16 +33,19 @@ public class Prophet extends MovingRobot implements Machine{
 		}
 		
 		if(state == ProphetState.Fortifying || state == ProphetState.MovingToDefencePosition){
-			//method to read battlecry;
-				//set to mobilizing
-				//check if getting attacked
-				//enter undersiege
-		}
+			if(WatchForSignal(robot, 65535)){
+				state= ProphetState.Mobilizing;
+			}
 			if(state == ProphetState.MovingToDefencePosition){
-				//If position is a valid spot
-					//set state to fortifying
-				// else try to find defence position
-			}	
+				if(Helper.IsSurroundingsOccupied(robot, robot.getVisibleRobotMap(), location)){
+					state = ProphetState.Fortifying;
+				}
+			}		
+		}
+		else if(state == ProphetState.Mobilizing){
+			Position closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);
+			CombatFloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle), closestEnemyCastle);
+		}	
 
 		return null;
 	}
@@ -59,6 +65,8 @@ public class Prophet extends MovingRobot implements Machine{
 		mapIsHorizontal = Helper.FindSymmetry(robot.map);
 		location = new Position(robot.me.y, robot.me.x);
 		castleLocations = new ArrayList<>();
+		enemyCastleLocations = new ArrayList<>();
+		routesToEnemies = new HashMap<>();
 		initialized = false;
 		previousHealth = robot.SPECS.UNITS[robot.me.unit].STARTING_HP;
 	}
