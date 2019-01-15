@@ -14,6 +14,7 @@ public class Preacher extends MovingRobot implements Machine{
 	HashMap<Position, float[][]> routesToEnemies;
 	Position closestCastle;
 	PreacherState state;
+	int previousHealth; 
  
 	public Preacher(MyRobot robot)
 	{
@@ -22,9 +23,17 @@ public class Preacher extends MovingRobot implements Machine{
 
 	public Action Execute(){	//Initializing, Fortifying, MovingToDefencePosition, UnderSiege, Mobilizing
 		location = new Position(robot.me.y, robot.me.x);
+
+		if(EnemiesAround()){
+			AttackEnemies();
+		}
 		if(!initialized)
 		{
 			Initialize();
+		}
+		UnderSiege();
+		if(state == PreacherState.UnderSiege){
+
 		}
 		if(state == PreacherState.Fortifying || state == PreacherState.MovingToDefencePosition){
 			//method to read battlecry;
@@ -68,10 +77,29 @@ public class Preacher extends MovingRobot implements Machine{
 		castleLocations = new ArrayList<>();
 		enemyCastleLocations = new ArrayList<>();
 		routesToEnemies = new HashMap<>();
+		previousHealth = robot.SPECS.UNITS[robot.me.unit].STARTING_HP;
 		GetClosestCastle();
-    }
+	}
+	
+	public void UnderSiege(){
+		if(previousHealth != robot.me.health && !EnemiesAround()){
+			robot.signal(0, 9);
+			state = PreacherState.UnderSiege;
+		}		
+		previousHealth = robot.me.health;
+	}
 
-	public Action AttackClosest()
+	public boolean EnemiesAround(){
+		Robot[] robots = robot.getVisibleRobots();
+		for(int i =0; i < robots.length; i++){
+			if(robots[i].team != ourTeam){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public Action AttackEnemies()
 	{
 		int most = Integer.MIN_VALUE;
 		Position attackTile = null;
@@ -82,9 +110,9 @@ public class Preacher extends MovingRobot implements Machine{
 			for (int j = -visionRadius; j <= visionRadius; j++)
 			{
 				Position checkTile = new Position(location.y + i, location.x + j);
-				if (Helper.inMap(robot.map, attackTile) && Helper.DistanceSquared(attackTile, location) <= visionRange)
+				if (Helper.inMap(robot.map, checkTile) && Helper.DistanceSquared(checkTile, location) <= visionRange)
 				{
-					int mostEnemies = NumAdjacentEnemies(attackTile);
+					int mostEnemies = NumAdjacentEnemies(checkTile);
 					if (mostEnemies > most)
 					{
 						most = mostEnemies;
