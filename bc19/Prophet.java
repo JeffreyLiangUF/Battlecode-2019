@@ -10,6 +10,8 @@ public class Prophet extends MovingRobot implements Machine{
 	Position location;
 	boolean mapIsHorizontal;
 	ArrayList<Position> castleLocations;
+	int previousHealth;
+	ProphetState state;
 
 	public Prophet(MyRobot robot)
 	{
@@ -18,13 +20,27 @@ public class Prophet extends MovingRobot implements Machine{
 
 	public Action Execute(){
 		location = new Position(robot.me.y, robot.me.x);
-		if(robot.me.turn == 1){
-			castleLocations = new ArrayList<>();
+		
+		if(EnemiesAround())
+		{
+			AttackEnemies();
 		}
 		if(!initialized){
-			boolean[] signals = ReadInitialSignals(robot, castleLocations);
-			initialized = signals[0];;}
-	
+			Initialize();
+		}
+		
+		if(state == ProphetState.Fortifying || state == ProphetState.MovingToDefencePosition){
+			//method to read battlecry;
+				//set to mobilizing
+				//check if getting attacked
+				//enter undersiege
+		}
+			if(state == ProphetState.MovingToDefencePosition){
+				//If position is a valid spot
+					//set state to fortifying
+				// else try to find defence position
+			}	
+
 		return null;
 	}
 
@@ -44,9 +60,10 @@ public class Prophet extends MovingRobot implements Machine{
 		location = new Position(robot.me.y, robot.me.x);
 		castleLocations = new ArrayList<>();
 		initialized = false;
+		previousHealth = robot.SPECS.UNITS[robot.me.unit].STARTING_HP;
 	}
-	/*
-	public Action AttackClosest()
+	
+	public Action AttackEnemies()
 	{
 		//get robots in vision
 		//check if robots are enemy and in range
@@ -70,5 +87,10 @@ public class Prophet extends MovingRobot implements Machine{
 			}
 		}
 		return robot.attack(attackTile.x - location.x, attackTile.y - location.y);
-	}	*/
+	}	
+}
+
+enum ProphetState
+{
+	Initializing, Fortifying, MovingToDefencePosition, Mobilizing
 }
