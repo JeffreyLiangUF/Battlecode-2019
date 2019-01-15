@@ -239,10 +239,8 @@ public class MovingRobot {
 	int PathingDistance(MyRobot robot, int[][] path) {
 		return path[robot.me.y][robot.me.x];
 	}
-	
 
 	Action FloodPathing(MyRobot robot, float[][] path, Position goal)
-
 	{
 		if (path == null) {
 			return null;
@@ -271,12 +269,75 @@ public class MovingRobot {
 
 		for (int i = 0; i < validPositions.length; i++) {
 			if (path[validPositions[i].y][validPositions[i].x] < lowest
-					&& path[validPositions[i].y][validPositions[i].x] > 0) {
+					&& path[validPositions[i].y][validPositions[i].x] > 0) 
+			{
 				lowest = path[validPositions[i].y][validPositions[i].x];
 				lowestPos = validPositions[i];
 			}
 		}
 		return robot.move(lowestPos.x - robot.me.x, lowestPos.y - robot.me.y);
+	}
+
+	Action CombatFloodPathing(MyRobot robot, float[][] path, Position goal)
+	{
+		if (path == null) {
+			return null;
+		}
+		int moveSpeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
+		if(Helper.DistanceSquared(new Position(robot.me.y, robot.me.x), goal) <= moveSpeed){
+			
+			if(robot.getVisibleRobotMap()[goal.y][goal.x] == 0){
+				
+				return robot.move(goal.x - robot.me.x, goal.y - robot.me.y);
+			}
+			Position adj = Helper.RandomNonResourceAdjacentPositionInMoveRange(robot, goal);
+			if(adj != null){
+				
+				return robot.move(adj.x - robot.me.x, adj.y - robot.me.y);
+			}
+			else{
+				return null;
+			}
+		}
+		Position[] validFormations = Helper.AllOpenInRangeInFormation(robot, robot.map, new Position(robot.me.y, robot.me.x), robot.SPECS.UNITS[robot.me.unit].SPEED);
+		Position[] validPositions = Helper.AllOpenInRange(robot, robot.map, new Position(robot.me.y, robot.me.x),
+				robot.SPECS.UNITS[robot.me.unit].SPEED);
+		float lowest = path[robot.me.y][robot.me.x];
+		if (lowest <= 0)
+		{
+			lowest = Integer.MAX_VALUE;
+		}
+		Position lowestPos = null;
+
+		for (int i = 0; i < validFormations.length; i++) {
+			if (path[validFormations[i].y][validFormations[i].x] < lowest
+					&& path[validFormations[i].y][validFormations[i].x] > 0) 
+			{
+				lowest = path[validFormations[i].y][validFormations[i].x];
+				lowestPos = validFormations[i];
+			}
+		}
+
+		if (lowestPos == null)
+		{
+			for (int i = 0; i < validPositions.length; i++) {
+				if (path[validPositions[i].y][validPositions[i].x] < lowest
+						&& path[validPositions[i].y][validPositions[i].x] > 0) 
+				{
+					lowest = path[validPositions[i].y][validPositions[i].x];
+					lowestPos = validPositions[i];
+				}
+			}
+		}
+		
+		if (lowestPos != null)
+		{
+			return robot.move(lowestPos.x - robot.me.x, lowestPos.y - robot.me.y);
+		}
+		else
+		{
+			return MoveCloser(robot, goal);
+		}
 	}
 
 	boolean[] ReadInitialSignals(MyRobot robot, ArrayList<Position> castleLocations) {
@@ -324,15 +385,6 @@ public class MovingRobot {
 			outputRead[0] = false;
 			return outputRead;
 		}
-	}
-	public boolean EnemiesAround(MyRobot robot, int ourTeam){
-		Robot[] robots = robot.getVisibleRobots();
-		for(int i =0; i < robots.length; i++){
-			if(robots[i].team != ourTeam){
-				return true;
-			}
-		}
-		return false;
 	}
 	Action MoveCloser(MyRobot robot, Position pos){
 		int moveSpeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
