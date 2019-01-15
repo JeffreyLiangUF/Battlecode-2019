@@ -32,9 +32,11 @@ public class Pilgrim extends MovingRobot implements Machine{
 		this.robot = robot;
 	}
 
-	public Action Execute(){
+	public Action Execute(){        
+        location = new Position(robot.me.y, robot.me.x);
         if (!initialized)
         {
+            robot.log("not intialized");
             Initialize();
             if(initialized){
                 state = PilgrimState.GoingToResource;
@@ -46,14 +48,19 @@ public class Pilgrim extends MovingRobot implements Machine{
             UpdateOccupiedResources();
             if (state == PilgrimState.GoingToResource)
             {
+                robot.log("Off to Mine");
                 return GoToMine();
             }
             if (state == PilgrimState.Mining)
             {
+                robot.log("Mining");
+
                 return Mining();
             }
             if (state == PilgrimState.Returning)
             {
+                robot.log("Returning to Dropoff");
+
                 return ReturnToDropOff();
             }  
         }
@@ -72,7 +79,6 @@ public class Pilgrim extends MovingRobot implements Machine{
         fuelLocations = new ArrayList<>();
         dropOffLocations = new ArrayList<>();
         ourDropOffRoutes = new HashMap<>();
-        location = new Position(robot.me.y, robot.me.x);
         state = PilgrimState.Initializing;
         maxKarb = 0;
         maxFuel = robot.SPECS.UNITS[robot.me.unit].FUEL_CAPACITY;
@@ -103,19 +109,11 @@ public class Pilgrim extends MovingRobot implements Machine{
     {
         if (robot.me.turn == 1) {
             InitializeVariables();
-            for(int i = 0; i < dropOffLocations.size(); i++){
-                robot.log("Castle: "+ dropOffLocations.get(i).toString());
-            }
-            robot.log("Should be above");
         }
         if (!initialized) {
             boolean[] signals = ReadInitialSignals(robot, dropOffLocations);
             initialized = signals[0];
-            robot.log("INITIALIZED " + initialized);
             maxKarb = signals[2] ? emergencyAmount : karbThreshold;
-            for(int i = 0; i < dropOffLocations.size(); i++){
-                robot.log("Castle: "+ dropOffLocations.get(i).toString());
-            }
        }
     }
     void UpdateOccupiedResources()
@@ -157,12 +155,10 @@ public class Pilgrim extends MovingRobot implements Machine{
         Position closest = null;
         for(int i = 0; i < dropOffLocations.size(); i++){
             Position pos = dropOffLocations.get(i);
-            robot.log(pos.toString());
             float distance = ourDropOffRoutes.containsKey(pos) ? 
             ourDropOffRoutes.get(pos)[location.y][location.x] : 
                 Helper.DistanceSquared(pos, location);
 
-            robot.log(" " + distance);
             if (occupiedResources[pos.y][pos.x] != 1 && distance < lowest)
             {
                 lowest = distance;
@@ -172,8 +168,9 @@ public class Pilgrim extends MovingRobot implements Machine{
         return closest;
     }
     public Action ReturnToDropOff(){ 
-        dropOff = GetNearestDropOff();            
-        robot.log("AM I HERE?");
+        dropOff = GetNearestDropOff();  
+
+       // robot.log("KARB: " + robot.me.karbonite + " turn " + robot.me.turn + " Me "+ location.toString() + "   "+ dropOff.toString());
 
         if (Helper.DistanceSquared(dropOff, location) < 3)
         {
@@ -186,8 +183,11 @@ public class Pilgrim extends MovingRobot implements Machine{
         }
         else if (Helper.DistanceSquared(dropOff, location) <= robot.SPECS.UNITS[robot.me.unit].SPEED)
         { 
-            Position nextToDropoff = Helper.RandomNonResourceAdjacentPositionInMoveRange(robot, dropOff);          
-            return robot.move(nextToDropoff.x - location.x, nextToDropoff.y - location.x);  
+            Position nextToDropoff = Helper.RandomNonResourceAdjacentPositionInMoveRange(robot, dropOff); 
+            if(nextToDropoff != null){
+                return robot.move(nextToDropoff.x - location.x, nextToDropoff.y - location.y);
+            }
+            return MoveCloser(robot, dropOff);
         }
         else
         {
@@ -231,6 +231,7 @@ public class Pilgrim extends MovingRobot implements Machine{
     {
         Position nearest = GetNearestResource();
 
+        robot.log("" + occupiedResources[nearest.y][nearest.x]);
         int movespeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
         if (nearest.y - location.y == 0 && nearest.x - location.x == 0)
         {

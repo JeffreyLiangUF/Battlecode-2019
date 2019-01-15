@@ -52,8 +52,7 @@ public class Castle implements Machine {
             if(Helper.CanAfford(robot, spawnOrder[positionInSpawnOrder])){
                 int robotType = spawnOrder[positionInSpawnOrder];
                 positionInSpawnOrder++;   
-                DeclareAllyCastlePositions(Attacking, EmergencyMining, 2);   
-                robot.log("declared ");          
+                DeclareAllyCastlePositions(Attacking, EmergencyMining, 5);          
                 return robot.buildUnit(robotType, spawnPosition.x - location.x, spawnPosition.y - location.y);
                 
             }
@@ -69,8 +68,7 @@ public class Castle implements Machine {
             //robot.signal(65535, 100);
         }
         
-        DeclareAllyCastlePositions(Attacking, EmergencyMining, 2);
-        robot.log("declared ");
+        DeclareAllyCastlePositions(Attacking, EmergencyMining, 5);
         
         return null;
     }
@@ -167,7 +165,7 @@ public class Castle implements Machine {
 
     void DeclareAllyCastlePositions(boolean bit1, boolean bit2, int radius) {
         if (numCastles == 1) {
-            return;
+            robot.signal(BinarySignalsForInitialization(bit1, bit2, new Position(1, 1)), radius);
         }
 
         else if (numCastles == 2) {

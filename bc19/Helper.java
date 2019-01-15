@@ -105,13 +105,15 @@ public class Helper{
 			for (int j = -1; j <= 1; j++)
 			{
 				Position adjacent = new Position(pos.y + i, pos.x + j);
-				if(Helper.inMap(robot.map, adjacent) && Helper.DistanceSquared(pos, adjacent) < robot.SPECS.UNITS[robot.me.unit].SPEED){
+				if(Helper.inMap(robot.map, adjacent) && robot.map[adjacent.y][adjacent.x] && Helper.DistanceSquared(new Position(robot.me.y, robot.me.x), adjacent) <= robot.SPECS.UNITS[robot.me.unit].SPEED){
 					if (robot.map[adjacent.y][adjacent.x] && robots[adjacent.y][adjacent.x] == 0 && fuelMap[adjacent.y][adjacent.x] == false && karbMap[adjacent.y][adjacent.x] == false)
-				{
-					return new Position(pos.y + i, pos.x + j);
-				}}
+					{
+						return new Position(adjacent.y, adjacent.x);
+					}
+				}
 			}
-		}
+		}	
+	
 		return null;
 	}
 
@@ -124,7 +126,7 @@ public class Helper{
 		{
 			for (int j = -1; j <= 1; j++)
 			{
-				if(Helper.inMap(robot.map, new Position(pos.y + i, pos.x + j))){
+				if(Helper.inMap(robot.map, new Position(pos.y + i, pos.x + j)) && robot.map[pos.y + i][pos.x + j]){
 				if (robot.map[pos.y + i][pos.x + j] && robots[pos.y + i][pos.x + j] == 0 && fuelMap[pos.y + i][pos.x + j] == false && karbMap[pos.y + i][pos.x + j] == false)
 				{
 					return new Position(pos.y + i, pos.x + j);

@@ -246,7 +246,6 @@ public class MovingRobot {
 		if (path == null) {
 			return null;
 		}
-		robot.log("Flood Pathing, Current Position is " + robot.me.y + ", " + robot.me.x + " and the goal is : " + goal.toString());
 		int moveSpeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
 		if(Helper.DistanceSquared(new Position(robot.me.y, robot.me.x), goal) <= moveSpeed){
 			
@@ -277,7 +276,6 @@ public class MovingRobot {
 				lowestPos = validPositions[i];
 			}
 		}
-		robot.log("LOWEST : " + lowestPos.toString());
 		return robot.move(lowestPos.x - robot.me.x, lowestPos.y - robot.me.y);
 	}
 
@@ -291,7 +289,6 @@ public class MovingRobot {
 			}
 		}
 		Position spawnCastlePos = new Position(spawnCastle.y, spawnCastle.x);
-		robot.log("Positions : " + spawnCastlePos.toString() + "  " + robot.me.y + ", " + robot.me.x);
 		if (castleLocations.size() == 0) {
 			castleLocations.add(spawnCastlePos);
 		}
@@ -300,14 +297,11 @@ public class MovingRobot {
 			outputRead[0] = false;
 			return outputRead;
 		}
-		robot.log("Signal " + Position.convertBinary(signal));
 		int x = signal & 63;
 		signal >>= 6;
 		int y = signal & 63;
-		robot.log("CORDS " + y + " " + x);
 		signal >>= 6;
 		int numCastle = signal & 3;
-		robot.log("NUMBER OF CASTLES " + numCastle);
 		if (numCastle == 1) {
 			outputRead[0] = true;
 			return outputRead;
@@ -327,7 +321,28 @@ public class MovingRobot {
 			return outputRead;
 		}
 	}
-
+	Action MoveCloser(MyRobot robot, Position pos){
+		int moveSpeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
+		float closest = Integer.MAX_VALUE;
+		Position output = null;
+		for (int y = -moveSpeed; y <= moveSpeed; y++) {
+			for (int x = -moveSpeed; x <= moveSpeed; x++) {
+				Position possible = new Position(robot.me.y + y, robot.me.x + x);
+				if(Helper.inMap(robot.map, possible) && robot.map[possible.y][possible.x] && 
+				Helper.DistanceSquared(new Position(robot.me.y, robot.me.x), possible) <= moveSpeed &&
+				robot.getVisibleRobotMap()[possible.y][possible.x] == 0){
+					if(Helper.DistanceSquared(pos, possible) < closest){
+						closest = Helper.DistanceSquared(pos, possible);
+						output = possible;
+					}
+				}
+			}
+		}
+		if(output != null){
+			return robot.move(robot.me.x - output.x, robot.me.y - output.y);
+		}		
+		return null;
+	}
 }
 
 class PathingPosition {

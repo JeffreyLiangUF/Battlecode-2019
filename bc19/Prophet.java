@@ -17,6 +17,7 @@ public class Prophet extends MovingRobot implements Machine{
 	}
 
 	public Action Execute(){
+		location = new Position(robot.me.y, robot.me.x);
 		if(robot.me.turn == 1){
 			castleLocations = new ArrayList<>();
 		}
