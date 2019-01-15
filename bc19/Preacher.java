@@ -18,12 +18,13 @@ public class Preacher extends MovingRobot implements Machine{
 	}
 
 	public Action Execute(){
-		location = new Position(robot.me.y, robot.me.x);
-
+		
+		/*location = new Position(robot.me.y, robot.me.x);
+robot.log("This is a Preacher.");
 		if(!initialized)
 		{
 			Initialize();
-		}
+		}*/
 		return null;
 	}
 

@@ -27,7 +27,6 @@ public class Castle implements Machine {
     }
 
     public Action Execute() {
-
         if (!initialized) {
             Initialize();
         }
@@ -43,7 +42,6 @@ public class Castle implements Machine {
           // castle gets eneabled
             //metric that we are doing fine
         //}
-
 
         boolean Attacking = state == CastleState.Mobilizing ? true : false;
         boolean EmergencyMining = positionInSpawnOrder < spawnOrder.length ? true : false;

@@ -221,7 +221,7 @@ public class MovingRobot {
 	float[][] GetOrCreateMap(MyRobot robot, HashMap<Position, float[][]> maps, Position pos){
 		if(maps.containsKey(pos)){
 			if(maps.get(pos)[pos.y][pos.x] <= 0){
-				float[][] newMap  = CreateLayeredFloodPath(robot.map, new Position(robot.me.y, robot.me.x), pos);
+				float[][] newMap  = CreateLayeredFloodPath(robot.map, pos, new Position(robot.me.y, robot.me.x));
 				maps.put(pos, newMap);
 				return newMap;
 			}
@@ -230,7 +230,7 @@ public class MovingRobot {
 			}
 		}
 		else{
-			float[][] newMap  = CreateLayeredFloodPath(robot.map, new Position(robot.me.y, robot.me.x), pos);
+			float[][] newMap  = CreateLayeredFloodPath(robot.map, pos, new Position(robot.me.y, robot.me.x));
 			maps.put(pos, newMap);
 			return newMap;
 		}
@@ -259,7 +259,6 @@ public class MovingRobot {
 				return robot.move(adj.x - robot.me.x, adj.y - robot.me.y);
 			}
 			else{
-				robot.log("Rare Case Shouldn't be occuring");
 				return null;
 			}
 		}
@@ -276,7 +275,6 @@ public class MovingRobot {
 				lowestPos = validPositions[i];
 			}
 		}
-		robot.log("Lowest " + lowestPos.toString() + " " + robot.me.y + ", " + robot.me.x);
 		return robot.move(lowestPos.x - robot.me.x, lowestPos.y - robot.me.y);
 	}
 
@@ -339,6 +337,7 @@ public class MovingRobot {
 				}
 			}
 		}
+		robot.log("HERE : " + output.toString() + "   " + robot.me.y + " " + robot.me.x);
 		if(output != null){
 			return robot.move(robot.me.x - output.x, robot.me.y - output.y);
 		}		
