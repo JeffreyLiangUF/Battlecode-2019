@@ -30,9 +30,19 @@ public class MyRobot extends BCAbstractRobot {
 		return robot.Execute();*/
 		Position tester = new Position(50, 50);
 		Position test2 = new Position(26,20);
-		if (debugTurn == 1) {
+		if (debugTurn == 5000) {
 			for(int z = 0; z < 3; z++){			
 				test = MovingRobot.CreateLayeredFloodPath(map, tester,test2);
+				log("drawn " + z);
+			}
+		}
+		if(debugTurn == 5000){
+			log("Time : " + me.time);
+			log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+		}
+		if (debugTurn == 1) {
+			for(int z = 0; z < 2; z++){			
+				test = MovingRobot.CreateLayeredFloodPath(map, tester,new Position(1000, 1000));
 				log("drawn " + z);
 			}
 		}
@@ -40,23 +50,16 @@ public class MyRobot extends BCAbstractRobot {
 			log("Time : " + me.time);
 			log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 		}
-		if (debugTurn == 3) {
-			for(int z = 0; z < 3; z++){			
-				test = MovingRobot.CreateLayeredFloodPath(map, tester,new Position(1000, 1000));
-				log("drawn " + z);
-			}
-		}
-		if(debugTurn == 4){
+		if(debugTurn == 49){
 			log("Time : " + me.time);
-			log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
 		}
-		if (debugTurn == 5) {
+		if (debugTurn == 50) {
 			for(int z = 0; z < 3; z++){			
-				test = MovingRobot.UpdateFlood(this, map, test, 3, 8, true);
+				test = MovingRobot.UpdateFlood(this, map, test, 2, 8, true);
 				log("drawn " + z);
 			}
 		}
-		if(debugTurn == 6){
+		if(debugTurn == 51){
 			log("Time : " + me.time);
 		}
 
