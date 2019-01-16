@@ -10,23 +10,28 @@ public class MyRobot extends BCAbstractRobot {
 
 	public Action turn() {
 		debugTurn++;
-/*
+
 		if (robot == null) {
 			if (me.unit == SPECS.CASTLE) {
+				log("I am a Castle");
 				robot = new Castle(this);
 			} else if (me.unit == SPECS.CHURCH) {
-				log("LET THE RELIGION SPREAD");
+				log("I am a ChuUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUrch");				
 				robot = new Church(this);
 			} else if (me.unit == SPECS.PILGRIM) {
+				log("I am a Pilgrim");
 				robot = new Pilgrim(this);
 			} else if (me.unit == SPECS.CRUSADER) {
 				robot = new Crusader(this);
 			} else if (me.unit == SPECS.PROPHET) {
+				log("I am a Prophet");
 				robot = new Prophet(this);
 			} else if (me.unit == SPECS.PREACHER) {
+				log("I am a Preacher");
 				robot = new Preacher(this);
 			}
 		}
+<<<<<<< HEAD
 		return robot.Execute();*/
 		Position tester = new Position(50, 50);
 		Position test2 = new Position(26,20);
@@ -64,12 +69,15 @@ public class MyRobot extends BCAbstractRobot {
 		}
 
 		return null;	
+=======
+		return robot.Execute();
+>>>>>>> 23e803a35ba374db06ca2e3703e9af877ebdf50f
 	}
 }
+
 class Position {
 	int y;
 	int x;
-
 
 	public Position(int y, int x) {
 		this.y = y;
@@ -78,19 +86,5 @@ class Position {
 
 	public String toString() {
 		return "(" + Integer.toString(y) + ", " + Integer.toString(x) + ")";
-	}
-
-	public static String convertBinary(int num) {
-		int binary[] = new int[40];
-		int index = 0;
-		while (num > 0) {
-			binary[index++] = num % 2;
-			num = num / 2;
-		}
-		String cat = "";
-		for (int i = index - 1; i >= 0; i--) {
-			cat += binary[i];
-		}
-		return cat;
 	}
 }

@@ -20,8 +20,8 @@ public class Castle implements Machine {
     CastleState state;
     int[] spawnOrder;
     int prophetCounter = 0;
-    int prophetsPerPreacher = 4;
-    int unitsRequiredToMobilize = 8;
+    int prophetsPerPreacher = 2;
+    int unitsRequiredToMobilize = 4;
     // hashmap of ids and unit types to keep track of number of assualt units and
     // such
 
@@ -30,7 +30,6 @@ public class Castle implements Machine {
     }
 
     public Action Execute() {
-        robot.log("Im a castle :)");
         if (!initialized) {
             Initialize();
         }
@@ -57,42 +56,40 @@ public class Castle implements Machine {
                     return robot.buildUnit(robotType, spawnPosition.x - location.x, spawnPosition.y - location.y);
 
                 }
-            } 
-            else if(state == CastleState.EnabledInitial) {
+            } else if (state == CastleState.EnabledInitial) {
                 state = CastleState.Fortifying;
             }
             if (state == CastleState.Fortifying) {
-                if(robot.karbonite > 50 && robot.fuel > 100){
-                    if(prophetCounter < prophetsPerPreacher && Helper.CanAfford(robot, robot.SPECS.PROPHET)){
-
+                if (robot.karbonite > 50 && robot.fuel > 100) {
+                    if (prophetCounter < prophetsPerPreacher && Helper.CanAfford(robot, robot.SPECS.PROPHET)) {
                         Position adj = Helper.RandomNonResourceAdjacentPosition(robot, location);
-                        robot.buildUnit(robot.SPECS.PROPHET, adj.x - location.x, adj.y - location.y);
                         prophetCounter++;
-                    }
-                    else if(Helper.CanAfford(robot, robot.SPECS.PREACHER)){
 
+                        return robot.buildUnit(robot.SPECS.PROPHET, adj.x - location.x, adj.y - location.y);
+                    } else if (Helper.CanAfford(robot, robot.SPECS.PILGRIM)) {
                         Position adj = Helper.RandomNonResourceAdjacentPosition(robot, location);
-                        robot.buildUnit(robot.SPECS.PREACHER, adj.x - location.x, adj.y - location.y);
                         prophetCounter = 0;
+
+                        return robot.buildUnit(robot.SPECS.PREACHER, adj.x - location.x, adj.y - location.y);
                     }
                 }
-                if(ReadyToAttack()){
+                if (ReadyToAttack()) {
 
                     state = CastleState.Mobilizing;
-                    robot.signal(65535, 100);
+                    //robot.signal(65535, 100);
                 }
             }
             if (state == CastleState.Mobilizing) {
-                if(robot.karbonite > 50 && robot.fuel > 250){
-                    if(prophetCounter < prophetsPerPreacher && Helper.CanAfford(robot, robot.SPECS.PROPHET)){
+                if (robot.karbonite > 50 && robot.fuel > 250) {
+                    if (prophetCounter < prophetsPerPreacher && Helper.CanAfford(robot, robot.SPECS.PROPHET)) {
                         Position adj = Helper.RandomNonResourceAdjacentPosition(robot, location);
-                        robot.buildUnit(robot.SPECS.PROPHET, adj.x - location.x, adj.y - location.y);
                         prophetCounter++;
-                    }
-                    else if(Helper.CanAfford(robot, robot.SPECS.PREACHER)){
+                        return robot.buildUnit(robot.SPECS.PROPHET, adj.x - location.x, adj.y - location.y);
+
+                    } else if (Helper.CanAfford(robot, robot.SPECS.PREACHER)) {
                         Position adj = Helper.RandomNonResourceAdjacentPosition(robot, location);
-                        robot.buildUnit(robot.SPECS.PREACHER, adj.x - location.x, adj.y - location.y);
                         prophetCounter = 0;
+                        return robot.buildUnit(robot.SPECS.PREACHER, adj.x - location.x, adj.y - location.y);
                     }
                 }
             }
@@ -276,16 +273,17 @@ public class Castle implements Machine {
         }
         return closestCastle;
     }
-    boolean ReadyToAttack(){
+
+    boolean ReadyToAttack() {
         Robot[] robots = robot.getVisibleRobots();
         int alliedFightingBots = 0;
-        for(int i = 0; i < robots.length; i++){
+        for (int i = 0; i < robots.length; i++) {
             Robot bot = robots[i];
-            if(bot.team == ourTeam && (bot.unit == robot.SPECS.PREACHER || bot.unit == robot.SPECS.PROPHET)){
-                alliedFightingBots ++;
+            if (bot.team == ourTeam && (bot.unit == robot.SPECS.PREACHER || bot.unit == robot.SPECS.PROPHET)) {
+                alliedFightingBots++;
             }
         }
-        if(alliedFightingBots >= unitsRequiredToMobilize){
+        if (alliedFightingBots >= unitsRequiredToMobilize) {
             return true;
         }
         return false;
