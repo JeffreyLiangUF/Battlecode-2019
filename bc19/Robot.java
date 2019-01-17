@@ -6,6 +6,7 @@ public class Robot {
 	public int team;
 	public int x;
 	public int y;
+
 	public int unit;
     public int turn;
     public int time;

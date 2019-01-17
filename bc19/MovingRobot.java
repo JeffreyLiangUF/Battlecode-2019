@@ -215,11 +215,47 @@ public class MovingRobot {
 		return singleStep;
 	}
 
+	public static float[][] CreateLayeredFloodPath(MyRobot robot, Position startPos, Position endPos) {
+		float[][] singleStep = new float[robot.map.length][robot.map[0].length];
+		Queue<PathingPosition> toBeVisited = new LinkedList<>();
+		toBeVisited.add(new PathingPosition(startPos, 0));
+		singleStep[startPos.y][startPos.x] = 1;
+		while (toBeVisited.size() > 0) {
+			PathingPosition removed = toBeVisited.poll();
+			
+			if (removed.pos.y == endPos.y && removed.pos.x == endPos.x) {
+				continue;
+			}
+			
+			if (robot.map[removed.pos.y][removed.pos.x]) {
+				for (int y = -robot.tileMovementRange; y <= robot.tileMovementRange; y++) {
+					for (int x = -robot.tileMovementRange; x <= robot.tileMovementRange; x++) {
+						Position relativePosition = new Position(removed.pos.y + y, removed.pos.x + x);
+						if(Helper.inMap(robot.map, relative.pos)){
+							if(singleStep[relativePosition.y][relativePosition.x] != 0){
+								continue;
+							}
+							if(!robot.map[relative.pos.y][relative.pos.x]){
+								singleStep[relative.pos.y][relative.pos.x] = -1;
+								continue;
+							}
+							float newCumulitive = removed.cumulative + x*x + y*y;
+							toBeVisited.add(new PathingPosition(relativePosition, newCumulitive));
+							singleStep[relative.pos.y][relative.pos.x] = newCumulitive;
+							
+						}
+					}
+				}
+			}		
+		singleStep[startPos.y][startPos.x] = 0;
+		return singleStep;
+	}
+
 	Position ClosestEnemyCastle(MyRobot robot, HashMap<Position, float[][]> maps) {
 		float lowest = Integer.MAX_VALUE;
 		Position output = null;
 		for (Map.Entry<Position, float[][]> entry : maps.entrySet()) {
-			
+
 			if (entry.getValue()[robot.me.y][robot.me.x] < lowest) {
 				lowest = entry.getValue()[robot.me.y][robot.me.x];
 				output = entry.getKey();
@@ -355,8 +391,6 @@ public class MovingRobot {
 		}
 	}
 
-	
-
 	boolean[] ReadInitialSignals(MyRobot robot, ArrayList<Position> castleLocations) {
 		boolean[] outputRead = new boolean[3];
 		Robot spawnCastle = robot.me;
@@ -406,14 +440,15 @@ public class MovingRobot {
 
 	Action MoveCloser(MyRobot robot, Position pos) {
 		int moveSpeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
-		int tileDistance = (int)Math.sqrt(robot.SPECS.UNITS[robot.me.unit].SPEED);
+		int tileDistance = (int) Math.sqrt(robot.SPECS.UNITS[robot.me.unit].SPEED);
 		float closest = Integer.MAX_VALUE;
 		Position output = null;
 		for (int y = -tileDistance; y <= tileDistance; y++) {
 			for (int x = -tileDistance; x <= tileDistance; x++) {
 				Position possible = new Position(robot.me.y + y, robot.me.x + x);
-				if (Helper.inMap(robot.map, possible)&& robot.map[possible.y][possible.x] &&robot.getVisibleRobotMap()[possible.y][possible.x] == 0
-						&& Helper.DistanceSquared(new Position(robot.me.y, robot.me.x), possible) <= moveSpeed){
+				if (Helper.inMap(robot.map, possible) && robot.map[possible.y][possible.x]
+						&& robot.getVisibleRobotMap()[possible.y][possible.x] == 0
+						&& Helper.DistanceSquared(new Position(robot.me.y, robot.me.x), possible) <= moveSpeed) {
 					if (Helper.DistanceSquared(pos, possible) < closest) {
 						closest = Helper.DistanceSquared(pos, possible);
 						output = possible;
@@ -426,8 +461,6 @@ public class MovingRobot {
 		}
 		return null;
 	}
-
-	
 
 	boolean WatchForSignal(MyRobot robot, int signal) {
 		Robot[] robots = robot.getVisibleRobots();

@@ -1,22 +1,32 @@
 package bc19;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class MyRobot extends BCAbstractRobot {
 	public Machine robot;
-	int debugTurn = 0;
-	float[][] test;
+	Position location;
+	int visionRange;
+	int tileVisionRange;
+	int attackRange[];
+	int tileAttackRange[];
+	int movementRange;
+	int tileMovementRange;
 
 	public Action turn() {
-		debugTurn++;
-
+		if(me.turn == 1){
+			Setup();
+		}
+		location = new Position(me.y, me.x);
+/*
 		if (robot == null) {
 			if (me.unit == SPECS.CASTLE) {
 				log("I am a Castle");
-				robot = new Castle(this);
+				if (me.turn == 1) {
+					Position random = Helper.RandomNonResourceAdjacentPosition(this, new Position(me.y, me.x));
+					return buildUnit(SPECS.PROPHET, random.x - me.x, random.y - me.y);
+				}
+				// robot = new Castle(this);
 			} else if (me.unit == SPECS.CHURCH) {
-				log("I am a ChuUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUrch");				
+				log("I am a Church");
 				robot = new Church(this);
 			} else if (me.unit == SPECS.PILGRIM) {
 				log("I am a Pilgrim");
@@ -31,47 +41,33 @@ public class MyRobot extends BCAbstractRobot {
 				robot = new Preacher(this);
 			}
 		}
-<<<<<<< HEAD
-		return robot.Execute();*/
-		Position tester = new Position(50, 50);
-		Position test2 = new Position(26,20);
-		if (debugTurn == 5000) {
-			for(int z = 0; z < 3; z++){			
-				test = MovingRobot.CreateLayeredFloodPath(map, tester,test2);
-				log("drawn " + z);
+		if (me.unit == SPECS.CASTLE) {
+			return null;
+		}*/
+		if(me.turn == 1){
+			tileMovementRange = 3;
+			float[][] test = MovingRobot.CreateLayeredFloodPath(this, new Position(25,10), new Position(200,200));
+			for (int i = 0; i < test.length; i++) {
+				String cat = "";
+				for (int j = 0; j < test[0].length; j++) {
+					String temp = Math.round(test[i][j]) + " ";
+					cat += temp;
+				}
+				log(cat);
 			}
-		}
-		if(debugTurn == 5000){
-			log("Time : " + me.time);
-			log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-		}
-		if (debugTurn == 1) {
-			for(int z = 0; z < 2; z++){			
-				test = MovingRobot.CreateLayeredFloodPath(map, tester,new Position(1000, 1000));
-				log("drawn " + z);
-			}
-		}
-		if(debugTurn == 2){
-			log("Time : " + me.time);
-			log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-		}
-		if(debugTurn == 49){
-			log("Time : " + me.time);
-		}
-		if (debugTurn == 50) {
-			for(int z = 0; z < 3; z++){			
-				test = MovingRobot.UpdateFlood(this, map, test, 2, 8, true);
-				log("drawn " + z);
-			}
-		}
-		if(debugTurn == 51){
-			log("Time : " + me.time);
 		}
 
-		return null;	
-=======
-		return robot.Execute();
->>>>>>> 23e803a35ba374db06ca2e3703e9af877ebdf50f
+		return null;
+		//return robot.Execute();
+	}
+
+	void Setup(){
+		visionRange = SPECS.UNITS[me.unit].VISION_RADIUS;
+		tileVisionRange = (int)Math.sqrt(visionRange);		
+		attackRange = SPECS.UNITS[me.unit].ATTACK_RADIUS;
+	 	tileAttackRange = attackRange != null ? new int[]{(int)Math.sqrt(attackRange[0]), (int)Math.sqrt(attackRange[1])} : null;
+	 	movementRange= SPECS.UNITS[me.unit].SPEED;
+	 	tileMovementRange = (int)Math.sqrt(movementRange);
 	}
 }
 
