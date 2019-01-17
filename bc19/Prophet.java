@@ -77,8 +77,8 @@ public class Prophet extends MovingRobot implements Machine {
 					}
 				}
 
-				return CombatFloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle),
-						closestEnemyCastle, ourTeam);
+			//	return CombatFloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle),
+			//			closestEnemyCastle, ourTeam);
 			}
 		}
 		return null;

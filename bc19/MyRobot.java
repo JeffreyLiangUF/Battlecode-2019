@@ -1,6 +1,5 @@
 package bc19;
 
-
 public class MyRobot extends BCAbstractRobot {
 	public Machine robot;
 	Position location;
@@ -11,11 +10,40 @@ public class MyRobot extends BCAbstractRobot {
 	int movementRange;
 	int tileMovementRange;
 
+	float[][] test;
+
 	public Action turn() {
-		if(me.turn == 1){
+		if (me.turn == 1) {
 			Setup();
 		}
 		location = new Position(me.y, me.x);
+
+		if (me.unit == SPECS.CASTLE && me.turn == 1) {
+			Position random = Helper.RandomNonResourceAdjacentPosition(this, new Position(me.y, me.x));
+			return buildUnit(SPECS.CRUSADER, random.x - me.x, random.y - me.y);
+		}
+		if (me.unit == SPECS.CRUSADER) {
+			if (me.turn == 1) {
+				for (int l = 0; l < 3; l++) {
+					test = MovingRobot.CreateLayeredFloodPath(this, new Position(57, 37), new Position(100,100));
+					/*
+					  for (int i = 0; i < test.length; i++) { String cat = ""; for (int j = 0; j <
+					  test[0].length; j++) { String temp = " " + Math.round(test[i][j]);
+					  if(temp.length() == 1){ temp = "   " + temp; } else if(temp.length() == 2){
+					  temp = "  " + temp; } else if(temp.length() == 3){ temp = " " + temp; } cat
+					  += temp; } log(cat); }
+					 */
+				}
+				
+			}
+			if (me.turn == 2) {
+					log("Time Used : " + (me.time - 20));
+				}
+				//tileMovementRange = 1;
+			//	return MovingRobot.FloodPathing(this, test, new Position(57, 37));
+		}
+
+		return null;
 /*
 		if (robot == null) {
 			if (me.unit == SPECS.CASTLE) {
@@ -43,31 +71,21 @@ public class MyRobot extends BCAbstractRobot {
 		}
 		if (me.unit == SPECS.CASTLE) {
 			return null;
-		}*/
-		if(me.turn == 1){
-			tileMovementRange = 3;
-			float[][] test = MovingRobot.CreateLayeredFloodPath(this, new Position(25,10), new Position(200,200));
-			for (int i = 0; i < test.length; i++) {
-				String cat = "";
-				for (int j = 0; j < test[0].length; j++) {
-					String temp = Math.round(test[i][j]) + " ";
-					cat += temp;
-				}
-				log(cat);
-			}
 		}
 
-		return null;
-		//return robot.Execute();
+		// return null;
+		// return robot.Execute();*/
 	}
 
-	void Setup(){
+	void Setup() {
 		visionRange = SPECS.UNITS[me.unit].VISION_RADIUS;
-		tileVisionRange = (int)Math.sqrt(visionRange);		
+		tileVisionRange = (int) Math.sqrt(visionRange);
 		attackRange = SPECS.UNITS[me.unit].ATTACK_RADIUS;
-	 	tileAttackRange = attackRange != null ? new int[]{(int)Math.sqrt(attackRange[0]), (int)Math.sqrt(attackRange[1])} : null;
-	 	movementRange= SPECS.UNITS[me.unit].SPEED;
-	 	tileMovementRange = (int)Math.sqrt(movementRange);
+		tileAttackRange = attackRange != null
+				? new int[] { (int) Math.sqrt(attackRange[0]), (int) Math.sqrt(attackRange[1]) }
+				: null;
+		movementRange = SPECS.UNITS[me.unit].SPEED;
+		tileMovementRange = (int) Math.sqrt(movementRange);
 	}
 }
 
