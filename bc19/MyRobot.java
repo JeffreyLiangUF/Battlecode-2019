@@ -19,12 +19,12 @@ public class MyRobot extends BCAbstractRobot {
 		location = new Position(me.y, me.x);
 
 		if (me.unit == SPECS.CASTLE && me.turn == 1) {
-		//	Position random = Helper.RandomNonResourceAdjacentPosition(this, new Position(me.y, me.x));
-		//	return buildUnit(SPECS.CRUSADER, random.x - me.x, random.y - me.y);
-		}/*
+			Position random = Helper.RandomNonResourceAdjacentPosition(this, new Position(me.y, me.x));
+			return buildUnit(SPECS.CRUSADER, random.x - me.x, random.y - me.y);
+		}
 		if (me.unit == SPECS.CRUSADER) {
 			if (me.turn == 1) {
-				for (int l = 0; l < 3; l++) {
+				for (int l = 0; l < 1; l++) {
 					test = MovingRobot.CreateLayeredFloodPath(this, new Position(57, 37), new Position(100,100));
 					/*
 					  for (int i = 0; i < test.length; i++) { String cat = ""; for (int j = 0; j <
@@ -32,16 +32,16 @@ public class MyRobot extends BCAbstractRobot {
 					  if(temp.length() == 1){ temp = "   " + temp; } else if(temp.length() == 2){
 					  temp = "  " + temp; } else if(temp.length() == 3){ temp = " " + temp; } cat
 					  += temp; } log(cat); }
-					 
+					 */
 				}
 				
 			}
 			if (me.turn == 2) {
 					log("Time Used : " + (me.time - 20));
 				}
-				//tileMovementRange = 1;
-			//	return MovingRobot.FloodPathing(this, test, new Position(57, 37));
-		}*/
+				tileMovementRange = 3;
+			return MovingRobot.FloodPathing(this, test, new Position(57, 37));
+		}
 		if(me.turn == 2){
 			log(lastOffer[0][0] + " " + lastOffer[0][1] + " "  +lastOffer[1][0] + " " + lastOffer[1][1]);
 

@@ -262,10 +262,12 @@ public class MovingRobot {
 	public static Action FloodPathing(MyRobot robot, float[][] path, Position goal) {
 		if (Helper.DistanceSquared(robot.location, goal) <= robot.movementRange) {
 			if (robot.getVisibleRobotMap()[goal.y][goal.x] == 0) {
+				robot.log("Trying to directly move to it, Value: " + robot.getVisibleRobotMap()[goal.y][goal.x]);
 				return robot.move(goal.x - robot.me.x, goal.y - robot.me.y);
 			}
 			Position adj = Helper.RandomAdjacent(robot, goal);
 			if (adj != null) {
+				robot.log("trying to move adjacent.");
 				return robot.move(adj.x - robot.me.x, adj.y - robot.me.y);
 			} else {
 				return null;
