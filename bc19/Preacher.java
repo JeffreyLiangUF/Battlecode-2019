@@ -37,7 +37,6 @@ public class Preacher extends MovingRobot implements Machine {
 			Initialize();
 		}
 		if (!doneUpgrading) {
-			doneUpgrading = UpgradeMaps(robot, routesToEnemies, toBeUpgraded);
 		}
 		UnderSiege();
 		if (state == PreacherState.UnderSiege) {
@@ -91,7 +90,7 @@ public class Preacher extends MovingRobot implements Machine {
 				enemyCastleLocations = Helper.FindEnemyCastles(robot, mapIsHorizontal, castleLocations);
 				toBeUpgraded = new ArrayList<>(enemyCastleLocations);
 				for (int i = 0; i < enemyCastleLocations.size(); i++) {
-					GetOrCreateMap(robot, routesToEnemies, enemyCastleLocations.get(i));
+					GetOrCreateMap(robot, routesToEnemies, enemyCastleLocations.get(i), false);
 				}
 			}
 			if (initialized && signals[1]) {

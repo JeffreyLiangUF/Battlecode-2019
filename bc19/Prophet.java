@@ -24,8 +24,7 @@ public class Prophet extends MovingRobot implements Machine {
 	}
 
 	public Action Execute() {
-		location = new Position(robot.me.y, robot.me.x);
-
+/*
 		if (robot.me.turn == 1) {
 			InitializeVariables();
 		}
@@ -38,7 +37,6 @@ public class Prophet extends MovingRobot implements Machine {
 		}
 		if (initialized) {
 			if (!doneUpgrading) {
-				doneUpgrading = UpgradeMaps(robot, routesToEnemies, toBeUpgraded);
 			}
 
 			if (state == ProphetState.Fortifying || state == ProphetState.MovingToDefencePosition) {
@@ -50,7 +48,7 @@ public class Prophet extends MovingRobot implements Machine {
 				 * (Helper.IsSurroundingsOccupied(robot, robot.getVisibleRobotMap(), location,
 				 * ourTeam) < 2) { state = ProphetState.Fortifying; } else { GetClosestCastle();
 				 * return MoveToDefend(); } }
-				 */
+				 
 			} else if (state == ProphetState.Mobilizing) {
 				// robot.log("are we mobilized");
 				Position closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);
@@ -80,6 +78,19 @@ public class Prophet extends MovingRobot implements Machine {
 			//	return CombatFloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle),
 			//			closestEnemyCastle, ourTeam);
 			}
+}*/
+
+if (robot.me.turn == 1) {
+	InitializeVariables();
+}
+
+if (!initialized) {
+	robot.log("init");
+	Initialize();
+}
+
+		for (int i = 0; i < castleLocations.size(); i++) {
+			robot.log("Turn : " + robot.me.turn + " Castle Position : " + castleLocations.get(i).toString());
 		}
 		return null;
 	}
@@ -91,7 +102,7 @@ public class Prophet extends MovingRobot implements Machine {
 		if (!initialized) {
 			boolean[] signals = ReadInitialSignals(robot, castleLocations);
 			initialized = signals[0];
-			if (initialized) {
+			/*if (initialized) {
 				enemyCastleLocations = Helper.FindEnemyCastles(robot, mapIsHorizontal, castleLocations);
 				toBeUpgraded = new ArrayList<>(enemyCastleLocations);
 				for (int i = 0; i < enemyCastleLocations.size(); i++) {
@@ -102,20 +113,18 @@ public class Prophet extends MovingRobot implements Machine {
 				state = ProphetState.Mobilizing;
 			} else if (initialized) {
 				state = ProphetState.MovingToDefencePosition;
-			}
+			}*/
 		}
 	}
 
 	void InitializeVariables() {
 		ourTeam = robot.me.team == robot.SPECS.RED ? 0 : 1;
 		mapIsHorizontal = Helper.FindSymmetry(robot.map);
-		location = new Position(robot.me.y, robot.me.x);
 		castleLocations = new ArrayList<>();
 		enemyCastleLocations = new ArrayList<>();
 		routesToEnemies = new HashMap<>();
 		initialized = false;
 		previousHealth = robot.SPECS.UNITS[robot.me.unit].STARTING_HP;
-		GetClosestCastle();
 
 	}
 

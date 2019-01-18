@@ -1,5 +1,7 @@
 package bc19;
 
+import java.util.*;
+
 public class MyRobot extends BCAbstractRobot {
 	public Machine robot;
 	Position location;
@@ -9,6 +11,8 @@ public class MyRobot extends BCAbstractRobot {
 	int tileAttackRange[];
 	int movementRange;
 	int tileMovementRange;
+	int fuelCapacity;
+	int karbCapacity;
 
 	float[][] test;
 
@@ -17,7 +21,8 @@ public class MyRobot extends BCAbstractRobot {
 			Setup();
 		}
 		location = new Position(me.y, me.x);
-
+		
+/*
 		if (me.unit == SPECS.CASTLE && me.turn == 1) {
 			Position random = Helper.RandomNonResourceAdjacentPosition(this, new Position(me.y, me.x));
 			return buildUnit(SPECS.CRUSADER, random.x - me.x, random.y - me.y);
@@ -25,37 +30,32 @@ public class MyRobot extends BCAbstractRobot {
 		if (me.unit == SPECS.CRUSADER) {
 			if (me.turn == 1) {
 				for (int l = 0; l < 1; l++) {
-					test = MovingRobot.CreateLayeredFloodPath(this, new Position(57, 37), new Position(100,100));
+					test = MovingRobot.CreateLayeredFloodPath(this, new Position(57, 37));
 					/*
 					  for (int i = 0; i < test.length; i++) { String cat = ""; for (int j = 0; j <
 					  test[0].length; j++) { String temp = " " + Math.round(test[i][j]);
 					  if(temp.length() == 1){ temp = "   " + temp; } else if(temp.length() == 2){
 					  temp = "  " + temp; } else if(temp.length() == 3){ temp = " " + temp; } cat
 					  += temp; } log(cat); }
-					 */
+					 
 				}
 				
 			}
-			if (me.turn == 2) {
-					log("Time Used : " + (me.time - 20));
-				}
-				tileMovementRange = 3;
+			
 			return MovingRobot.FloodPathing(this, test, new Position(57, 37));
 		}
-		if(me.turn == 2){
-			log(lastOffer[0][0] + " " + lastOffer[0][1] + " "  +lastOffer[1][0] + " " + lastOffer[1][1]);
-
-		}
-		return null;
-/*
+		if (me.turn == 2) {
+					log("Time Used : " + (me.time ));
+				}*/
+		
 		if (robot == null) {
 			if (me.unit == SPECS.CASTLE) {
 				log("I am a Castle");
-				if (me.turn == 1) {
-					Position random = Helper.RandomNonResourceAdjacentPosition(this, new Position(me.y, me.x));
-					return buildUnit(SPECS.PROPHET, random.x - me.x, random.y - me.y);
-				}
-				// robot = new Castle(this);
+			//	if (me.turn == 1) {
+			//		Position random = Helper.RandomNonResourceAdjacentPosition(this, new Position(me.y, me.x));
+			//		return buildUnit(SPECS.PROPHET, random.x - me.x, random.y - me.y);
+				//}
+				 robot = new Castle(this);
 			} else if (me.unit == SPECS.CHURCH) {
 				log("I am a Church");
 				robot = new Church(this);
@@ -72,10 +72,7 @@ public class MyRobot extends BCAbstractRobot {
 				robot = new Preacher(this);
 			}
 		}
-		if (me.unit == SPECS.CASTLE) {
-			return null;
-		}
-
+		return robot.Execute();
 		// return null;
 		// return robot.Execute();*/
 	}
@@ -89,6 +86,8 @@ public class MyRobot extends BCAbstractRobot {
 				: null;
 		movementRange = SPECS.UNITS[me.unit].SPEED;
 		tileMovementRange = (int) Math.sqrt(movementRange);
+		fuelCapacity = SPECS.UNITS[me.unit].FUEL_CAPACITY;
+		karbCapacity = SPECS.UNITS[me.unit].KARBONITE_CAPACITY;
 	}
 }
 
@@ -100,6 +99,16 @@ class Position {
 		this.y = y;
 		this.x = x;
 	}
+	@Override
+	public boolean equals(Object obj) {		
+		if (!(obj instanceof Position))
+        	return false;
+    	if (obj == this)
+        	return true;
+		Position toCompare = (Position) obj;
+		return this.y == toCompare.y && this.x == toCompare.x;		  
+	}
+	
 
 	public String toString() {
 		return "(" + Integer.toString(y) + ", " + Integer.toString(x) + ")";

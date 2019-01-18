@@ -126,7 +126,7 @@ public class Helper {
 		for (int i = -1; i <= 1; i++) {
 			for (int j = -1; j <= 1; j++) {
 				Position adjacent = new Position(pos.y + i, pos.x + j);
-				if (TileEmpty(robot, pos)) {
+				if (TileEmpty(robot, adjacent)) {
 					return new Position(adjacent.y, adjacent.x);
 				}
 			}
