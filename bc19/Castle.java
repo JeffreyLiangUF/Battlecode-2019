@@ -31,11 +31,13 @@ public class Castle implements Machine {
         if (!initialized) {
             Initialize();
         }
-        DeclareAllyCastlePositions(true, true);
-        if(robot.me.turn == 1){
-            Position random = Helper.RandomNonResourceAdjacentPosition(robot, robot.location);
-			return robot.buildUnit(robot.SPECS.PROPHET, random.x - robot.me.x, random.y - robot.me.y);
+        robot.log("Turn : " + robot.me.turn);
+        DeclareAllyCastlePositions(false, false);
+        if(Helper.CanAfford(robot, robot.SPECS.PILGRIM) && robot.me.turn < 15){
+            Position random = Helper.RandomAdjacentNonResource(robot, robot.location);
+			return robot.buildUnit(robot.SPECS.PILGRIM, random.x - robot.me.x, random.y - robot.me.y);
         }
+        
         
 
         //for(Position pos : allyCastles.values()){

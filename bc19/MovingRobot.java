@@ -9,7 +9,7 @@ import java.util.HashMap;
 public class MovingRobot {
 
 	public static float[][] CreateLayeredFloodPath(MyRobot robot, Position startPos) {
-		return CreateLayeredFloodPath(robot, startPos, new Position(1000,1000));
+		return CreateLayeredFloodPath(robot, startPos, new Position(1000, 1000));
 	}
 
 	public static float[][] CreateLayeredFloodPath(MyRobot robot, Position startPos, Position endPos) {
@@ -18,7 +18,7 @@ public class MovingRobot {
 		toBeVisited.add(new PathingPosition(startPos, 0));
 		while (toBeVisited.size() > 0) {
 			PathingPosition removed = toBeVisited.poll();
-			
+
 			for (int y = -robot.tileMovementRange; y <= robot.tileMovementRange; y++) {
 				for (int x = -robot.tileMovementRange; x <= robot.tileMovementRange; x++) {
 					Position relativePosition = new Position(removed.pos.y + y, removed.pos.x + x);
@@ -57,12 +57,17 @@ public class MovingRobot {
 		return singleStep;
 	}
 
-	public static Action FloodPathing(MyRobot robot, float[][] path, Position goal) {
+	public static Action FloodPathing(MyRobot robot, float[][] path, Position goal, boolean budget) {
+		int tileMoveRange = budget ? 1 : robot.tileMovementRange;
+		float moveRange = budget ? 3 : robot.movementRange;
 		if (Helper.DistanceSquared(robot.location, goal) <= robot.movementRange) {
+			if (robot.location.equals(goal)) {
+				return null;
+			}
 			if (Helper.TileEmpty(robot, goal)) {
 				return robot.move(goal.x - robot.me.x, goal.y - robot.me.y);
-			} else if (Helper.DistanceSquared(robot.location, goal) > 2) {
-				Position adj = Helper.RandomAdjacent(robot, goal);
+			} else if (Helper.DistanceSquared(robot.location, goal) > 3) {
+				Position adj = Helper.RandomAdjacentMoveable(robot, goal, robot.movementRange);
 				if (adj != null) {
 					return robot.move(adj.x - robot.me.x, adj.y - robot.me.y);
 				} else {
@@ -70,20 +75,32 @@ public class MovingRobot {
 				}
 			}
 		} else {
-			ArrayList<Position> validPositions = Helper.AllOpenInRange(robot, robot.location, robot.tileMovementRange);
-			float lowest = path[robot.me.y][robot.me.x];
+			Position lowestPos = LowestOnPathInMoveRange(robot, path, tileMoveRange, moveRange);
+			if (!lowestPos.equals(robot.location)) {
+				return robot.move(lowestPos.x - robot.me.x, lowestPos.y - robot.me.y);
+			}
+			lowestPos = LowestOnPathInMoveRange(robot, path, robot.tileMovementRange, robot.movementRange);
+			if (!lowestPos.equals(robot.location)) {
+				return robot.move(lowestPos.x - robot.me.x, lowestPos.y - robot.me.y);
+			}
+			else return null;
+		}
+		return null;
+	}
+	public static Position LowestOnPathInMoveRange(MyRobot robot, float[][] path, int tileMoveRange, float moveRange ){
+		ArrayList<Position> validPositions = Helper.AllOpenInRange(robot, robot.location, tileMoveRange, moveRange);
+			float lowest = path[robot.me.y][robot.me.x] == 0 ? Integer.MAX_VALUE : path[robot.me.y][robot.me.x];
 			Position lowestPos = robot.location;
+			
 			for (int i = 0; i < validPositions.size(); i++) {
 				Position possible = validPositions.get(i);
-				if (path[possible.y][possible.x] < lowest && path[possible.y][possible.x] > 0) {
+				if (path[possible.y][possible.x] < lowest && path[possible.y][possible.x] > 0
+						&& !possible.equals(robot.location)) {
 					lowest = path[possible.y][possible.x];
 					lowestPos = possible;
 				}
 			}
-			robot.log(lowestPos.toString());
-			return robot.move(lowestPos.x - robot.me.x, lowestPos.y - robot.me.y);
-		}
-		return null;
+			return lowestPos;
 	}
 
 	Position ClosestEnemyCastle(MyRobot robot, HashMap<Position, float[][]> maps) {
@@ -101,15 +118,17 @@ public class MovingRobot {
 
 	float[][] GetOrCreateMap(MyRobot robot, HashMap<Position, float[][]> maps, Position goal, boolean perfect) {
 		if (maps.containsKey(goal)) {
-			if (maps.get(goal)[goal.y][goal.x] <= 0) {
-				float[][] newMap = perfect ? CreateLayeredFloodPath(robot, goal) :  CreateLayeredFloodPath(robot, goal, robot.location);
+			if (maps.get(goal)[robot.me.y][robot.me.x] <= 0) {
+				float[][] newMap = perfect ? CreateLayeredFloodPath(robot, goal)
+						: CreateLayeredFloodPath(robot, goal, robot.location);
 				maps.put(goal, newMap);
 				return newMap;
 			} else {
 				return maps.get(goal);
 			}
 		} else {
-			float[][] newMap = perfect ? CreateLayeredFloodPath(robot, goal) :  CreateLayeredFloodPath(robot, goal, robot.location);
+			float[][] newMap = perfect ? CreateLayeredFloodPath(robot, goal)
+					: CreateLayeredFloodPath(robot, goal, robot.location);
 			maps.put(goal, newMap);
 			return newMap;
 		}
@@ -155,6 +174,10 @@ public class MovingRobot {
 	 * if (lowestPos != null) { return robot.move(lowestPos.x - robot.me.x,
 	 * lowestPos.y - robot.me.y); } else { return MoveCloser(robot, goal); } }
 	 */
+	boolean[] ReadInitialSignals(MyRobot robot) {
+		return ReadInitialSignals(robot, new ArrayList<Position>());
+	}
+
 	boolean[] ReadInitialSignals(MyRobot robot, ArrayList<Position> castleLocations) {
 
 		boolean[] outputRead = new boolean[3];
@@ -232,10 +255,10 @@ public class MovingRobot {
 		return false;
 	}
 
-	public boolean EnemiesAround(MyRobot robot, int ourTeam) {
+	public boolean EnemiesAround(MyRobot robot, int ignoreable) {
 		Robot[] robots = robot.getVisibleRobots();
 		for (int i = 0; i < robots.length; i++) {
-			if (robots[i].team != ourTeam) {
+			if (robots[i].team != robot.ourTeam && robots[i].unit != ignoreable) {
 				return true;
 			}
 		}

@@ -11,7 +11,7 @@ public class Church implements Machine{
 		this.robot = robot;
 	}
 
-	public Action Execute(){/*
+	public Action Execute(){
 		ourTeam = robot.me.team == robot.SPECS.RED ? 0 : 1;
 		location = new Position(robot.me.y, robot.me.x);
 
@@ -20,12 +20,12 @@ public class Church implements Machine{
 		int pilgrims = PilgrimsAround();
 		if (resources > pilgrims)
 		{
-			Position buildHere = Helper.RandomNonResourceAdjacentPosition(robot, location);
-			if (buildHere != null && robot.karbonite >= 50 && robot.fuel > 250)
+			Position buildHere = Helper.RandomAdjacentNonResource(robot, location);
+			if (buildHere != null && robot.karbonite >= 70 && robot.fuel > 250)
 			{
 				return robot.buildUnit(robot.SPECS.PILGRIM, buildHere.x - location.x, buildHere.y - location.y);
 			}
-		}*/
+		}
 		return null;
 	}
 	

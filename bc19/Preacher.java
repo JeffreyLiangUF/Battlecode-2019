@@ -30,7 +30,7 @@ public class Preacher extends MovingRobot implements Machine {
 			InitializeVariables();
 		}
 
-		if (EnemiesAround(robot, ourTeam)) {
+		if (EnemiesAround(robot, -1)) {
 			return AttackEnemies();
 		}
 		if (!initialized) {
@@ -114,7 +114,7 @@ public class Preacher extends MovingRobot implements Machine {
 	}
 
 	public void UnderSiege() {
-		if (previousHealth != robot.me.health && (!EnemiesAround(robot, ourTeam) || WatchForSignal(robot, 0))) {
+		if (previousHealth != robot.me.health && (!EnemiesAround(robot, -1) || WatchForSignal(robot, 0))) {
 			robot.signal(0, 9);
 			state = PreacherState.UnderSiege;
 		}

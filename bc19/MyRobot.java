@@ -13,6 +13,9 @@ public class MyRobot extends BCAbstractRobot {
 	int tileMovementRange;
 	int fuelCapacity;
 	int karbCapacity;
+	int constructionKarb;
+	int constructionFuel;
+	int ourTeam;
 
 	float[][] test;
 
@@ -88,6 +91,9 @@ public class MyRobot extends BCAbstractRobot {
 		tileMovementRange = (int) Math.sqrt(movementRange);
 		fuelCapacity = SPECS.UNITS[me.unit].FUEL_CAPACITY;
 		karbCapacity = SPECS.UNITS[me.unit].KARBONITE_CAPACITY;
+		constructionFuel = SPECS.UNITS[me.unit].CONSTRUCTION_FUEL;
+		constructionKarb = SPECS.UNITS[me.unit].CONSTRUCTION_KARBONITE;
+        ourTeam = me.team == SPECS.RED ? 0 : 1;
 	}
 }
 

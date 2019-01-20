@@ -85,7 +85,6 @@ if (robot.me.turn == 1) {
 }
 
 if (!initialized) {
-	robot.log("init");
 	Initialize();
 }
 

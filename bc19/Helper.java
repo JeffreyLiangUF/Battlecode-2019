@@ -10,12 +10,12 @@ public class Helper {
 		return true;
 	}
 
-	public static ArrayList<Position> AllOpenInRange(MyRobot robot, Position pos, int r) {
+	public static ArrayList<Position> AllOpenInRange(MyRobot robot, Position pos, int tileRange, float moveRange) {
 		ArrayList<Position> validPositions = new ArrayList<>();
-		for (int i = -r; i <= r; i++) {
-			for (int j = -r; j <= r; j++) {
+		for (int i = -tileRange; i <= tileRange; i++) {
+			for (int j = -tileRange; j <= tileRange; j++) {
 				Position relative = new Position(pos.y + i, pos.x + j);
-				if(TileEmpty(robot, relative) && Helper.DistanceSquared(pos, relative) <= robot.movementRange){
+				if(TileEmpty(robot, relative) && Helper.DistanceSquared(pos, relative) <= moveRange){
 					validPositions.add(relative);
 				}
 			}
@@ -121,7 +121,28 @@ public class Helper {
 		}
 		return highest;
 	}
-
+	public static Position RandomAdjacentNonResource(MyRobot robot, Position pos) {
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				Position adjacent = new Position(pos.y + i, pos.x + j);
+				if (TileEmptyNonResource(robot, adjacent)) {
+					return new Position(adjacent.y, adjacent.x);
+				}
+			}
+		}
+		return null;
+	}
+	public static Position RandomAdjacentMoveable(MyRobot robot, Position pos, float moveRange) {
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				Position adjacent = new Position(pos.y + i, pos.x + j);
+				if (TileEmpty(robot, adjacent) && Helper.DistanceSquared(robot.location, adjacent) <= moveRange) {
+					return new Position(adjacent.y, adjacent.x);
+				}
+			}
+		}
+		return null;
+	}
 	public static Position RandomAdjacent(MyRobot robot, Position pos) {
 		for (int i = -1; i <= 1; i++) {
 			for (int j = -1; j <= 1; j++) {
@@ -134,6 +155,12 @@ public class Helper {
 		return null;
 	}
 
+	public static boolean TileEmptyNonResource(MyRobot robot, Position pos){
+		if(TileEmpty(robot, pos) && !robot.getKarboniteMap()[pos.y][pos.x] && !robot.getFuelMap()[pos.y][pos.x]){
+			return true;
+		}
+		return false;
+	}
 	public static boolean TileEmpty(MyRobot robot, Position pos) {
 		if (Helper.inMap(robot.map, pos) && robot.map[pos.y][pos.x] && robot.getVisibleRobotMap()[pos.y][pos.x] == 0) {
 			return true;
@@ -141,47 +168,9 @@ public class Helper {
 		return false;
 	}
 
-	public static Position RandomNonResourceAdjacentPositionInMoveRange(MyRobot robot, Position pos) {
-		int[][] robots = robot.getVisibleRobotMap();
-		boolean[][] fuelMap = robot.getFuelMap();
-		boolean[][] karbMap = robot.getKarboniteMap();
-		for (int i = -1; i <= 1; i++) {
-			for (int j = -1; j <= 1; j++) {
-				Position adjacent = new Position(pos.y + i, pos.x + j);
-				if (Helper.inMap(robot.map, adjacent) && robot.map[adjacent.y][adjacent.x]
-						&& Helper.DistanceSquared(new Position(robot.me.y, robot.me.x),
-								adjacent) <= robot.SPECS.UNITS[robot.me.unit].SPEED) {
-					if (robot.map[adjacent.y][adjacent.x] && robots[adjacent.y][adjacent.x] == 0
-							&& fuelMap[adjacent.y][adjacent.x] == false && karbMap[adjacent.y][adjacent.x] == false) {
-						return new Position(adjacent.y, adjacent.x);
-					}
-				}
-			}
-		}
-
-		return null;
-	}
-
-	public static Position RandomNonResourceAdjacentPosition(MyRobot robot, Position pos) {
-		int[][] robots = robot.getVisibleRobotMap();
-		boolean[][] fuelMap = robot.getFuelMap();
-		boolean[][] karbMap = robot.getKarboniteMap();
-		for (int i = -1; i <= 1; i++) {
-			for (int j = -1; j <= 1; j++) {
-				if (Helper.inMap(robot.map, new Position(pos.y + i, pos.x + j)) && robot.map[pos.y + i][pos.x + j]) {
-					if (robot.map[pos.y + i][pos.x + j] && robots[pos.y + i][pos.x + j] == 0
-							&& fuelMap[pos.y + i][pos.x + j] == false && karbMap[pos.y + i][pos.x + j] == false) {
-						return new Position(pos.y + i, pos.x + j);
-					}
-				}
-			}
-		}
-		return null;
-	}
 
 	public static boolean CanAfford(MyRobot robot, int unit) {
-		if (robot.karbonite > robot.SPECS.UNITS[unit].CONSTRUCTION_KARBONITE
-				&& robot.fuel > robot.SPECS.UNITS[unit].CONSTRUCTION_FUEL) {
+		if (robot.karbonite > robot.SPECS.UNITS[unit].CONSTRUCTION_KARBONITE && robot.fuel > robot.SPECS.UNITS[unit].CONSTRUCTION_FUEL) {
 			return true;
 		}
 		return false;
