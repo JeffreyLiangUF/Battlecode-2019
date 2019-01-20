@@ -23,6 +23,8 @@ public class Pilgrim extends MovingRobot implements Machine {
     }
 
     public Action Execute() {
+        //robot.log("Pilgrim");
+
         if (!initialized) {
             Initialize();
         }

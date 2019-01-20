@@ -16,6 +16,8 @@ public class Preacher extends MovingRobot implements Machine {
 	}
 
 	public Action Execute() {
+		robot.log("Preacher");
+
 		if (robot.me.turn == 1) {
 			InitializeVariables();
 		}
@@ -30,10 +32,13 @@ public class Preacher extends MovingRobot implements Machine {
 
 		if (initialized) {
 			CastleDown(robot, enemyCastleLocations, routesToEnemies);
+
 			Position closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);
+
 			return FloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle, true),
 					closestEnemyCastle, true);
 		}
+
 		return null;
 	}
 

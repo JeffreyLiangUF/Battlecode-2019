@@ -17,6 +17,7 @@ public class Crusader extends MovingRobot implements Machine{
 	}
 
 	public Action Execute(){
+		//robot.log("Crusader");
 		if (robot.me.turn == 1) {
 			InitializeVariables();
 		}

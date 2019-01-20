@@ -18,6 +18,8 @@ public class Prophet extends MovingRobot implements Machine {
 	}
 
 	public Action Execute() {
+		//robot.log("Prophet");
+
 		if (robot.me.turn == 1) {
 			InitializeVariables();
 		}

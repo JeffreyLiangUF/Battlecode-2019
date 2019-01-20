@@ -143,6 +143,7 @@ public class MovingRobot {
 	Position ClosestEnemyCastle(MyRobot robot, HashMap<Position, float[][]> maps) {
 		float lowest = Integer.MAX_VALUE;
 		Position output = null;
+		robot.log(maps.size() + " THis si tah" + robot.location.toString());
 		for (Map.Entry<Position, float[][]> entry : maps.entrySet()) {
 
 			if (entry.getValue()[robot.me.y][robot.me.x] < lowest) {

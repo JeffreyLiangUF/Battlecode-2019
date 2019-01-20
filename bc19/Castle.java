@@ -29,7 +29,6 @@ public class Castle extends StationairyRobot implements Machine {
             Initialize();
         }
         if (initialized) {
-            robot.log("Im Initied");
             DeclareAllyCastlePositions(false, false);
             if (robot.me.turn == 30) {
                 robot.signal(65535, 36);
@@ -46,20 +45,30 @@ public class Castle extends StationairyRobot implements Machine {
                     return robot.attack(closestEnemy.x - robot.me.x, closestEnemy.y - robot.me.y);
                 }
             }
-            if(robot.me.turn < 50 && robot.karbonite > 60 && Helper.CanAfford(robot, robot.SPECS.PILGRIM)){
+            if (robot.me.turn < 50 && robot.karbonite > 60 && Helper.CanAfford(robot, robot.SPECS.PILGRIM)) {
                 Position random = Helper.RandomAdjacent(robot, robot.location);
-			    return robot.buildUnit(robot.SPECS.PILGRIM, random.x - robot.me.x, random.y - robot.me.y);
+                return robot.buildUnit(robot.SPECS.PILGRIM, random.x - robot.me.x, random.y - robot.me.y);
             }
+            if (positionInGrowthOrder > growthSpawnOrder.length - 1) {
+                positionInGrowthOrder = 0;
+            }
+            if (robot.me.turn >= 50 && robot.me.turn < 350 && robot.karbonite > 50
+                    && Helper.CanAfford(robot, growthSpawnOrder[positionInGrowthOrder])) {
 
-            else if(robot.me.turn < 350 && robot.karbonite > 50 && Helper.CanAfford(robot, growthSpawnOrder[positionInGrowthOrder])){
                 positionInGrowthOrder++;
                 Position random = Helper.RandomAdjacent(robot, robot.location);
-			    return robot.buildUnit(growthSpawnOrder[positionInGrowthOrder - 1], random.x - robot.me.x, random.y - robot.me.y);
+                return robot.buildUnit(growthSpawnOrder[positionInGrowthOrder - 1], random.x - robot.me.x,
+                        random.y - robot.me.y);
             }
-            else if(Helper.CanAfford(robot, seigeSpawnOrder[positionInSeigeOrder])){
+            if (positionInSeigeOrder > seigeSpawnOrder.length - 1) {
+                positionInSeigeOrder = 0;
+            }
+            if (robot.me.turn >= 350 && Helper.CanAfford(robot, seigeSpawnOrder[positionInSeigeOrder])) {
+
                 positionInSeigeOrder++;
                 Position random = Helper.RandomAdjacent(robot, robot.location);
-			    return robot.buildUnit(growthSpawnOrder[positionInSeigeOrder - 1], random.x - robot.me.x, random.y - robot.me.y);
+                return robot.buildUnit(growthSpawnOrder[positionInSeigeOrder - 1], random.x - robot.me.x,
+                        random.y - robot.me.y);
             }
         }
 
@@ -76,11 +85,10 @@ public class Castle extends StationairyRobot implements Machine {
     }
 
     void InitializeVariables() {
-        growthSpawnOrder = new int[] { robot.SPECS.PREACHER, robot.SPECS.PROPHET,  robot.SPECS.PROPHET, 
-                                       robot.SPECS.CRUSADER, robot.SPECS.PILGRIM};
-        seigeSpawnOrder = new int[] { robot.SPECS.PREACHER, robot.SPECS.PROPHET, robot.SPECS.CRUSADER, 
-                                      robot.SPECS.PREACHER, robot.SPECS.PROPHET, robot.SPECS.CRUSADER,
-                                      robot.SPECS.PILGRIM};
+        growthSpawnOrder = new int[] { robot.SPECS.PREACHER, robot.SPECS.PROPHET, robot.SPECS.PROPHET,
+                robot.SPECS.CRUSADER, robot.SPECS.PILGRIM };
+        seigeSpawnOrder = new int[] { robot.SPECS.PREACHER, robot.SPECS.PROPHET, robot.SPECS.CRUSADER,
+                robot.SPECS.PREACHER, robot.SPECS.PROPHET, robot.SPECS.CRUSADER, robot.SPECS.PILGRIM };
         positionInGrowthOrder = 0;
         positionInSeigeOrder = 0;
         allyCastles = new HashMap<>();

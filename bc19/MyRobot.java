@@ -50,6 +50,9 @@ public class MyRobot extends BCAbstractRobot {
 				robot = new Preacher(this);
 			}
 		}
+		return robot.Execute();
+		
+		/*
 		if (me.unit == SPECS.CASTLE && me.turn % 5 == 0 && ourTeam == 1) {
 			Position random = Helper.RandomAdjacent(this, new Position(me.y, me.x));
 			return buildUnit(SPECS.CRUSADER, random.x - me.x, random.y - me.y);
@@ -63,7 +66,7 @@ public class MyRobot extends BCAbstractRobot {
 		else if(testCount >= 5 && me.turn > 15 && Helper.CanAfford(this, SPECS.PROPHET)){
 			return buildUnit(SPECS.PROPHET, random.x - me.x, random.y - me.y);
 		}
-		}*/
+		}
 		if(me.unit == SPECS.CASTLE){
 			return robot.Execute();
 		}
@@ -83,7 +86,7 @@ public class MyRobot extends BCAbstractRobot {
 		//	log("pilgrim");
 			return robot.Execute();
 		}
-		return null;
+		return null;*/
 		
 		/*
 		if (me.unit == SPECS.CRUSADER) {

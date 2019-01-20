@@ -9,6 +9,8 @@ public class Church extends StationairyRobot implements Machine {
 	}
 
 	public Action Execute() {
+		//robot.log("Church");
+
 
 		Action defend = EvaluateEnemyRatio(robot);
 		if (defend == null) {
