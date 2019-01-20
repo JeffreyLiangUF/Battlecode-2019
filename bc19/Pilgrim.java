@@ -32,8 +32,9 @@ public class Pilgrim extends MovingRobot implements Machine {
             Initialize();
         }
         else {
+            robot.log("I AM HERE : " + robot.location.toString());
             UpdateOccupiedResources();
-            if (EnemiesAround(robot, robot.SPECS.PILGRIM)){
+            if (ThreatsAround(robot)){
                 robot.log("enemyies around");
                 state = PilgrimState.Returning;
                 return ReturnToDropOff();
@@ -116,7 +117,7 @@ public class Pilgrim extends MovingRobot implements Machine {
                             || occupiedResources[yNew][xNew] == -1) {
                         continue;
                     }
-                    if (Helper.RobotAtPosition(robot, tile) == null || tile.equals(robot.location)) {
+                    if ((Helper.RobotAtPosition(robot, tile) == null || tile.equals(robot.location)) && ImTheClosestPilgrim(tile)) {
                         occupiedResources[yNew][xNew] = 0;
                     } else {
                         occupiedResources[yNew][xNew] = 1;
@@ -163,10 +164,23 @@ public class Pilgrim extends MovingRobot implements Machine {
             float distance  = choseRoutes.containsKey(pos) ? choseRoutes.get(pos)[robot.me.y][robot.me.x]
             : Helper.DistanceSquared(pos, robot.location);
 
+            if(pos.equals(new Position(1,29))){
+                robot.log("trying to go close " + distance);
+            }
+            if(pos.equals(new Position(49,50))){
+                robot.log("trying to go for far " + distance);
+            }
+
             if (occupiedResources[pos.y][pos.x] == 0 && distance < lowest) {
+
                 lowest = distance;
                 closest = pos;
             }
+            
+            
+        }
+        if(closest.equals(new Position(49,50))){
+            robot.log("why you dipship");
         }
         
         return closest;
@@ -174,6 +188,8 @@ public class Pilgrim extends MovingRobot implements Machine {
 
     Action GoToMine() {
         Position nearest = GetNearestResource();
+
+        robot.log("MY GOAL IS : " + nearest.toString());
 
         Action act = null;
         if (miningKarb) {
@@ -264,6 +280,16 @@ public class Pilgrim extends MovingRobot implements Machine {
             }
         }
         return false;
+    }
+    boolean ImTheClosestPilgrim(Position pos){
+        Robot[] robots = robot.getVisibleRobots();
+        float myDist = Helper.DistanceSquared(robot.location, pos);
+        for(int i = 0; i < robots.length; i++){
+            if(robots[i].unit == robot.SPECS.PILGRIM && Helper.DistanceSquared(pos, new Position(robots[i].y, robots[i].x)) < myDist){
+                return false;
+            }
+        }
+        return true;
     }
 }
 

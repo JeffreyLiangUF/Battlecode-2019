@@ -42,8 +42,7 @@ public class MovingRobot {
 						if (singleStep[relativePosition.y][relativePosition.x] != 0) {
 							continue;
 						}
-
-						int decrementedRange = (robot.tileMovementRange - 1) * (robot.tileMovementRange);
+						int decrementedRange = (robot.tileMovementRange - 1) * (robot.tileMovementRange -1);
 						singleStep[relativePosition.y][relativePosition.x] = newCumulitive;
 						if (Helper.DistanceSquared(relativePosition, removed.pos) > decrementedRange) {
 							toBeVisited.add(new PathingPosition(relativePosition, newCumulitive));
@@ -75,15 +74,27 @@ public class MovingRobot {
 				}
 			}
 		} else {
+
+			if(goal.equals(new Position(1,29))){
+			for (int i = 0; i < path.length; i++) { String cat = ""; for (int j = 0; j <
+					  path[0].length; j++) { String temp = " " + Math.round(path[i][j]);
+					  if(temp.length() == 1){ temp = "   " + temp; } else if(temp.length() == 2){
+					  temp = "  " + temp; } else if(temp.length() == 3){ temp = " " + temp; } cat
+					  += temp; } robot.log(cat); }
+			}
+			
 			Position lowestPos = LowestOnPathInMoveRange(robot, path, tileMoveRange, moveRange);
-			if (!lowestPos.equals(robot.location)) {
-				return robot.move(lowestPos.x - robot.me.x, lowestPos.y - robot.me.y);
+			if(goal.equals(new Position(1,29))){
+				robot.log("HERE is the lowest " + lowestPos.toString());
 			}
+			
 			lowestPos = LowestOnPathInMoveRange(robot, path, robot.tileMovementRange, robot.movementRange);
+			
 			if (!lowestPos.equals(robot.location)) {
 				return robot.move(lowestPos.x - robot.me.x, lowestPos.y - robot.me.y);
 			}
-			else return null;
+			
+			return null;
 		}
 		return null;
 	}
@@ -255,10 +266,10 @@ public class MovingRobot {
 		return false;
 	}
 
-	public boolean EnemiesAround(MyRobot robot, int ignoreable) {
+	public boolean ThreatsAround(MyRobot robot) {
 		Robot[] robots = robot.getVisibleRobots();
 		for (int i = 0; i < robots.length; i++) {
-			if (robots[i].team != robot.ourTeam && robots[i].unit != ignoreable) {
+			if (robots[i].team != robot.ourTeam && robots[i].unit != robot.SPECS.PILGRIM && robots[i].unit != robot.SPECS.CHURCH) {
 				return true;
 			}
 		}

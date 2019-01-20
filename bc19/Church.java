@@ -18,7 +18,7 @@ public class Church implements Machine{
 
 		int resources = ResourcesAround();
 		int pilgrims = PilgrimsAround();
-		if (resources > pilgrims)
+		if (resources >= pilgrims)
 		{
 			Position buildHere = Helper.RandomAdjacentNonResource(robot, location);
 			if (buildHere != null && robot.karbonite >= 70 && robot.fuel > 250)
