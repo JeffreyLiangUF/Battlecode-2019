@@ -32,10 +32,6 @@ public class Castle extends StationairyRobot implements Machine {
         }
         robot.log("Turn : " + robot.me.turn);
         DeclareAllyCastlePositions(false, false);
-        if(Helper.CanAfford(robot, robot.SPECS.PILGRIM) && robot.me.turn < 15){
-            Position random = Helper.RandomAdjacentNonResource(robot, robot.location);
-			return robot.buildUnit(robot.SPECS.PREACHER, random.x - robot.me.x, random.y - robot.me.y);
-        }
         
         
 
@@ -111,7 +107,6 @@ public class Castle extends StationairyRobot implements Machine {
     void Initialize() {
         if (robot.me.turn == 1) {
             InitializeVariables();
-            state = CastleState.DisabledInitial;
         }
         if (!initialized) {
             initialized = SetupAllyCastles();
@@ -121,10 +116,7 @@ public class Castle extends StationairyRobot implements Machine {
     void InitializeVariables() {
         spawnOrder = new int[] { robot.SPECS.PILGRIM, robot.SPECS.PREACHER, robot.SPECS.PREACHER, robot.SPECS.PREACHER,
                 robot.SPECS.PILGRIM };
-        mapIsHorizontal = Helper.FindSymmetry(robot.map);
-        ourTeam = robot.me.team == robot.SPECS.RED ? 0 : 1;
         allyCastles = new HashMap<>();
-
     }
 
     boolean SetupAllyCastles() {
@@ -140,14 +132,12 @@ public class Castle extends StationairyRobot implements Machine {
             allyCastles.put(robot.id, robot.location);
             return true;
         }
-
         int castlesTalking = 0;
         for (int i = 0; i < robots.size(); i++) {
             if (robots.get(i).castle_talk > 0) {
                 castlesTalking++;
             }
         }
-
         if (robots.size() > 1 && castlesTalking == 0) {
             numCastles = robots.size();
         } else {
@@ -171,14 +161,12 @@ public class Castle extends StationairyRobot implements Machine {
                 }
             }
         }
-
         if (allyCastles.containsKey(robot.me.id)) {
             robot.castleTalk(CastleInfoTalk(numCastles == 3 ? true : false, false, robot.me.x));
         } else {
             allyCastles.put(robot.me.id, robot.location);
             robot.castleTalk(CastleInfoTalk(numCastles == 3 ? true : false, true, robot.me.y));
         }
-
         return CheckComplete();
     }
 
@@ -215,6 +203,7 @@ public class Castle extends StationairyRobot implements Machine {
                 }
             }
             if (other != null && other.x >= 0 && other.y >= 0) {
+                robot.log(BinarySignalsForInitialization(bit1, bit2, other) + "    X");
                 robot.signal(BinarySignalsForInitialization(bit1, bit2, other), 3);
             }
         } else if(numCastles == 3) {

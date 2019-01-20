@@ -15,8 +15,7 @@ public class Preacher extends MovingRobot implements Machine {
 		this.robot = robot;
 	}
 
-	public Action Execute() { 
-
+	public Action Execute() {
 		if (robot.me.turn == 1) {
 			InitializeVariables();
 		}
@@ -24,13 +23,19 @@ public class Preacher extends MovingRobot implements Machine {
 		if (EnemiesAround(robot)) {
 			return AttackEnemies();
 		}
+
 		if (!initialized) {
 			Initialize();
+		}		
+		robot.log(" " + initialized);
+
+		if (initialized) {
+			CastleDown(robot, enemyCastleLocations, routesToEnemies);
+			Position closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);
+			return FloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle, true),
+					closestEnemyCastle, true);
 		}
-		
-		CastleDown(robot, enemyCastleLocations, routesToEnemies);
-		Position closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);
-		return FloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle, true), closestEnemyCastle, true);
+		return null;
 	}
 
 	void Initialize() {
@@ -51,7 +56,7 @@ public class Preacher extends MovingRobot implements Machine {
 		enemyCastleLocations = new ArrayList<>();
 		routesToEnemies = new HashMap<>();
 		initialized = false;
-	}	
+	}
 
 	public Action AttackEnemies() {
 		int most = Integer.MIN_VALUE;
@@ -59,7 +64,8 @@ public class Preacher extends MovingRobot implements Machine {
 		for (int i = -robot.tileVisionRange; i <= robot.tileVisionRange; i++) {
 			for (int j = -robot.tileVisionRange; j <= robot.tileVisionRange; j++) {
 				Position checkTile = new Position(robot.me.y + i, robot.me.x + j);
-				if (Helper.inMap(robot.map, checkTile) && Helper.DistanceSquared(checkTile, robot.location) <= robot.visionRange) {
+				if (Helper.inMap(robot.map, checkTile)
+						&& Helper.DistanceSquared(checkTile, robot.location) <= robot.visionRange) {
 					int mostEnemies = NumAdjacentEnemies(checkTile);
 					if (mostEnemies > most) {
 						most = mostEnemies;
@@ -72,8 +78,6 @@ public class Preacher extends MovingRobot implements Machine {
 		}
 		return robot.attack(attackTile.x - robot.me.x, attackTile.y - robot.me.y);
 	}
-
-	
 
 	public int NumAdjacentEnemies(Position pos) {
 		int numEnemies = 0;

@@ -29,15 +29,46 @@ public class MyRobot extends BCAbstractRobot {
 		location = new Position(me.y, me.x);
 		currentHealth = me.health;
 		
-
-		if (me.unit == SPECS.CASTLE && me.turn == 1) {
+		if (robot == null) {
+			if (me.unit == SPECS.CASTLE) {
+				log("I am a Castle");
+				 robot = new Castle(this);
+			} else if (me.unit == SPECS.CHURCH) {
+				log("I am a Church");
+				robot = new Church(this);
+			} else if (me.unit == SPECS.PILGRIM) {
+				log("I am a Pilgrim");
+				robot = new Pilgrim(this);
+			} else if (me.unit == SPECS.CRUSADER) {
+				robot = new Crusader(this);
+			} else if (me.unit == SPECS.PROPHET) {
+				log("I am a Prophet");
+				robot = new Prophet(this);
+			} else if (me.unit == SPECS.PREACHER) {
+				log("I am a Preacher");
+				robot = new Preacher(this);
+			}
+		}
+		if (me.unit == SPECS.CASTLE && me.turn == 2 && ourTeam == 1) {
 			Position random = Helper.RandomAdjacent(this, new Position(me.y, me.x));
 			return buildUnit(SPECS.CRUSADER, random.x - me.x, random.y - me.y);
 		}
-		if(me.unit == SPECS.CRUSADER){
-			return MovingRobot.MoveCloser(this, new Position(1,1));
+		if (me.unit == SPECS.CASTLE && me.turn == 2 && ourTeam == 0) {
+			Position random = Helper.RandomAdjacent(this, new Position(me.y, me.x));
+			return buildUnit(SPECS.PREACHER, random.x - me.x, random.y - me.y);
 		}
-		log("hi");
+		if(me.unit == SPECS.CASTLE){
+			return robot.Execute();
+		}
+		if(me.unit == SPECS.CRUSADER){
+			log("crusader");
+			robot.Execute();
+		}
+		if(me.unit == SPECS.PREACHER){
+			log("preacher");
+			robot.Execute();
+		}
+		log("its running");
 		return null;
 		
 		/*

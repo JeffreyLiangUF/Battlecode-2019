@@ -206,6 +206,7 @@ public class MovingRobot {
 			castleLocations.add(new Position(spawnCastle.y, spawnCastle.x));
 		}
 		int signal = spawnCastle.signal;
+		robot.log("The Real Signal da fuq " + signal);
 		if (signal == -1) {
 			outputRead[0] = false;
 			return outputRead;
