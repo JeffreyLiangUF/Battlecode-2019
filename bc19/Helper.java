@@ -107,6 +107,30 @@ public class Helper {
 		return false;
 	}
 
+	public static Position closestEnemy(MyRobot robot, ArrayList<Robot> robots){
+		float dist = Integer.MAX_VALUE;
+		Position closest = null;
+		for (int i = 0; i < robots.size(); i++) {
+			Position rp = new Position(robots.get(i).y, robots.get(i).x);
+			if(Helper.DistanceSquared(rp, robot.location) < dist){
+				dist = Helper.DistanceSquared(rp, robot.location);
+				closest = rp;
+			}
+		}
+		return closest;
+	}
+
+	public static ArrayList<Robot> EnemiesWithin(MyRobot robot, float range){
+		ArrayList<Robot> output = new ArrayList<>();
+		Robot[] robots = robot.getVisibleRobots();
+		for (int i = 0; i < robots.length; i++) {
+			if (robots[i].team != robot.ourTeam && Helper.DistanceSquared(new Position(robots[i].y, robots[i].x), robot.location) <= range) {
+				output.add(robots[i]);
+			}
+		}
+		return output;
+	}
+
 	public static int IsSurroundingsOccupied(MyRobot robot, int[][] map, Position pos, int ourTeam) {
 		int highest = 0;
 		for (int i = -2; i <= 2; i++) {

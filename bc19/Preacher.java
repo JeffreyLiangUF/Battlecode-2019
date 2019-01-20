@@ -20,14 +20,13 @@ public class Preacher extends MovingRobot implements Machine {
 			InitializeVariables();
 		}
 
-		if (EnemiesAround(robot)) {
+		if (Helper.EnemiesAround(robot)) {
 			return AttackEnemies();
 		}
 
 		if (!initialized) {
 			Initialize();
 		}		
-		robot.log(" " + initialized);
 
 		if (initialized) {
 			CastleDown(robot, enemyCastleLocations, routesToEnemies);

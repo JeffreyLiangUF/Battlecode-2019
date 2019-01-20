@@ -298,16 +298,7 @@ public class MovingRobot {
 		return false;
 	}
 	
-	public ArrayList<Robot> EnemiesWithin(MyRobot robot, float range){
-		ArrayList<Robot> output = new ArrayList<>();
-		Robot[] robots = robot.getVisibleRobots();
-		for (int i = 0; i < robots.length; i++) {
-			if (robots[i].team != robot.ourTeam && Helper.DistanceSquared(new Position(robots[i].y, robots[i].x), robot.location) <= range) {
-				output.add(robots[i]);
-			}
-		}
-		return output;
-	}
+	
 }
 
 class PathingPosition {

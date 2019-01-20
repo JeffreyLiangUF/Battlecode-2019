@@ -4,35 +4,32 @@ public class StationairyRobot {
 
     Action EvaluateEnemyRatio(MyRobot robot) {
         Robot[] robots = robot.getVisibleRobots();
-        int enemyPreacher = 0;
+        int enemyPreacherCrusader = 0;
         int enemyProphet = 0;
-        int enemyCrusader = 0;
         int enemyPassive = 0;
         for (int i = 0; i < robots.length; i++) {
             Robot r = robots[i];
             if (Helper.DistanceSquared(new Position(r.y, r.x), robot.location) <= robot.visionRange) {
                 if (r.team != robot.ourTeam) {
                     if (r.unit == robot.SPECS.PREACHER) {
-                        enemyPreacher++;
-                    } else if (r.unit == robot.SPECS.PROPHET) {
-                        enemyProphet++;
+                        enemyPreacherCrusader++;
                     } else if (r.unit == robot.SPECS.CRUSADER) {
-                        enemyCrusader++;
-                    } else {
+                        enemyPreacherCrusader++;
+                    }else if (r.unit == robot.SPECS.PROPHET) {
+                        enemyProphet++;
+                    }  else {
                         enemyPassive++;
                     }
                 } else {
                     if (r.unit == robot.SPECS.PREACHER) {
-                        enemyPreacher--;
-                    } else if (r.unit == robot.SPECS.PROPHET) {
+                        enemyPreacherCrusader--;
+                    }else if (r.unit == robot.SPECS.CRUSADER) {
                         enemyProphet--;
-                    } else if (r.unit == robot.SPECS.CRUSADER) {
-                        enemyCrusader--;
                     }
                 }
             }
         }
-        if ((enemyPreacher > 0 || enemyCrusader > 0) && Helper.CanAfford(robot, robot.SPECS.PREACHER)) {
+        if (enemyPreacherCrusader > 0 && Helper.CanAfford(robot, robot.SPECS.PREACHER)) {
             Position random = Helper.RandomAdjacentNonResource(robot, robot.location);
             return robot.buildUnit(robot.SPECS.PREACHER, random.x - robot.me.x, random.y - robot.me.y);
         } else if ((enemyProphet > 0 || enemyPassive > 0) && Helper.CanAfford(robot, robot.SPECS.CRUSADER)) {

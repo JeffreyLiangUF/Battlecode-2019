@@ -31,7 +31,7 @@ public class Crusader extends MovingRobot implements Machine{
 			pathToEnemyCastle = GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle, true);
 		}			
 
-		if (EnemiesAround(robot)) {
+		if (Helper.EnemiesAround(robot)) {
 			ArrayList<Robot> prophets = EnemiesOfTypeInVision(new int[]{robot.SPECS.PROPHET});
 			if(prophets.size() > 0){
 				Robot farthest = FarthestProphetOutOfRange(prophets);

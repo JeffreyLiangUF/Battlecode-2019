@@ -50,20 +50,20 @@ public class MyRobot extends BCAbstractRobot {
 				robot = new Preacher(this);
 			}
 		}
-		if (me.unit == SPECS.CASTLE && me.turn == 5 && ourTeam == 1) {
-			//Position random = Helper.RandomAdjacent(this, new Position(me.y, me.x));
-			//return buildUnit(SPECS.CRUSADER, random.x - me.x, random.y - me.y);
-		}
+		if (me.unit == SPECS.CASTLE && me.turn % 5 == 0 && ourTeam == 1) {
+			Position random = Helper.RandomAdjacent(this, new Position(me.y, me.x));
+			return buildUnit(SPECS.CRUSADER, random.x - me.x, random.y - me.y);
+		}/*
 		if (me.unit == SPECS.CASTLE && me.turn > 5 && ourTeam == 0) {
 			Position random = Helper.RandomAdjacent(this, new Position(me.y, me.x));
 			if(testCount < 5){	testCount++;
 			return buildUnit(SPECS.PILGRIM, random.x - me.x, random.y - me.y);
 		
-		}
+			}
 		else if(testCount >= 5 && me.turn > 15 && Helper.CanAfford(this, SPECS.PROPHET)){
 			return buildUnit(SPECS.PROPHET, random.x - me.x, random.y - me.y);
 		}
-		}
+		}*/
 		if(me.unit == SPECS.CASTLE){
 			return robot.Execute();
 		}

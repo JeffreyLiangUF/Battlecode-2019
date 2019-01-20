@@ -157,7 +157,6 @@ public class Pilgrim extends MovingRobot implements Machine {
 
     Action GoToMine() {
         Position nearest = GetNearestResource();
-        robot.log("Here :  " + robot.getKarboniteMap()[robot.me.y][robot.me.x] + " " + robot.getFuelMap()[robot.me.y][robot.me.x]);
         if(robot.getKarboniteMap()[robot.me.y][robot.me.x] || robot.getFuelMap()[robot.me.y][robot.me.x]){
             state = PilgrimState.Mining;
             return robot.mine();

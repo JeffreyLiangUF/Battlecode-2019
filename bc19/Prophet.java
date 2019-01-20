@@ -22,14 +22,14 @@ public class Prophet extends MovingRobot implements Machine {
 			InitializeVariables();
 		}
 
-		if (EnemiesAround(robot)) {
-			ArrayList<Robot> closeEnemies = EnemiesWithin(robot, robot.attackRange[0]);
+		if (Helper.EnemiesAround(robot)) {
+			ArrayList<Robot> closeEnemies = Helper.EnemiesWithin(robot, robot.attackRange[0]);
 			if(initialized && closeEnemies.size() > 0){
 				battleTime = true;
 				return Flee(closeEnemies);
 			}
 			else{
-				ArrayList<Robot> attackable = EnemiesWithin(robot, robot.attackRange[1]);
+				ArrayList<Robot> attackable = Helper.EnemiesWithin(robot, robot.attackRange[1]);
 				return AttackEnemies(attackable.toArray(new Robot[0]));
 			}
 
@@ -102,24 +102,13 @@ public class Prophet extends MovingRobot implements Machine {
 		return robot.attack(attackTile.x - robot.me.x, attackTile.y - robot.me.y);
 	}
 	Action Flee(ArrayList<Robot> robots){
-		Position closest = closestEnemy(robots);
+		Position closest = Helper.closestEnemy(robot, robots);
 		int dx = closest.x - robot.me.x;
 		int dy = closest.y - robot.me.y;
 		Position opposite = new Position(robot.me.y - dy, robot.me.x - dx);
 		return MoveCloser(robot, opposite, false);
 	}
-	Position closestEnemy(ArrayList<Robot> robots){
-		float dist = Integer.MAX_VALUE;
-		Position closest = null;
-		for (int i = 0; i < robots.size(); i++) {
-			Position rp = new Position(robots.get(i).y, robots.get(i).x);
-			if(Helper.DistanceSquared(rp, robot.location) < dist){
-				dist = Helper.DistanceSquared(rp, robot.location);
-				closest = rp;
-			}
-		}
-		return closest;
-	}
+	
 	Position GetMyCastlePosition(){
 		Robot[] robots = robot.getVisibleRobots();
 		float closest = Integer.MAX_VALUE;
