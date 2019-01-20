@@ -6,186 +6,166 @@ import java.util.HashMap;
 public class Prophet extends MovingRobot implements Machine {
 
 	MyRobot robot;
-	int ourTeam; // red:0 blue:1
-	Position location;
 	boolean initialized;
-	boolean mapIsHorizontal;
-	Position closestCastle;
 	ArrayList<Position> castleLocations;
 	ArrayList<Position> enemyCastleLocations;
 	HashMap<Position, float[][]> routesToEnemies;
-	int previousHealth;
-	ProphetState state;
-	ArrayList<Position> toBeUpgraded;
-	boolean doneUpgrading = false;
+	Position myCastle;
+	boolean battleTime;
 
 	public Prophet(MyRobot robot) {
 		this.robot = robot;
 	}
 
 	public Action Execute() {
-/*
 		if (robot.me.turn == 1) {
 			InitializeVariables();
 		}
 
-		if (EnemiesAround(robot, ourTeam)) {
-			return AttackEnemies();
+		if (EnemiesAround(robot)) {
+			ArrayList<Robot> closeEnemies = EnemiesWithin(robot, robot.attackRange[0]);
+			if(initialized && closeEnemies.size() > 0){
+				return Flee(closeEnemies);
+			}
+			else{
+				ArrayList<Robot> attackable = EnemiesWithin(robot, robot.attackRange[1]);
+				return AttackEnemies(attackable.toArray(new Robot[0]));
+			}
+
 		}
 		if (!initialized) {
 			Initialize();
-		}
-		if (initialized) {
-			if (!doneUpgrading) {
-			}
-
-			if (state == ProphetState.Fortifying || state == ProphetState.MovingToDefencePosition) {
-				// if (WatchForSignal(robot, 65535)) {
-				state = ProphetState.Mobilizing;
-				// }
-				/*
-				 * if (state == ProphetState.MovingToDefencePosition) { if
-				 * (Helper.IsSurroundingsOccupied(robot, robot.getVisibleRobotMap(), location,
-				 * ourTeam) < 2) { state = ProphetState.Fortifying; } else { GetClosestCastle();
-				 * return MoveToDefend(); } }
-				 
-			} else if (state == ProphetState.Mobilizing) {
-				// robot.log("are we mobilized");
-				Position closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);
-				Robot[] robots = robot.getVisibleRobots();
-				// robot.log(closestEnemyCastle.toString() + " This is the position");
-				if (Helper.DistanceSquared(new Position(robot.me.y, robot.me.x),
-						closestEnemyCastle) <= robot.SPECS.UNITS[robot.me.unit].VISION_RADIUS) {
-					// robot.log("we can see it");
-					boolean absent = true;
-					for (int j = 0; j < robots.length; j++) {
-						if (robots[j].y == closestEnemyCastle.y && robots[j].x == closestEnemyCastle.x
-								&& robots[j].unit == robot.SPECS.CASTLE) {
-							// robot.log("it still exists");
-							absent = false;
-						}
-					}
-					if (absent) {
-						// robot.log("we tried to remove");
-						// robot.log(enemyCastleLocations.size() + " ");
-						enemyCastleLocations.remove(closestEnemyCastle);
-						// robot.log(enemyCastleLocations.size() + " ");
-
-						closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);
-					}
+		}	
+		if(initialized){
+			//war cry run the fuck along
+			if(!Fortified()){
+				ArrayList<Position> valid = GetValidFortifiedPositions();
+				if(valid.size() > 0){
+					Position closest = ClosestPosition(valid);
+					return MoveCloser(robot, closest);
 				}
-
-			//	return CombatFloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle),
-			//			closestEnemyCastle, ourTeam);
+				else{
+					Position closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);
+					return FloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle, true),
+					closestEnemyCastle, true);
+				}
 			}
-}*/
-
-if (robot.me.turn == 1) {
-	InitializeVariables();
-}
-
-if (!initialized) {
-	Initialize();
-}
-
-		for (int i = 0; i < castleLocations.size(); i++) {
-			robot.log("Turn : " + robot.me.turn + " Castle Position : " + castleLocations.get(i).toString());
+			else if(battleTime){
+				CastleDown(robot, enemyCastleLocations, routesToEnemies);
+				Position closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);
+				return FloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle, true),
+				closestEnemyCastle, true);
+			}
 		}
+
 		return null;
 	}
 
 	void Initialize() {
-		if (robot.me.turn == 1) {
-			state = ProphetState.Initializing;
-		}
 		if (!initialized) {
 			boolean[] signals = ReadInitialSignals(robot, castleLocations);
 			initialized = signals[0];
-			/*if (initialized) {
-				enemyCastleLocations = Helper.FindEnemyCastles(robot, mapIsHorizontal, castleLocations);
-				toBeUpgraded = new ArrayList<>(enemyCastleLocations);
+			if (initialized) {
+				myCastle = GetMyCastlePosition();
+				enemyCastleLocations = Helper.FindEnemyCastles(robot, robot.mapIsHorizontal, castleLocations);
 				for (int i = 0; i < enemyCastleLocations.size(); i++) {
-					GetOrCreateMap(robot, routesToEnemies, enemyCastleLocations.get(i));
+					GetOrCreateMap(robot, routesToEnemies, enemyCastleLocations.get(i), false);
 				}
 			}
-			if (initialized && signals[1]) {
-				state = ProphetState.Mobilizing;
-			} else if (initialized) {
-				state = ProphetState.MovingToDefencePosition;
-			}*/
 		}
 	}
 
 	void InitializeVariables() {
-		ourTeam = robot.me.team == robot.SPECS.RED ? 0 : 1;
-		mapIsHorizontal = Helper.FindSymmetry(robot.map);
 		castleLocations = new ArrayList<>();
 		enemyCastleLocations = new ArrayList<>();
 		routesToEnemies = new HashMap<>();
 		initialized = false;
-		previousHealth = robot.SPECS.UNITS[robot.me.unit].STARTING_HP;
-
+		battleTime = false;
 	}
 
-	public Action AttackEnemies() {
-		// get robots in vision
-		// check if robots are enemy and in range
-		// loop to get position of lowest id robot
-		// attack lowest enemy id robot
-		Robot[] robots = robot.getVisibleRobots();
+	public Action AttackEnemies(Robot[] robots) {
 		Position attackTile = null;
 		int lowestID = Integer.MAX_VALUE;
-		for (int i = 0; i < robots.length; i++) {
-			Position visibleRobot = new Position(robots[i].y, robots[i].x);
-			float withinRange = Helper.DistanceSquared(visibleRobot, location);
-			if (robots[i].team != ourTeam && withinRange <= robot.SPECS.UNITS[robot.me.unit].VISION_RADIUS) {
-				int robotID = robots[i].id;
-				if (robotID < lowestID) {
-					lowestID = robotID;
-					attackTile = visibleRobot;
+		for (int i = 0; i < robots.length; i++) {	
+			Position robotPos = new Position(robots[i].y, robots[i].x);		
+			if (robots[i].team != robot.ourTeam && Helper.DistanceSquared(robotPos, robot.location) <= robot.attackRange[1]) {
+				if (robots[i].id < lowestID) {
+					lowestID = robots[i].id;
+					attackTile = robotPos;
 				}
 			}
 		}
-		return robot.attack(attackTile.x - location.x, attackTile.y - location.y);
+		return robot.attack(attackTile.x - robot.me.x, attackTile.y - robot.me.y);
 	}
-
-	Action MoveToDefend() {
-		Position robotPos = new Position(robot.me.y, robot.me.x);
-		Position enemyCastle = Helper.FindEnemyCastle(robot.map, mapIsHorizontal, closestCastle);
-		int movespeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
-		int moveRange = (int) Math.sqrt(robot.SPECS.UNITS[robot.me.unit].SPEED);
-
-		for (int i = -moveRange; i <= moveRange; i++) {
-			for (int j = -moveRange; j <= moveRange; j++) {
-				Position defenceTile = new Position(robot.me.y + i, robot.me.x + j);
-				if (Helper.inMap(robot.map, defenceTile) && robot.map[defenceTile.y][defenceTile.x]) {
-					if (Helper.IsSurroundingsOccupied(robot, robot.getVisibleRobotMap(), defenceTile, ourTeam) < 2) {
-						float moveDistance = Helper.DistanceSquared(defenceTile, robotPos);
-						if (moveDistance <= movespeed) {
-							return robot.move(defenceTile.x - robot.me.x, defenceTile.y - robot.me.y);
-						} else {
-							return MoveCloser(robot, defenceTile);
-						}
+	Action Flee(ArrayList<Robot> robots){
+		Position closest = closestEnemy(robots);
+		int dx = closest.x - robot.me.x;
+		int dy = closest.y - robot.me.y;
+		Position opposite = new Position(robot.me.y - dy, robot.me.x - dx);
+		return MoveCloser(robot, opposite);
+	}
+	Position closestEnemy(ArrayList<Robot> robots){
+		float dist = Integer.MAX_VALUE;
+		Position closest = null;
+		for (int i = 0; i < robots.size(); i++) {
+			Position rp = new Position(robots.get(i).y, robots.get(i).x);
+			if(Helper.DistanceSquared(rp, robot.location) < dist){
+				dist = Helper.DistanceSquared(rp, robot.location);
+				closest = rp;
+			}
+		}
+		return closest;
+	}
+	Position GetMyCastlePosition(){
+		Robot[] robots = robot.getVisibleRobots();
+		float closest = Integer.MAX_VALUE;
+		Position myCastle = null;
+		for (int i = 0; i < robots.length; i++) {
+			Position rp = new Position(robots[i].y, robots[i].x);
+			if(Helper.DistanceSquared(rp, robot.location) < closest){
+				closest = Helper.DistanceSquared(rp, robot.location);
+				myCastle = rp;
+			}
+		}
+		return myCastle;
+	}
+	ArrayList<Position> GetValidFortifiedPositions(){
+		ArrayList<Position> valid = new ArrayList<>();
+		for (int y = -robot.tileVisionRange; y <= robot.tileVisionRange; y++) {
+			for (int x = -robot.tileVisionRange; x <= robot.tileVisionRange; x++) {
+				Position possible = new Position(robot.me.y + y, robot.me.x + x);
+				if(Helper.DistanceSquared(robot.location, possible) < robot.visionRange && Helper.TileEmpty(robot,possible)){
+					if(((myCastle.y - possible.y) % 2 == 0) && ((myCastle.x - possible.x) % 2 == 0)){
+						valid.add(possible);
+					}
+					else if(((myCastle.y - possible.y) % 2 == 1) && ((myCastle.x - possible.x) % 2 == 1)){
+						valid.add(possible);
 					}
 				}
 			}
 		}
-		return MoveCloser(robot, enemyCastle);
+		return valid;
 	}
-
-	void GetClosestCastle() {
-		float least = Integer.MAX_VALUE;
-		for (Position castlePos : castleLocations) {
-			float distance = Helper.DistanceSquared(castlePos, location);
-			if (distance < least) {
-				least = distance;
-				closestCastle = castlePos;
+	Position ClosestPosition(ArrayList<Position> positions){
+		float dist = Integer.MAX_VALUE;
+		Position closest = null;
+		for (int i = 0; i < positions.size(); i++) {
+			if(Helper.DistanceSquared(positions.get(i), robot.location) < dist){
+				dist = Helper.DistanceSquared(positions.get(i), robot.location);
+				closest = positions.get(i);
 			}
 		}
+		return closest;
 	}
 
-}
+	boolean Fortified(){
+		if(((robot.me.y - myCastle.y) % 2 == 0) && ((robot.me.x - myCastle.x) % 2 == 0)){
+			return true;
+		}
+		else if(((robot.me.y - myCastle.y) % 2 == 1) && ((robot.me.x - myCastle.x) % 2 == 1)){
+			return true;
+		}
+		return false;
+	}
 
-enum ProphetState {
-	Initializing, Fortifying, MovingToDefencePosition, Mobilizing
 }

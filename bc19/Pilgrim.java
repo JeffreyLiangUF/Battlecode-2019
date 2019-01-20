@@ -35,7 +35,6 @@ public class Pilgrim extends MovingRobot implements Machine {
           //  robot.log("I AM HERE : " + robot.location.toString());
             UpdateOccupiedResources();
             if (ThreatsAround(robot)){
-                robot.log("enemyies around");
                 state = PilgrimState.Returning;
                 return ReturnToDropOff();
             }

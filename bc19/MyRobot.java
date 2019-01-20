@@ -49,24 +49,28 @@ public class MyRobot extends BCAbstractRobot {
 				robot = new Preacher(this);
 			}
 		}
-		if (me.unit == SPECS.CASTLE && me.turn == 2 && ourTeam == 1) {
+		if (me.unit == SPECS.CASTLE && me.turn == 5 && ourTeam == 1) {
 			Position random = Helper.RandomAdjacent(this, new Position(me.y, me.x));
 			return buildUnit(SPECS.CRUSADER, random.x - me.x, random.y - me.y);
 		}
-		if (me.unit == SPECS.CASTLE && me.turn == 2 && ourTeam == 0) {
+		if (me.unit == SPECS.CASTLE && me.turn == 5 && ourTeam == 0) {
 			Position random = Helper.RandomAdjacent(this, new Position(me.y, me.x));
-			return buildUnit(SPECS.PREACHER, random.x - me.x, random.y - me.y);
+			return buildUnit(SPECS.PROPHET, random.x - me.x, random.y - me.y);
 		}
 		if(me.unit == SPECS.CASTLE){
 			return robot.Execute();
 		}
 		if(me.unit == SPECS.CRUSADER){
 			log("crusader");
-			robot.Execute();
+			return robot.Execute();
 		}
 		if(me.unit == SPECS.PREACHER){
 			log("preacher");
-			robot.Execute();
+			return robot.Execute();
+		}
+		if(me.unit == SPECS.PROPHET){
+			log("prophet");
+			return robot.Execute();
 		}
 		log("its running");
 		return null;

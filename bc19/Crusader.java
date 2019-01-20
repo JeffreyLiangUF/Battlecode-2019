@@ -24,7 +24,6 @@ public class Crusader extends MovingRobot implements Machine{
 			Initialize();
 		}
 		CastleDown(robot, enemyCastleLocations, routesToEnemies);
-		robot.log(" " + initialized);
 		Position closestEnemyCastle = null; 
 		float[][] pathToEnemyCastle = new float[robot.map.length][robot.map[0].length];
 		if(initialized){
@@ -59,7 +58,7 @@ public class Crusader extends MovingRobot implements Machine{
 			pathToEnemyCastle = BlackOutPreacherPaths(pathToEnemyCastle, preachers);
 		}
 		if(initialized){
-			return FloodPathing(robot,pathToEnemyCastle, closestEnemyCastle, true);
+			return FloodPathing(robot,pathToEnemyCastle, closestEnemyCastle, false);
 		}
 		return null;
 	}
@@ -142,13 +141,14 @@ public class Crusader extends MovingRobot implements Machine{
 	}
 	float[][] BlackOutPreacherPaths(float[][] flood, ArrayList<Robot> preachers){
 		float[][] output = twoDimensionalArrayClone(flood);
-		int preacherAttackRange = robot.SPECS.UNITS[robot.SPECS.PREACHER].ATTACK_RADIUS[1];
+		int preacherAttackRange = (int)Math.sqrt(robot.SPECS.UNITS[robot.SPECS.PREACHER].ATTACK_RADIUS[1]);
 		for (int i = 0; i < preachers.size(); i++) {
+			Position preach = new Position(preachers.get(i).y, preachers.get(i).x);
 			for (int j =  -preacherAttackRange; j <= preacherAttackRange; j++) {
-				for (int k =  -preacherAttackRange; k <= preacherAttackRange; k++) {
-					Position pos = new Position(preachers.get(i).y + j, preachers.get(i).x + k);
-					if(Helper.inMap(robot.map, pos)){
-						output[pos.y][pos.x] = 1000;
+				for (int k =  -preacherAttackRange; k <= preacherAttackRange; k++) {					
+					Position pos = new Position(preach.y + j, preach.x + k);
+					if(Helper.inMap(robot.map, pos) && Helper.DistanceSquared(preach, pos) <= robot.SPECS.UNITS[robot.SPECS.PREACHER].ATTACK_RADIUS[1]){
+						output[pos.y][pos.x] = 999;
 					}
 				}
 			}

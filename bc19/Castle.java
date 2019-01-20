@@ -142,12 +142,9 @@ public class Castle extends StationairyRobot implements Machine {
             numCastles = robots.size();
         } else {
             for (int i = 0; i < robots.size(); i++) {
-                if (robots.get(i).team == ourTeam && robots.get(i).castle_talk > 0) {
+                 if (robots.get(i).castle_talk > 0) {
                     CastleLocation info = new CastleLocation(robots.get(i).castle_talk);
                     numCastles = info.threeCastles ? 3 : 2;
-
-
-
                     if (allyCastles.containsKey(robots.get(i).id)) {
                         Position current = allyCastles.get(robots.get(i).id);
                         Position input = info.yValue ? new Position(info.location, current.x)
@@ -191,6 +188,7 @@ public class Castle extends StationairyRobot implements Machine {
 
 
     void DeclareAllyCastlePositions(boolean bit1, boolean bit2) {
+        robot.log("declaring");
         if (numCastles == 1) {
             robot.signal(BinarySignalsForInitialization(bit1, bit2, robot.location), 3);
         }
