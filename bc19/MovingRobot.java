@@ -74,26 +74,14 @@ public class MovingRobot {
 				}
 			}
 		} else {
-
-			if(goal.equals(new Position(1,29))){
-			for (int i = 0; i < path.length; i++) { String cat = ""; for (int j = 0; j <
-					  path[0].length; j++) { String temp = " " + Math.round(path[i][j]);
-					  if(temp.length() == 1){ temp = "   " + temp; } else if(temp.length() == 2){
-					  temp = "  " + temp; } else if(temp.length() == 3){ temp = " " + temp; } cat
-					  += temp; } robot.log(cat); }
-			}
-			
 			Position lowestPos = LowestOnPathInMoveRange(robot, path, tileMoveRange, moveRange);
-			if(goal.equals(new Position(1,29))){
-				robot.log("HERE is the lowest " + lowestPos.toString());
-			}
-			
-			lowestPos = LowestOnPathInMoveRange(robot, path, robot.tileMovementRange, robot.movementRange);
-			
 			if (!lowestPos.equals(robot.location)) {
 				return robot.move(lowestPos.x - robot.me.x, lowestPos.y - robot.me.y);
-			}
-			
+			}			
+			lowestPos = LowestOnPathInMoveRange(robot, path, robot.tileMovementRange, robot.movementRange);			
+			if (!lowestPos.equals(robot.location)) {
+				return robot.move(lowestPos.x - robot.me.x, lowestPos.y - robot.me.y);
+			}			
 			return null;
 		}
 		return null;
@@ -101,14 +89,23 @@ public class MovingRobot {
 	public static Position LowestOnPathInMoveRange(MyRobot robot, float[][] path, int tileMoveRange, float moveRange ){
 		ArrayList<Position> validPositions = Helper.AllOpenInRange(robot, robot.location, tileMoveRange, moveRange);
 			float lowest = path[robot.me.y][robot.me.x] == 0 ? Integer.MAX_VALUE : path[robot.me.y][robot.me.x];
-			Position lowestPos = robot.location;
-			
+			Position lowestPos = robot.location;	
+
 			for (int i = 0; i < validPositions.size(); i++) {
 				Position possible = validPositions.get(i);
-				if (path[possible.y][possible.x] < lowest && path[possible.y][possible.x] > 0
-						&& !possible.equals(robot.location)) {
-					lowest = path[possible.y][possible.x];
-					lowestPos = possible;
+				if(path[possible.y][possible.x] > 0	&& !possible.equals(robot.location)){
+					if(possible.x - robot.me.x == 0 || possible.y - robot.me.y == 0){
+						if (path[possible.y][possible.x] <= lowest ) {
+							lowest = path[possible.y][possible.x];
+							lowestPos = possible;
+						}
+					}
+					else{
+						if (path[possible.y][possible.x] < lowest - 1) {
+							lowest = path[possible.y][possible.x];
+							lowestPos = possible;
+						}
+					}
 				}
 			}
 			return lowestPos;
@@ -232,17 +229,13 @@ public class MovingRobot {
 		return outputRead;
 	}
 
-	Action MoveCloser(MyRobot robot, Position pos) {
-		int moveSpeed = robot.SPECS.UNITS[robot.me.unit].SPEED;
-		int tileDistance = (int) Math.sqrt(robot.SPECS.UNITS[robot.me.unit].SPEED);
+	static Action MoveCloser(MyRobot robot, Position pos) {
 		float closest = Integer.MAX_VALUE;
 		Position output = null;
-		for (int y = -tileDistance; y <= tileDistance; y++) {
-			for (int x = -tileDistance; x <= tileDistance; x++) {
+		for (int y = -robot.tileMovementRange; y <= robot.tileMovementRange; y++) {
+			for (int x = -robot.tileMovementRange; x <= robot.tileMovementRange; x++) {
 				Position possible = new Position(robot.me.y + y, robot.me.x + x);
-				if (Helper.inMap(robot.map, possible) && robot.map[possible.y][possible.x]
-						&& robot.getVisibleRobotMap()[possible.y][possible.x] == 0
-						&& Helper.DistanceSquared(new Position(robot.me.y, robot.me.x), possible) <= moveSpeed) {
+				if (Helper.TileEmpty(robot, possible) && Helper.DistanceSquared(robot.location, possible) <= robot.movementRange) {
 					if (Helper.DistanceSquared(pos, possible) < closest) {
 						closest = Helper.DistanceSquared(pos, possible);
 						output = possible;
@@ -256,6 +249,24 @@ public class MovingRobot {
 		return null;
 	}
 
+	public void CastleDown(MyRobot robot, ArrayList<Position> enemyCastleLocations, HashMap<Position, float[][]> routesToEnemies){
+		Robot[] robots = robot.getVisibleRobots();
+		for (int i = enemyCastleLocations.size() - 1; i >= 0; i--) {
+			if(Helper.DistanceSquared(enemyCastleLocations.get(i), robot.location) <= robot.visionRange){
+				for (int j = 0; j < robots.length; j++) {
+					if(Helper.TileEmpty(robot, enemyCastleLocations.get(i))){
+						routesToEnemies.remove(enemyCastleLocations.get(i));
+						enemyCastleLocations.remove(i);
+					}
+					else if(Helper.RobotAtPosition(robot, enemyCastleLocations.get(i)).unit != robot.SPECS.CASTLE){
+						routesToEnemies.remove(enemyCastleLocations.get(i));
+						enemyCastleLocations.remove(i);
+					}
+				}
+			}
+		}
+	}
+	
 	boolean WatchForSignal(MyRobot robot, int signal) {
 		Robot[] robots = robot.getVisibleRobots();
 		for (int i = 0; i < robots.length; i++) {
@@ -270,6 +281,15 @@ public class MovingRobot {
 		Robot[] robots = robot.getVisibleRobots();
 		for (int i = 0; i < robots.length; i++) {
 			if (robots[i].team != robot.ourTeam && robots[i].unit != robot.SPECS.PILGRIM && robots[i].unit != robot.SPECS.CHURCH) {
+				return true;
+			}
+		}
+		return false;
+	}
+	public boolean EnemiesAround(MyRobot robot){
+		Robot[] robots = robot.getVisibleRobots();
+		for (int i = 0; i < robots.length; i++) {
+			if (robots[i].team != robot.ourTeam) {
 				return true;
 			}
 		}

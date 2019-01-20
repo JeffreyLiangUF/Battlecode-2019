@@ -2,9 +2,8 @@ package bc19;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
-public class Castle implements Machine {
+public class Castle extends StationairyRobot implements Machine {
 
     MyRobot robot;
     boolean initialized = false;
@@ -23,7 +22,7 @@ public class Castle implements Machine {
     // hashmap of ids and unit types to keep track of number of assualt units and
     // such
 
-    public Castle(MyRobot robot) {
+    public Castle(MyRobot robot)  {
         this.robot = robot;
     }
 
@@ -35,7 +34,7 @@ public class Castle implements Machine {
         DeclareAllyCastlePositions(false, false);
         if(Helper.CanAfford(robot, robot.SPECS.PILGRIM) && robot.me.turn < 15){
             Position random = Helper.RandomAdjacentNonResource(robot, robot.location);
-			return robot.buildUnit(robot.SPECS.PILGRIM, random.x - robot.me.x, random.y - robot.me.y);
+			return robot.buildUnit(robot.SPECS.PREACHER, random.x - robot.me.x, random.y - robot.me.y);
         }
         
         
@@ -129,39 +128,45 @@ public class Castle implements Machine {
     }
 
     boolean SetupAllyCastles() {
-        Robot[] robots = robot.getVisibleRobots();
-        if (robots.length == 1) {
+        Robot[] rs = robot.getVisibleRobots();
+        ArrayList<Robot> robots = new ArrayList<>();
+        for (int i = 0; i < rs.length; i++) {//all to make sure we dont read enemy messages
+            if(rs[i].team == robot.ourTeam){
+                robots.add(rs[i]);
+            }
+        }
+        if (robots.size() == 1) {
             numCastles = 1;
             allyCastles.put(robot.id, robot.location);
             return true;
         }
 
         int castlesTalking = 0;
-        for (int i = 0; i < robots.length; i++) {
-            if (robots[i].castle_talk > 0) {
+        for (int i = 0; i < robots.size(); i++) {
+            if (robots.get(i).castle_talk > 0) {
                 castlesTalking++;
             }
         }
 
-        if (robots.length > 1 && castlesTalking == 0) {
-            numCastles = robots.length;
+        if (robots.size() > 1 && castlesTalking == 0) {
+            numCastles = robots.size();
         } else {
-            for (int i = 0; i < robots.length; i++) {
-                if (robots[i].team == ourTeam && robots[i].castle_talk > 0) {
-                    CastleLocation info = new CastleLocation(robots[i].castle_talk);
+            for (int i = 0; i < robots.size(); i++) {
+                if (robots.get(i).team == ourTeam && robots.get(i).castle_talk > 0) {
+                    CastleLocation info = new CastleLocation(robots.get(i).castle_talk);
                     numCastles = info.threeCastles ? 3 : 2;
 
 
 
-                    if (allyCastles.containsKey(robots[i].id)) {
-                        Position current = allyCastles.get(robots[i].id);
+                    if (allyCastles.containsKey(robots.get(i).id)) {
+                        Position current = allyCastles.get(robots.get(i).id);
                         Position input = info.yValue ? new Position(info.location, current.x)
                                 : new Position(current.y, info.location);
-                                allyCastles.put(robots[i].id, input);
+                                allyCastles.put(robots.get(i).id, input);
                     } else {
                         Position input = info.yValue ? new Position(info.location, -1)
                                 : new Position(-1, info.location);
-                                allyCastles.put(robots[i].id, input);
+                                allyCastles.put(robots.get(i).id, input);
                     }
                 }
             }
@@ -280,22 +285,6 @@ public class Castle implements Machine {
         }
         return closestCastle;
     }
-
-    boolean ReadyToAttack() {
-        Robot[] robots = robot.getVisibleRobots();
-        int alliedFightingBots = 0;
-        for (int i = 0; i < robots.length; i++) {
-            Robot bot = robots[i];
-            if (bot.team == ourTeam && (bot.unit == robot.SPECS.PREACHER || bot.unit == robot.SPECS.PROPHET)) {
-                alliedFightingBots++;
-            }
-        }
-        if (alliedFightingBots >= unitsRequiredToMobilize) {
-            return true;
-        }
-        return false;
-    }
-
 }
 
 enum CastleState {

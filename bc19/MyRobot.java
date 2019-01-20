@@ -16,6 +16,9 @@ public class MyRobot extends BCAbstractRobot {
 	int constructionKarb;
 	int constructionFuel;
 	int ourTeam;
+	int startHealth;
+	int currentHealth;
+	boolean mapIsHorizontal;
 
 	float[][] test;
 
@@ -24,12 +27,20 @@ public class MyRobot extends BCAbstractRobot {
 			Setup();
 		}
 		location = new Position(me.y, me.x);
-		/*
+		currentHealth = me.health;
+		
 
 		if (me.unit == SPECS.CASTLE && me.turn == 1) {
 			Position random = Helper.RandomAdjacent(this, new Position(me.y, me.x));
 			return buildUnit(SPECS.CRUSADER, random.x - me.x, random.y - me.y);
 		}
+		if(me.unit == SPECS.CRUSADER){
+			return MovingRobot.MoveCloser(this, new Position(1,1));
+		}
+		log("hi");
+		return null;
+		
+		/*
 		if (me.unit == SPECS.CRUSADER) {
 			if (me.turn == 1) {
 				for (int l = 0; l < 3; l++) {
@@ -54,7 +65,7 @@ public class MyRobot extends BCAbstractRobot {
 		}
 		
 				return null;*/
-		
+		/*
 		if (robot == null) {
 			if (me.unit == SPECS.CASTLE) {
 				log("I am a Castle");
@@ -79,7 +90,7 @@ public class MyRobot extends BCAbstractRobot {
 				robot = new Preacher(this);
 			}
 		}
-		return robot.Execute();
+		return robot.Execute();*/
 		// return null;
 		// return robot.Execute();*/
 	}
@@ -97,7 +108,9 @@ public class MyRobot extends BCAbstractRobot {
 		karbCapacity = SPECS.UNITS[me.unit].KARBONITE_CAPACITY;
 		constructionFuel = SPECS.UNITS[me.unit].CONSTRUCTION_FUEL;
 		constructionKarb = SPECS.UNITS[me.unit].CONSTRUCTION_KARBONITE;
-        ourTeam = me.team == SPECS.RED ? 0 : 1;
+		ourTeam = me.team == SPECS.RED ? 0 : 1;
+		mapIsHorizontal = Helper.FindSymmetry(map);
+		startHealth = SPECS.UNITS[me.unit].STARTING_HP;
 	}
 }
 

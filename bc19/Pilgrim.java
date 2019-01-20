@@ -32,7 +32,7 @@ public class Pilgrim extends MovingRobot implements Machine {
             Initialize();
         }
         else {
-            robot.log("I AM HERE : " + robot.location.toString());
+          //  robot.log("I AM HERE : " + robot.location.toString());
             UpdateOccupiedResources();
             if (ThreatsAround(robot)){
                 robot.log("enemyies around");
@@ -40,16 +40,16 @@ public class Pilgrim extends MovingRobot implements Machine {
                 return ReturnToDropOff();
             }
             if (state == PilgrimState.GoingToResource) {
-                 robot.log("Off to Mine");
+           //      robot.log("Off to Mine");
                 return GoToMine();
             }
             if (state == PilgrimState.Mining) {
-                 robot.log("Mining");
+            //     robot.log("Mining");
 
                 return Mining();
             }
             if (state == PilgrimState.Returning) {
-                 robot.log("Returning to Dropoff");
+            //     robot.log("Returning to Dropoff");
                 CheckForChurch();
                 return ReturnToDropOff();
             }
@@ -165,10 +165,8 @@ public class Pilgrim extends MovingRobot implements Machine {
             : Helper.DistanceSquared(pos, robot.location);
 
             if(pos.equals(new Position(1,29))){
-                robot.log("trying to go close " + distance);
             }
             if(pos.equals(new Position(49,50))){
-                robot.log("trying to go for far " + distance);
             }
 
             if (occupiedResources[pos.y][pos.x] == 0 && distance < lowest) {
@@ -180,7 +178,6 @@ public class Pilgrim extends MovingRobot implements Machine {
             
         }
         if(closest.equals(new Position(49,50))){
-            robot.log("why you dipship");
         }
         
         return closest;
@@ -189,7 +186,6 @@ public class Pilgrim extends MovingRobot implements Machine {
     Action GoToMine() {
         Position nearest = GetNearestResource();
 
-        robot.log("MY GOAL IS : " + nearest.toString());
 
         Action act = null;
         if (miningKarb) {
@@ -202,8 +198,6 @@ public class Pilgrim extends MovingRobot implements Machine {
                 state = PilgrimState.Mining;
                 return robot.mine();
             } else {
-                robot.log("My Location : " + robot.location.toString() + " Goal : " + nearest.toString());
-                robot.log("In Pilgrim can't move but not on resources, shouldn't really happen.");
                 return null;
             }
         } else {
