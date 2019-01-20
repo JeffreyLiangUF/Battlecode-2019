@@ -22,85 +22,46 @@ public class Castle extends StationairyRobot implements Machine {
     // hashmap of ids and unit types to keep track of number of assualt units and
     // such
 
-    public Castle(MyRobot robot)  {
+    public Castle(MyRobot robot) {
         this.robot = robot;
     }
 
     public Action Execute() {
+        robot.log("Turn " + robot.me.turn);
+        
+        
         if (!initialized) {
             Initialize();
         }
-        robot.log("Turn : " + robot.me.turn);
-        DeclareAllyCastlePositions(false, false);
-        
-        
+        if (initialized) {
+            DeclareAllyCastlePositions(false, false);
+            if(robot.me.turn == 30){
+            robot.signal(65535, 36);
+            
+            if(Helper.EnemiesAround(robot)){
 
-        //for(Position pos : allyCastles.values()){
-          //  robot.log("Turn : " + robot.me.turn + " Castle Position : " + pos.toString());
-        //}
-        /*if (initialized && state == CastleState.DisabledInitial) {
-            Position closest = ClosestCastleToKarb();
-            if (closest.y == location.y && closest.x == location.x) {
-                state = CastleState.EnabledInitial;
-            } else if (robot.me.turn > 10 && robot.karbonite > 50) {
-                state = CastleState.EnabledInitial;
-            } else {
-                state = CastleState.DisabledInitial;
             }
+
+
+
+
+        }
+            //if turn is 800 SEIGE 
+            
+            //if enemies
+                //spawn
+                //atk
+                
+            //if turn < 50 spawn pilgrims when above 70 karb 
+
+            //else spawn preach, prophet, prophet, crusader
+            
+            
+            
+            
+
         }
 
-        if (state != CastleState.DisabledInitial) {
-            boolean Attacking = state == CastleState.Mobilizing ? true : false;
-            boolean EmergencyMining = positionInSpawnOrder < spawnOrder.length ? true : false;
-            if (positionInSpawnOrder < spawnOrder.length) {
-                Position spawnPosition = Helper.RandomNonResourceAdjacentPosition(robot, location);
-                if (Helper.CanAfford(robot, spawnOrder[positionInSpawnOrder])) {
-                    int robotType = spawnOrder[positionInSpawnOrder];
-                    positionInSpawnOrder++;
-                    DeclareAllyCastlePositions(Attacking, EmergencyMining, 5);
-                    return robot.buildUnit(robotType, spawnPosition.x - location.x, spawnPosition.y - location.y);
-
-                }
-            } else if (state == CastleState.EnabledInitial) {
-                state = CastleState.Fortifying;
-            }
-            if (state == CastleState.Fortifying) {
-                if (robot.karbonite > 50 && robot.fuel > 100) {
-                    if (prophetCounter < prophetsPerPreacher && Helper.CanAfford(robot, robot.SPECS.PROPHET)) {
-                        Position adj = Helper.RandomNonResourceAdjacentPosition(robot, location);
-                        prophetCounter++;
-
-                        return robot.buildUnit(robot.SPECS.PROPHET, adj.x - location.x, adj.y - location.y);
-                    } else if (Helper.CanAfford(robot, robot.SPECS.PILGRIM)) {
-                        Position adj = Helper.RandomNonResourceAdjacentPosition(robot, location);
-                        prophetCounter = 0;
-
-                        return robot.buildUnit(robot.SPECS.PREACHER, adj.x - location.x, adj.y - location.y);
-                    }
-                }
-                if (ReadyToAttack()) {
-
-                    state = CastleState.Mobilizing;
-                    //robot.signal(65535, 100);
-                }
-            }
-            if (state == CastleState.Mobilizing) {
-                if (robot.karbonite > 50 && robot.fuel > 250) {
-                    if (prophetCounter < prophetsPerPreacher && Helper.CanAfford(robot, robot.SPECS.PROPHET)) {
-                        Position adj = Helper.RandomNonResourceAdjacentPosition(robot, location);
-                        prophetCounter++;
-                        return robot.buildUnit(robot.SPECS.PROPHET, adj.x - location.x, adj.y - location.y);
-
-                    } else if (Helper.CanAfford(robot, robot.SPECS.PREACHER)) {
-                        Position adj = Helper.RandomNonResourceAdjacentPosition(robot, location);
-                        prophetCounter = 0;
-                        return robot.buildUnit(robot.SPECS.PREACHER, adj.x - location.x, adj.y - location.y);
-                    }
-                }
-            }
-            */
-           
-        
         return null;
     }
 
@@ -122,8 +83,8 @@ public class Castle extends StationairyRobot implements Machine {
     boolean SetupAllyCastles() {
         Robot[] rs = robot.getVisibleRobots();
         ArrayList<Robot> robots = new ArrayList<>();
-        for (int i = 0; i < rs.length; i++) {//all to make sure we dont read enemy messages
-            if(rs[i].team == robot.ourTeam){
+        for (int i = 0; i < rs.length; i++) {// all to make sure we dont read enemy messages
+            if (rs[i].team == robot.ourTeam) {
                 robots.add(rs[i]);
             }
         }
@@ -142,18 +103,18 @@ public class Castle extends StationairyRobot implements Machine {
             numCastles = robots.size();
         } else {
             for (int i = 0; i < robots.size(); i++) {
-                 if (robots.get(i).castle_talk > 0) {
+                if (robots.get(i).castle_talk > 0) {
                     CastleLocation info = new CastleLocation(robots.get(i).castle_talk);
                     numCastles = info.threeCastles ? 3 : 2;
                     if (allyCastles.containsKey(robots.get(i).id)) {
                         Position current = allyCastles.get(robots.get(i).id);
                         Position input = info.yValue ? new Position(info.location, current.x)
                                 : new Position(current.y, info.location);
-                                allyCastles.put(robots.get(i).id, input);
+                        allyCastles.put(robots.get(i).id, input);
                     } else {
                         Position input = info.yValue ? new Position(info.location, -1)
                                 : new Position(-1, info.location);
-                                allyCastles.put(robots.get(i).id, input);
+                        allyCastles.put(robots.get(i).id, input);
                     }
                 }
             }
@@ -186,9 +147,7 @@ public class Castle extends StationairyRobot implements Machine {
         return true;
     }
 
-
     void DeclareAllyCastlePositions(boolean bit1, boolean bit2) {
-        robot.log("declaring");
         if (numCastles == 1) {
             robot.signal(BinarySignalsForInitialization(bit1, bit2, robot.location), 3);
         }
@@ -204,7 +163,7 @@ public class Castle extends StationairyRobot implements Machine {
                 robot.log(BinarySignalsForInitialization(bit1, bit2, other) + "    X");
                 robot.signal(BinarySignalsForInitialization(bit1, bit2, other), 3);
             }
-        } else if(numCastles == 3) {
+        } else if (numCastles == 3) {
             if (idDone == 0) {
                 Position other = null;
                 for (Integer id : allyCastles.keySet()) {

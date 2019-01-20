@@ -21,6 +21,7 @@ public class MyRobot extends BCAbstractRobot {
 	boolean mapIsHorizontal;
 
 	float[][] test;
+	int testCount;
 
 	public Action turn() {
 		if (me.turn == 1) {
@@ -50,29 +51,38 @@ public class MyRobot extends BCAbstractRobot {
 			}
 		}
 		if (me.unit == SPECS.CASTLE && me.turn == 5 && ourTeam == 1) {
-			Position random = Helper.RandomAdjacent(this, new Position(me.y, me.x));
-			return buildUnit(SPECS.CRUSADER, random.x - me.x, random.y - me.y);
+			//Position random = Helper.RandomAdjacent(this, new Position(me.y, me.x));
+			//return buildUnit(SPECS.CRUSADER, random.x - me.x, random.y - me.y);
 		}
-		if (me.unit == SPECS.CASTLE && me.turn == 5 && ourTeam == 0) {
+		if (me.unit == SPECS.CASTLE && me.turn > 5 && ourTeam == 0) {
 			Position random = Helper.RandomAdjacent(this, new Position(me.y, me.x));
+			if(testCount < 5){	testCount++;
+			return buildUnit(SPECS.PILGRIM, random.x - me.x, random.y - me.y);
+		
+		}
+		else if(testCount >= 5 && me.turn > 15 && Helper.CanAfford(this, SPECS.PROPHET)){
 			return buildUnit(SPECS.PROPHET, random.x - me.x, random.y - me.y);
+		}
 		}
 		if(me.unit == SPECS.CASTLE){
 			return robot.Execute();
 		}
 		if(me.unit == SPECS.CRUSADER){
-			log("crusader");
+		//	log("crusader");
 			return robot.Execute();
 		}
 		if(me.unit == SPECS.PREACHER){
-			log("preacher");
+		//	log("preacher");
 			return robot.Execute();
 		}
 		if(me.unit == SPECS.PROPHET){
-			log("prophet");
+	//		log("prophet");
 			return robot.Execute();
 		}
-		log("its running");
+		if(me.unit == SPECS.PILGRIM){
+		//	log("pilgrim");
+			return robot.Execute();
+		}
 		return null;
 		
 		/*

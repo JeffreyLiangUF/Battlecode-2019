@@ -110,6 +110,35 @@ public class MovingRobot {
 			}
 			return lowestPos;
 	}
+	static Action MoveCloser(MyRobot robot, Position pos, boolean budget) {
+		Position output = null;		
+		if(budget){
+			output = LowestInRange(robot, pos, 1);
+		}
+		if(output == null){
+			output = LowestInRange(robot, pos, robot.tileMovementRange);
+		}
+		if (output != null) {
+			return robot.move(output.x - robot.me.x, output.y - robot.me.y);
+		}
+		return null;
+	}
+	static Position LowestInRange(MyRobot robot,Position pos, int tileRange){
+		float closest = Integer.MAX_VALUE;
+		Position output = null;
+		for (int y = -tileRange; y <= tileRange; y++) {
+			for (int x = -tileRange; x <= tileRange; x++) {
+				Position possible = new Position(robot.me.y + y, robot.me.x + x);
+				if (Helper.TileEmpty(robot, possible) && Helper.DistanceSquared(robot.location, possible) <= robot.movementRange) {
+					if (Helper.DistanceSquared(pos, possible) < closest) {
+						closest = Helper.DistanceSquared(pos, possible);
+						output = possible;
+					}
+				}
+			}
+		}
+		return output;
+	}
 
 	Position ClosestEnemyCastle(MyRobot robot, HashMap<Position, float[][]> maps) {
 		float lowest = Integer.MAX_VALUE;
@@ -229,25 +258,7 @@ public class MovingRobot {
 		return outputRead;
 	}
 
-	static Action MoveCloser(MyRobot robot, Position pos) {
-		float closest = Integer.MAX_VALUE;
-		Position output = null;
-		for (int y = -robot.tileMovementRange; y <= robot.tileMovementRange; y++) {
-			for (int x = -robot.tileMovementRange; x <= robot.tileMovementRange; x++) {
-				Position possible = new Position(robot.me.y + y, robot.me.x + x);
-				if (Helper.TileEmpty(robot, possible) && Helper.DistanceSquared(robot.location, possible) <= robot.movementRange) {
-					if (Helper.DistanceSquared(pos, possible) < closest) {
-						closest = Helper.DistanceSquared(pos, possible);
-						output = possible;
-					}
-				}
-			}
-		}
-		if (output != null) {
-			return robot.move(output.x - robot.me.x, output.y - robot.me.y);
-		}
-		return null;
-	}
+	
 
 	public void CastleDown(MyRobot robot, ArrayList<Position> enemyCastleLocations, HashMap<Position, float[][]> routesToEnemies){
 		Robot[] robots = robot.getVisibleRobots();
@@ -286,15 +297,7 @@ public class MovingRobot {
 		}
 		return false;
 	}
-	public boolean EnemiesAround(MyRobot robot){
-		Robot[] robots = robot.getVisibleRobots();
-		for (int i = 0; i < robots.length; i++) {
-			if (robots[i].team != robot.ourTeam) {
-				return true;
-			}
-		}
-		return false;
-	}
+	
 	public ArrayList<Robot> EnemiesWithin(MyRobot robot, float range){
 		ArrayList<Robot> output = new ArrayList<>();
 		Robot[] robots = robot.getVisibleRobots();

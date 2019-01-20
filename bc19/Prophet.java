@@ -25,6 +25,7 @@ public class Prophet extends MovingRobot implements Machine {
 		if (EnemiesAround(robot)) {
 			ArrayList<Robot> closeEnemies = EnemiesWithin(robot, robot.attackRange[0]);
 			if(initialized && closeEnemies.size() > 0){
+				battleTime = true;
 				return Flee(closeEnemies);
 			}
 			else{
@@ -37,12 +38,20 @@ public class Prophet extends MovingRobot implements Machine {
 			Initialize();
 		}	
 		if(initialized){
-			//war cry run the fuck along
-			if(!Fortified()){
+			if(WatchForSignal(robot, 65535)){
+				battleTime = true;
+			}
+			if(battleTime){
+				CastleDown(robot, enemyCastleLocations, routesToEnemies);
+				Position closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);
+				return FloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle, true),
+				closestEnemyCastle, true);
+			}
+			else if(!Fortified()){
 				ArrayList<Position> valid = GetValidFortifiedPositions();
 				if(valid.size() > 0){
 					Position closest = ClosestPosition(valid);
-					return MoveCloser(robot, closest);
+					return MoveCloser(robot, closest, true);
 				}
 				else{
 					Position closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);
@@ -50,12 +59,7 @@ public class Prophet extends MovingRobot implements Machine {
 					closestEnemyCastle, true);
 				}
 			}
-			else if(battleTime){
-				CastleDown(robot, enemyCastleLocations, routesToEnemies);
-				Position closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);
-				return FloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle, true),
-				closestEnemyCastle, true);
-			}
+			
 		}
 
 		return null;
@@ -102,7 +106,7 @@ public class Prophet extends MovingRobot implements Machine {
 		int dx = closest.x - robot.me.x;
 		int dy = closest.y - robot.me.y;
 		Position opposite = new Position(robot.me.y - dy, robot.me.x - dx);
-		return MoveCloser(robot, opposite);
+		return MoveCloser(robot, opposite, false);
 	}
 	Position closestEnemy(ArrayList<Robot> robots){
 		float dist = Integer.MAX_VALUE;
@@ -122,7 +126,7 @@ public class Prophet extends MovingRobot implements Machine {
 		Position myCastle = null;
 		for (int i = 0; i < robots.length; i++) {
 			Position rp = new Position(robots[i].y, robots[i].x);
-			if(Helper.DistanceSquared(rp, robot.location) < closest){
+			if(robots[i].unit == robot.SPECS.CASTLE && Helper.DistanceSquared(rp, robot.location) < closest){
 				closest = Helper.DistanceSquared(rp, robot.location);
 				myCastle = rp;
 			}
@@ -135,6 +139,9 @@ public class Prophet extends MovingRobot implements Machine {
 			for (int x = -robot.tileVisionRange; x <= robot.tileVisionRange; x++) {
 				Position possible = new Position(robot.me.y + y, robot.me.x + x);
 				if(Helper.DistanceSquared(robot.location, possible) < robot.visionRange && Helper.TileEmpty(robot,possible)){
+					if(robot.getKarboniteMap()[possible.y][possible.x] || robot.getFuelMap()[possible.y][possible.x]){
+						continue;
+					}
 					if(((myCastle.y - possible.y) % 2 == 0) && ((myCastle.x - possible.x) % 2 == 0)){
 						valid.add(possible);
 					}
@@ -159,10 +166,13 @@ public class Prophet extends MovingRobot implements Machine {
 	}
 
 	boolean Fortified(){
-		if(((robot.me.y - myCastle.y) % 2 == 0) && ((robot.me.x - myCastle.x) % 2 == 0)){
+		if(robot.getKarboniteMap()[robot.me.y][robot.me.x] || robot.getFuelMap()[robot.me.y][robot.me.x]){
+			return false;
+		}
+		if((Math.abs(robot.me.y - myCastle.y) % 2 == 0) && (Math.abs(robot.me.x - myCastle.x) % 2 == 0)){
 			return true;
 		}
-		else if(((robot.me.y - myCastle.y) % 2 == 1) && ((robot.me.x - myCastle.x) % 2 == 1)){
+		if((Math.abs(robot.me.y - myCastle.y) % 2 == 1) && (Math.abs(robot.me.x - myCastle.x) % 2 == 1)){
 			return true;
 		}
 		return false;

@@ -37,7 +37,7 @@ public class Crusader extends MovingRobot implements Machine{
 				Robot farthest = FarthestProphetOutOfRange(prophets);
 				robot.log("Oh its a Prophet");
 				if(farthest != null && initialized){
-					return MoveCloser(robot, new Position(farthest.y, farthest.x));
+					return MoveCloser(robot, new Position(farthest.y, farthest.x), false);
 				}
 				else {
 					return AttackEnemies(prophets.toArray(new Robot[0]));
@@ -51,7 +51,7 @@ public class Crusader extends MovingRobot implements Machine{
 				}
 				else if (initialized){
 					Robot farthest = FarthestProphetOutOfRange(crusadersAndHarmless);
-					return MoveCloser(robot, new Position(farthest.y, farthest.x));
+					return MoveCloser(robot, new Position(farthest.y, farthest.x), false);
 				}
 			}
 			ArrayList<Robot> preachers = EnemiesOfTypeInVision(new int[]{robot.SPECS.PREACHER});

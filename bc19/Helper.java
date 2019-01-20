@@ -97,6 +97,16 @@ public class Helper {
 		return false;
 	}
 
+	public static boolean EnemiesAround(MyRobot robot){
+		Robot[] robots = robot.getVisibleRobots();
+		for (int i = 0; i < robots.length; i++) {
+			if (robots[i].team != robot.ourTeam) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static int IsSurroundingsOccupied(MyRobot robot, int[][] map, Position pos, int ourTeam) {
 		int highest = 0;
 		for (int i = -2; i <= 2; i++) {

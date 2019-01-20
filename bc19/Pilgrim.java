@@ -10,17 +10,12 @@ public class Pilgrim extends MovingRobot implements Machine {
     boolean mapIsHorizontal;
     PilgrimState state;
     boolean initialized;
-    ArrayList<Position> karbLocations;
-    HashMap<Position, float[][]> karbRoutes;
     ArrayList<Position> allLocations;
     HashMap<Position, float[][]> allRoutes;
     ArrayList<Position> dropOffLocations;
     HashMap<Position, float[][]> ourDropOffRoutes;
-    int maxKarb;
-    int emergencyAmount = 10;
     int karbThreshold = 50, fuelThreshold = 500;// changed this by mistake
     int oportunityKarbLostThreshold = 10;
-    boolean miningKarb; // true for karb, false for fuel
     int[][] occupiedResources; // -1 if not resource, 0 unoccupied resource, 1 occupied by PILGRIM,
 
     public Pilgrim(MyRobot robot) {
@@ -32,7 +27,6 @@ public class Pilgrim extends MovingRobot implements Machine {
             Initialize();
         }
         else {
-          //  robot.log("I AM HERE : " + robot.location.toString());
             UpdateOccupiedResources();
             if (ThreatsAround(robot)){
                 state = PilgrimState.Returning;
@@ -43,12 +37,12 @@ public class Pilgrim extends MovingRobot implements Machine {
                 return GoToMine();
             }
             if (state == PilgrimState.Mining) {
-            //     robot.log("Mining");
+           //      robot.log("Mining");
 
                 return Mining();
             }
             if (state == PilgrimState.Returning) {
-            //     robot.log("Returning to Dropoff");
+             //    robot.log("Returning to Dropoff");
                 CheckForChurch();
                 return ReturnToDropOff();
             }
@@ -61,19 +55,14 @@ public class Pilgrim extends MovingRobot implements Machine {
 
     void InitializeVariables() {
         mapIsHorizontal = Helper.FindSymmetry(robot.map);
-        karbLocations = new ArrayList<>();
-        karbRoutes = new HashMap<>();
         allLocations = new ArrayList<>();
         allRoutes = new HashMap<>();
         dropOffLocations = new ArrayList<>();
         ourDropOffRoutes = new HashMap<>();
-        maxKarb = 10;
-        miningKarb = true;
         occupiedResources = new int[robot.map.length][robot.map[0].length];
         for (int i = 0; i < robot.map.length; i++) {
             for (int j = 0; j < robot.map[0].length; j++) {
                 if (robot.getKarboniteMap()[i][j] == true) {
-                    karbLocations.add(new Position(i, j));
                     allLocations.add(new Position(i, j));
                     occupiedResources[i][j] = 0;
                 } else if (robot.getFuelMap()[i][j] == true) {
@@ -93,14 +82,12 @@ public class Pilgrim extends MovingRobot implements Machine {
         if (!initialized) {
             boolean[] signals = ReadInitialSignals(robot, dropOffLocations);
             initialized = signals[0];
-            maxKarb = signals[2] ? emergencyAmount : robot.karbCapacity;
             
             if (initialized) {
                 for (int i = 0; i < dropOffLocations.size(); i++) {
                     ourDropOffRoutes.put(dropOffLocations.get(i),
                             CreateLayeredFloodPath(robot, dropOffLocations.get(i)));
                 }
-                WhatToMine();
                 state=PilgrimState.GoingToResource;
             }
         }
@@ -144,54 +131,39 @@ public class Pilgrim extends MovingRobot implements Machine {
     Action ReturnToDropOff() {
         Position dropOff = GetNearestDropOff();
         if (Helper.DistanceSquared(dropOff, robot.location) < 3) {
-            WhatToMine();
-            boolean[] signals = ReadInitialSignals(robot);
-            maxKarb = signals[2] ? emergencyAmount : robot.karbCapacity;
             state = PilgrimState.GoingToResource;
             return robot.give(dropOff.x - robot.me.x, dropOff.y - robot.me.y, robot.me.karbonite, robot.me.fuel);
         }
-        return FloodPathing(robot, GetOrCreateMap(robot, karbRoutes, dropOff, true), dropOff, true);
+        return FloodPathing(robot, GetOrCreateMap(robot, ourDropOffRoutes, dropOff, true), dropOff, true);
     }
 
     Position GetNearestResource() {
-        ArrayList<Position> chosenLocations = miningKarb ? karbLocations : allLocations;
-        HashMap<Position, float[][]> choseRoutes = miningKarb ? karbRoutes : allRoutes;
+        ArrayList<Position> chosenLocations = allLocations;
+        HashMap<Position, float[][]> choseRoutes = allRoutes;
         float lowest = Integer.MAX_VALUE;
         Position closest = null;
         for (int i = 0; i < chosenLocations.size(); i++) {
             Position pos = chosenLocations.get(i);
             float distance  = choseRoutes.containsKey(pos) ? choseRoutes.get(pos)[robot.me.y][robot.me.x]
             : Helper.DistanceSquared(pos, robot.location);
-
-            if(pos.equals(new Position(1,29))){
-            }
-            if(pos.equals(new Position(49,50))){
-            }
-
             if (occupiedResources[pos.y][pos.x] == 0 && distance < lowest) {
 
                 lowest = distance;
                 closest = pos;
-            }
-            
-            
+            }  
         }
-        if(closest.equals(new Position(49,50))){
-        }
-        
         return closest;
     }
 
     Action GoToMine() {
         Position nearest = GetNearestResource();
-
-
-        Action act = null;
-        if (miningKarb) {
-            act = FloodPathing(robot, GetOrCreateMap(robot, karbRoutes, nearest, false), nearest, true);
-        } else {
-            act = FloodPathing(robot, GetOrCreateMap(robot, allRoutes, nearest, false), nearest, true);
+        robot.log("Here :  " + robot.getKarboniteMap()[robot.me.y][robot.me.x] + " " + robot.getFuelMap()[robot.me.y][robot.me.x]);
+        if(robot.getKarboniteMap()[robot.me.y][robot.me.x] || robot.getFuelMap()[robot.me.y][robot.me.x]){
+            state = PilgrimState.Mining;
+            return robot.mine();
         }
+
+        Action act = FloodPathing(robot, GetOrCreateMap(robot, allRoutes, nearest, false), nearest, true);        
         if (act == null) {
             if (robot.location.equals(nearest)) {
                 state = PilgrimState.Mining;
@@ -205,19 +177,8 @@ public class Pilgrim extends MovingRobot implements Machine {
         }
     }
 
-    void WhatToMine() // Need to change proportions in mining
-    {
-        if (maxKarb == emergencyAmount) {
-            miningKarb = true;
-        } else if (robot.karbonite < karbThreshold) {
-            miningKarb = true;
-        } else {
-            miningKarb = false;
-        }
-    }
-
     Action Mining() {
-        if (robot.me.karbonite >= maxKarb || robot.me.fuel >= robot.fuelCapacity) {
+        if (robot.me.karbonite >= robot.karbCapacity || robot.me.fuel >= robot.fuelCapacity) {
             state = PilgrimState.Returning;
             Action churchAction = BuildChurch();
             return churchAction == null ? ReturnToDropOff() : churchAction;
@@ -229,9 +190,6 @@ public class Pilgrim extends MovingRobot implements Machine {
     boolean ShouldBuildChurch() {
         CheckForChurch();
         Position dropOff = GetNearestDropOff();
-        if (maxKarb == emergencyAmount) {
-            return false;
-        }
         float cost = FuelToReturn(GetOrCreateMap(robot, ourDropOffRoutes, dropOff, true));
         if (cost > oportunityKarbLostThreshold) {
             return true;
