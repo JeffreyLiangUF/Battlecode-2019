@@ -279,45 +279,47 @@ public class Helper {
 
 	public static boolean[][] ResourcesOnOurHalfMap(MyRobot robot)
 	{
-		boolean[][] halfResourceMap = new boolean[robot.map.length][robot.map[0].length];
+		robot.log("Map is Horinzontal : " + robot.mapIsHorizontal + "  " + robot.positiveSide);
+		boolean[][] halfResourceMap = robot.mapIsHorizontal ? new boolean[(robot.map.length + 1) / 2][robot.map.length] : new boolean[robot.map.length][(robot.map.length + 1) / 2];
+		robot.log(halfResourceMap.length + " " + halfResourceMap[0].length);
 
 		if (robot.positiveSide && robot.mapIsHorizontal)
 		{
-			for (i = 0; i < (halfResourceMap.length + 1) / 2; i++)
+			for (int i = 0; i < (robot.map.length + 1) / 2; i++)
 			{
-				for (j = 0; j < halfResourceMap[0].length; j++)
+				for (int j = 0; j < robot.map[0].length; j++)
 				{
-					halfResourceMap[i][j] = robot.getFuelMap[i][j] || robot.getKarbMap[i][j] ? true : false;
+					halfResourceMap[i][j] = robot.getFuelMap()[i][j] || robot.getKarboniteMap()[i][j] ? true : false;
 				}
 			}
 		}
-		if (!robot.positiveSide && robot.mapIsHorizontal)
+		else if (!robot.positiveSide && robot.mapIsHorizontal)
 		{
-			for (i = (halfResourceMap.length + 1) / 2; i < halfResourceMap.length; i++)
+			for (int i = (robot.map.length) / 2; i < robot.map.length; i++)
 			{
-				for (j = 0; j < halfResourceMap[0].length; j++)
+				for (int j = 0; j < robot.map[0].length; j++)
 				{
-					halfResourceMap[i][j] = robot.getFuelMap[i][j] || robot.getKarboniteMap[i][j] ? true : false;
+					halfResourceMap[i- (robot.map[0].length) / 2][j] = robot.getFuelMap()[i][j] || robot.getKarboniteMap()[i][j] ? true : false;
 				}
 			}
 		}
-		if (robot.positiveSide && !robot.mapIsHorizontal)
+		else if (robot.positiveSide && !robot.mapIsHorizontal)
 		{
-			for (i = 0; i < halfResourceMap.length; i++)
+			for (int i = 0; i < robot.map.length; i++)
 			{
-				for (j = (halfResourceMap[0].length + 1) / 2; j < halfResourceMap[i].length; j++)
+				for (int j = (robot.map[0].length) / 2; j < robot.map[i].length; j++)
 				{
-					halfResourceMap[i][j] = robot.getFuelMap[i][j] || robot.getKarboniteMap[i][j] ? true : false;
+					halfResourceMap[i][j - (robot.map[0].length) / 2] = robot.getFuelMap()[i][j] || robot.getKarboniteMap()[i][j] ? true : false;
 				}
 			}
 		}
-		if (!robot.positiveSide && !robot.mapIsHorizontal)
+		else if (!robot.positiveSide && !robot.mapIsHorizontal)
 		{
-			for (i = 0; i < halfResourceMap.length; i++)
+			for (int i = 0; i < robot.map.length; i++)
 			{
-				for (j = 0; j < (halfResourceMap[0].length + 1) / 2; j++)
+				for (int j = 0; j < (robot.map[0].length + 1) / 2; j++)
 				{
-					halfResourceMap[i][j] = robot.getFuelMap[i][j] || robot.getKarboniteMap[i][j] ? true : false;
+					halfResourceMap[i][j] = robot.getFuelMap()[i][j] || robot.getKarboniteMap()[i][j] ? true : false;
 				}
 			}
 		}

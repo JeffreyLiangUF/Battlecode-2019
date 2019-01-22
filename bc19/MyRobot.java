@@ -31,7 +31,20 @@ public class MyRobot extends BCAbstractRobot {
 		location = new Position(me.y, me.x);
 		currentHealth = me.health;
 
-		
+		boolean[][] test = Helper.ResourcesOnOurHalfMap(this);
+
+					 for (int i = 0; i < test.length; i++) { 
+						 String cat = ""; 
+						 for (int j = 0; j < test[0].length; j++) 
+						 { 
+							 String temp = test[i][j] ? " " + 1 : " " + 0;							 		
+							cat  += temp; 
+						} 
+						log(cat); 
+					}
+
+		return null;
+		/*
 		if(me.team == 0){
 			return null;
 		}
@@ -57,7 +70,7 @@ public class MyRobot extends BCAbstractRobot {
 			}
 		}
 		return robot.Execute();
-		
+		*/
 		/*
 		if (me.unit == SPECS.CASTLE && me.turn % 5 == 0 && ourTeam == 1) {
 			Position random = Helper.RandomAdjacent(this, new Position(me.y, me.x));
@@ -165,7 +178,7 @@ public class MyRobot extends BCAbstractRobot {
 		ourTeam = me.team == SPECS.RED ? 0 : 1;
 		mapIsHorizontal = Helper.FindSymmetry(map);
 		startHealth = SPECS.UNITS[me.unit].STARTING_HP;
-		positiveSide = Helper.PositiveOrNegativeMap(robot);
+		positiveSide = Helper.PositiveOrNegativeMap(this);
 	}
 }
 
