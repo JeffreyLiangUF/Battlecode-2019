@@ -19,6 +19,7 @@ public class MyRobot extends BCAbstractRobot {
 	int startHealth;
 	int currentHealth;
 	boolean mapIsHorizontal;
+	boolean positiveSide;
 
 	float[][] test;
 	int testCount;
@@ -175,6 +176,7 @@ public class MyRobot extends BCAbstractRobot {
 		ourTeam = me.team == SPECS.RED ? 0 : 1;
 		mapIsHorizontal = Helper.FindSymmetry(map);
 		startHealth = SPECS.UNITS[me.unit].STARTING_HP;
+		positiveSide = Helper.PositiveOrNegativeMap(robot);
 	}
 }
 
