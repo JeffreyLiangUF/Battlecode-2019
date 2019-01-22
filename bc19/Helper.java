@@ -65,14 +65,6 @@ public class Helper {
 		return null;
 	}
 
-	public static boolean PositionInVision(MyRobot robot, Position pos) {
-		Position robotPos = new Position(robot.me.y, robot.me.x);
-		if (DistanceSquared(robotPos, pos) <= robot.SPECS.UNITS[robot.me.unit].VISION_RADIUS) {
-			return true;
-		}
-		return false;
-	}
-
 	public static boolean EnemiesAround(MyRobot robot){
 		Robot[] robots = robot.getVisibleRobots();
 		for (int i = 0; i < robots.length; i++) {
@@ -132,6 +124,57 @@ public class Helper {
 			}
 		}
 		return output;
+	}
+
+	public static Position UpdateBattleStatus(MyRobot robot, ArrayList<Position> enemies, Position enemy){
+		Position battleCry = ListenForBattleCry(robot);
+		if(battleCry != null){
+			robot.log("Hearing the battle Cry");
+			if(Helper.ContainsPosition(enemies, battleCry)){
+				robot.log("My Position is " + robot.location.toString() + " I should be a castle boi");
+				robot.log("This is the battleCry " + battleCry.toString());
+				return battleCry;
+			}
+			else{
+				robot.log("My Position is " + robot.location.toString() + " I should be a church boi");
+				robot.log("This is the battleCry " + battleCry.toString());
+
+				enemies.add(battleCry);
+				return battleCry;
+			}
+		}
+		return enemy;
+	}
+
+	public static Position ListenForBattleCry(MyRobot robot){
+		Robot[] robots = robot.getVisibleRobots();
+		for (int i = 0; i < robots.length; i++) {
+			Position enemyCastle = DecodeBattleCry(robots[i].signal);
+			if(enemyCastle != null){
+				if(robot.me.unit != robot.SPECS.PROPHET){
+					return enemyCastle;
+				}
+				else if(ProphetBattleCry(robots[i].signal)){
+					return enemyCastle;
+				}				
+			}
+		}
+		return null;
+	}
+	public static boolean ProphetBattleCry(int signal){
+		if(signal < 61440 && signal >= 45056){// starts with 1011 
+			return true;
+		}
+		return false;
+	}
+	public static Position DecodeBattleCry(int signal){
+		if(signal < 45056){//1011 followed by the cords
+			return null;
+		}
+		int x = signal & 63;
+		signal >>= 6;
+		int y = signal & 63;
+		return new Position(y, x);		
 	}
 
 	public static int IsSurroundingsOccupied(MyRobot robot, int[][] map, Position pos, int ourTeam) {

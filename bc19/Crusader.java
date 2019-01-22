@@ -19,6 +19,8 @@ public class Crusader extends MovingRobot implements Machine {
 	}
 
 	public Action Execute() {
+		robot.log("Crusader");
+
 		if (robot.me.turn == 1) {
 			InitializeVariables();
 			parent = StructureBornFrom(robot);
@@ -30,8 +32,8 @@ public class Crusader extends MovingRobot implements Machine {
 		if (!initialized) {
 			CastleInit();
 		}		
-		targetCastle = UpdateBattleStatus(robot,enemyCastleLocations, targetCastle);
-		if (Helper.EnemiesAround(robot) && robot.fuel > 10) {
+		targetCastle = Helper.UpdateBattleStatus(robot,enemyCastleLocations, targetCastle);
+		if (Helper.EnemiesAround(robot) && robot.fuel > 110) {
 			ArrayList<Robot> prophets = EnemiesOfTypeInVision(new int[] { robot.SPECS.PROPHET });
 			if (prophets.size() > 0) {
 				Robot farthest = FarthestProphetOutOfRange(prophets);
@@ -168,7 +170,7 @@ public class Crusader extends MovingRobot implements Machine {
 	}
 
 	float[][] BlackOutPreacherPaths(float[][] flood, ArrayList<Robot> preachers) {
-		float[][] output = twoDimensionalArrayClone(flood);
+		float[][] output = Helper.twoDimensionalArrayClone(flood);
 		int preacherAttackRange = (int) Math.sqrt(robot.SPECS.UNITS[robot.SPECS.PREACHER].ATTACK_RADIUS[1]);
 		for (int i = 0; i < preachers.size(); i++) {
 			Position preach = new Position(preachers.get(i).y, preachers.get(i).x);

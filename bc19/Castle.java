@@ -9,10 +9,12 @@ public class Castle extends StationairyRobot implements Machine {
     boolean initialized = false;
     int numCastles;
 
+    ArrayList<Position> allyCastlePositions;
     HashMap<Integer, Position> allyCastles;
     int idDone;
     int positionInGrowthOrder = 0;
     int positionInSeigeOrder = 0;
+    int targetCastleIndex = 0;
     int[] growthSpawnOrder;
     int[] seigeSpawnOrder;
     // hashmap of ids and unit types to keep track of number of assualt units and
@@ -23,14 +25,14 @@ public class Castle extends StationairyRobot implements Machine {
     }
 
     public Action Execute() {
+        robot.log("Turn : " + robot.me.turn);
         if (!initialized) {
             Initialize();
         }
+        robot.log("init problem?");
         if (initialized) {
             DeclareAllyCastlePositions(false, false);
-            if (robot.me.turn == 800) {
-                robot.signal(65535, robot.map.length * robot.map.length);
-            }
+            SignalAttack();
             if (Helper.EnemiesAround(robot)) {
                 Action canBuildDefense = EvaluateEnemyRatio(robot);
                 if (canBuildDefense != null) {
@@ -61,7 +63,8 @@ public class Castle extends StationairyRobot implements Machine {
             if (positionInSeigeOrder > seigeSpawnOrder.length - 1) {
                 positionInSeigeOrder = 0;
             }
-            if (robot.karbonite > 50 && robot.me.turn >= 350 && Helper.CanAfford(robot, seigeSpawnOrder[positionInSeigeOrder])) {
+            if (robot.karbonite > 50 && robot.me.turn >= 350
+                    && Helper.CanAfford(robot, seigeSpawnOrder[positionInSeigeOrder])) {
 
                 positionInSeigeOrder++;
                 Position random = Helper.RandomAdjacent(robot, robot.location);
@@ -77,8 +80,14 @@ public class Castle extends StationairyRobot implements Machine {
         if (robot.me.turn == 1) {
             InitializeVariables();
         }
+        robot.log("initing variables");
         if (!initialized) {
             initialized = SetupAllyCastles();
+        }
+        if (initialized) {
+            for (Position pos : allyCastles.values()) {
+                allyCastlePositions.add(pos);
+            }
         }
     }
 
@@ -90,6 +99,35 @@ public class Castle extends StationairyRobot implements Machine {
         positionInGrowthOrder = 0;
         positionInSeigeOrder = 0;
         allyCastles = new HashMap<>();
+        allyCastlePositions = new ArrayList<>();
+        targetCastleIndex = 0;
+    }
+
+    void SignalAttack() {
+        Position otherCastlesCry = Helper.ListenForBattleCry(robot);
+        targetCastleIndex = targetCastleIndex >= numCastles ? 0 : targetCastleIndex;
+        if (otherCastlesCry == null && robot.me.turn % 200 == 0) {
+            robot.log("Signalling " + (robot.me.turn == 200));
+            robot.log("list size " + allyCastlePositions + " " + targetCastleIndex);
+
+            Position enemyCastle = Helper.FindEnemyCastle(robot.map, robot.mapIsHorizontal,
+                    allyCastlePositions.get(targetCastleIndex));
+            robot.log("The Position is : " + enemyCastle);
+            robot.signal(CreateAttackSignal(enemyCastle, robot.me.turn == 200),
+                    robot.map.length * robot.map.length + robot.map.length * robot.map.length);
+            robot.log("sent the signal");
+        } else if (robot.me.turn % 100 == 0) {
+            targetCastleIndex++;
+        }
+    }
+
+    int CreateAttackSignal(Position pos, boolean finalAttack) {
+        int output = finalAttack ? 11 : 15;
+        output <<= 6;
+        output += pos.y;
+        output <<= 6;
+        output += pos.x;
+        return output;
     }
 
     boolean SetupAllyCastles() {
@@ -156,6 +194,7 @@ public class Castle extends StationairyRobot implements Machine {
                 return false;
             }
         }
+
         return true;
     }
 
