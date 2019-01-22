@@ -23,15 +23,13 @@ public class Castle extends StationairyRobot implements Machine {
     }
 
     public Action Execute() {
-        robot.log("Turn " + robot.me.turn);
-
         if (!initialized) {
             Initialize();
         }
         if (initialized) {
             DeclareAllyCastlePositions(false, false);
-            if (robot.me.turn == 30) {
-                robot.signal(65535, 36);
+            if (robot.me.turn == 800) {
+                robot.signal(65535, robot.map.length * robot.map.length);
             }
             if (Helper.EnemiesAround(robot)) {
                 Action canBuildDefense = EvaluateEnemyRatio(robot);
@@ -63,7 +61,7 @@ public class Castle extends StationairyRobot implements Machine {
             if (positionInSeigeOrder > seigeSpawnOrder.length - 1) {
                 positionInSeigeOrder = 0;
             }
-            if (robot.me.turn >= 350 && Helper.CanAfford(robot, seigeSpawnOrder[positionInSeigeOrder])) {
+            if (robot.karbonite > 50 && robot.me.turn >= 350 && Helper.CanAfford(robot, seigeSpawnOrder[positionInSeigeOrder])) {
 
                 positionInSeigeOrder++;
                 Position random = Helper.RandomAdjacent(robot, robot.location);

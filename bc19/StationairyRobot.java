@@ -44,7 +44,7 @@ public class StationairyRobot {
         int pilgrims = PilgrimsAround(robot);
         if (resources >= pilgrims) {
             Position buildHere = Helper.RandomAdjacentNonResource(robot, robot.location);
-            if (buildHere != null && robot.karbonite >= 70 && robot.fuel > 250) {
+            if (buildHere != null && robot.karbonite >= 50 && robot.fuel > 250) {
                 return robot.buildUnit(robot.SPECS.PILGRIM, buildHere.x - robot.me.x, buildHere.y - robot.me.y);
             }
         }
@@ -52,15 +52,16 @@ public class StationairyRobot {
     }
 
     int ResourcesAround(MyRobot robot) {
-        int visionRadius = (int) Math.sqrt(robot.SPECS.UNITS[robot.me.unit].VISION_RADIUS) - 5;
         int numResources = 0;
-        for (int i = -visionRadius; i <= visionRadius; i++) {
-            for (int j = -visionRadius; j <= visionRadius; j++)
-                if (Helper.inMap(robot.map, new Position(robot.me.y + i, robot.me.x + j))
-                        && (robot.getFuelMap()[robot.me.y + i][robot.me.x + j]
-                                || robot.getKarboniteMap()[robot.me.y + i][robot.me.x + j])) {
+        for (int i = -robot.tileVisionRange; i <= robot.tileVisionRange; i++) {
+            for (int j = -robot.tileVisionRange; j <= robot.tileVisionRange; j++){
+             Position relative = new Position(robot.me.y + i, robot.me.x + j);
+                if (Helper.inMap(robot.map, relative) && Helper.DistanceSquared(relative, robot.location) <= robot.visionRange){
+                    if(robot.getFuelMap()[relative.y][relative.x] || robot.getKarboniteMap()[relative.y][relative.x]) {
                     numResources++;
+                    }
                 }
+            }
         }
         return numResources;
     }

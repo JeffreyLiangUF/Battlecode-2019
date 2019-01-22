@@ -24,7 +24,6 @@ public class Pilgrim extends MovingRobot implements Machine {
 
     public Action Execute() {
         //robot.log("Pilgrim");
-
         if (!initialized) {
             Initialize();
         }
@@ -35,16 +34,13 @@ public class Pilgrim extends MovingRobot implements Machine {
                 return ReturnToDropOff();
             }
             if (state == PilgrimState.GoingToResource) {
-           //      robot.log("Off to Mine");
                 return GoToMine();
             }
             if (state == PilgrimState.Mining) {
-           //      robot.log("Mining");
 
                 return Mining();
             }
             if (state == PilgrimState.Returning) {
-             //    robot.log("Returning to Dropoff");
                 CheckForChurch();
                 return ReturnToDropOff();
             }
@@ -237,7 +233,8 @@ public class Pilgrim extends MovingRobot implements Machine {
         Robot[] robots = robot.getVisibleRobots();
         float myDist = Helper.DistanceSquared(robot.location, pos);
         for(int i = 0; i < robots.length; i++){
-            if(robots[i].unit == robot.SPECS.PILGRIM && Helper.DistanceSquared(pos, new Position(robots[i].y, robots[i].x)) < myDist){
+            Position pil = new Position(robots[i].y, robots[i].x);
+            if(robots[i].unit == robot.SPECS.PILGRIM && !robot.getFuelMap()[pil.y][pil.x] && !robot.getKarboniteMap()[pil.y][pil.x] && Helper.DistanceSquared(pos, pil) < myDist){
                 return false;
             }
         }

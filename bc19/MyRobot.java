@@ -32,21 +32,21 @@ public class MyRobot extends BCAbstractRobot {
 		
 		if (robot == null) {
 			if (me.unit == SPECS.CASTLE) {
-				log("I am a Castle");
+			//	log("I am a Castle");
 				 robot = new Castle(this);
 			} else if (me.unit == SPECS.CHURCH) {
-				log("I am a Church");
+			//	log("I am a Church");
 				robot = new Church(this);
 			} else if (me.unit == SPECS.PILGRIM) {
-				log("I am a Pilgrim");
+			//	log("I am a Pilgrim");
 				robot = new Pilgrim(this);
 			} else if (me.unit == SPECS.CRUSADER) {
 				robot = new Crusader(this);
 			} else if (me.unit == SPECS.PROPHET) {
-				log("I am a Prophet");
+		//		log("I am a Prophet");
 				robot = new Prophet(this);
 			} else if (me.unit == SPECS.PREACHER) {
-				log("I am a Preacher");
+		//		log("I am a Preacher");
 				robot = new Preacher(this);
 			}
 		}

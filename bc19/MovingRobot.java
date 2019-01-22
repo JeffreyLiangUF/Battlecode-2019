@@ -143,7 +143,6 @@ public class MovingRobot {
 	Position ClosestEnemyCastle(MyRobot robot, HashMap<Position, float[][]> maps) {
 		float lowest = Integer.MAX_VALUE;
 		Position output = null;
-		robot.log(maps.size() + " THis si tah" + robot.location.toString());
 		for (Map.Entry<Position, float[][]> entry : maps.entrySet()) {
 
 			if (entry.getValue()[robot.me.y][robot.me.x] < lowest) {
@@ -292,7 +291,8 @@ public class MovingRobot {
 	public boolean ThreatsAround(MyRobot robot) {
 		Robot[] robots = robot.getVisibleRobots();
 		for (int i = 0; i < robots.length; i++) {
-			if (robots[i].team != robot.ourTeam && robots[i].unit != robot.SPECS.PILGRIM && robots[i].unit != robot.SPECS.CHURCH) {
+			if (robots[i].team != robot.ourTeam && robots[i].unit != robot.SPECS.PILGRIM && 
+			robots[i].unit != robot.SPECS.CHURCH && Helper.DistanceSquared(robot.location, new Position(robots[i].y, robots[i].x)) <= robot.SPECS.UNITS[robots[i].unit].ATTACK_RADIUS[1]) {
 				return true;
 			}
 		}
