@@ -19,6 +19,7 @@ public class Preacher extends MovingRobot implements Machine {
 	}
 
 	public Action Execute() {
+		robot.log("Preacher");
 
 		if (robot.me.turn == 1) {
 			InitializeVariables();
@@ -31,8 +32,8 @@ public class Preacher extends MovingRobot implements Machine {
 		if (!initialized) {
 			CastleInit();
 		}
-		targetCastle = UpdateBattleStatus(robot,enemyCastleLocations, targetCastle);
-		if (Helper.EnemiesAround(robot) && robot.fuel > 10) {
+		targetCastle = Helper.UpdateBattleStatus(robot,enemyCastleLocations, targetCastle);
+		if (Helper.EnemiesAround(robot) && robot.fuel > 110) {
 			return AttackEnemies();
 		}
 		if (initialized && robot.fuel > 200) {

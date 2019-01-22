@@ -23,23 +23,27 @@ public class Pilgrim extends MovingRobot implements Machine {
     }
 
     public Action Execute() {
-        //robot.log("Pilgrim");
+      //  robot.log("Pilgrim");
         if (!initialized) {
             Initialize();
         }
         else {
             UpdateOccupiedResources();
+
             if (ThreatsAround(robot)){
                 state = PilgrimState.Returning;
                 return ReturnToDropOff();
             }
+
             if (state == PilgrimState.GoingToResource) {
                 return GoToMine();
             }
+
             if (state == PilgrimState.Mining) {
 
                 return Mining();
             }
+
             if (state == PilgrimState.Returning) {
                 CheckForChurch();
                 return ReturnToDropOff();
