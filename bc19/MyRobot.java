@@ -29,7 +29,23 @@ public class MyRobot extends BCAbstractRobot {
 		}
 		location = new Position(me.y, me.x);
 		currentHealth = me.health;
+
+	/*
+		int test = 15;
+		test <<= 6;
+		test += tester.y;
+		test<<= 6;
+		test+= tester.x;
+		log(test + " Initial");
+		signal(test, 6000);
+		*/
+	
+
 		
+		
+
+		return null;
+		/*
 		if (robot == null) {
 			if (me.unit == SPECS.CASTLE) {
 			//	log("I am a Castle");
@@ -51,7 +67,7 @@ public class MyRobot extends BCAbstractRobot {
 			}
 		}
 		return robot.Execute();
-		
+		*/
 		/*
 		if (me.unit == SPECS.CASTLE && me.turn % 5 == 0 && ourTeam == 1) {
 			Position random = Helper.RandomAdjacent(this, new Position(me.y, me.x));

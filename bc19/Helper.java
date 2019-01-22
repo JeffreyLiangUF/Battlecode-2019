@@ -2,6 +2,7 @@ package bc19;
 
 import java.util.ArrayList;
 
+
 public class Helper {
 	public static boolean inMap(boolean[][] map, Position pos) {
 		if (pos.y < 0 || pos.y > (map.length - 1) || pos.x < 0 || pos.x > (map[0].length - 1)) {
@@ -106,6 +107,33 @@ public class Helper {
 		}
 		return false;
 	}
+	public static int abs(int a) {
+		return a < 0 ? -a : a;
+	}
+	public static int sign(int a){
+		return a == 0 ? 0 : a / abs(a);
+	}
+
+	public static boolean ContainsPosition(ArrayList<Position> list, Position pos){
+		for (int i = 0; i < list.size(); i++) {
+			if(list.get(i).y == pos.y && list.get(i).x == pos.x){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static Position ClosestPosition(MyRobot robot, ArrayList<Position> positions){
+		float dist = Integer.MAX_VALUE;
+		Position closest = null;
+		for (int i = 0; i < positions.size(); i++) {
+			if(Helper.DistanceSquared(positions.get(i), robot.location) < dist){
+				dist = Helper.DistanceSquared(positions.get(i), robot.location);
+				closest = positions.get(i);
+			}
+		}
+		return closest;
+	}
 
 	public static Position closestEnemy(MyRobot robot, ArrayList<Robot> robots){
 		float dist = Integer.MAX_VALUE;
@@ -176,6 +204,14 @@ public class Helper {
 			}
 		}
 		return null;
+	}
+
+	public static float[][] twoDimensionalArrayClone(float[][] original) {
+		float[][] output = new float[original.length][original[0].length];
+		for (int i = 0; i < original.length; i++) {
+			output[i] = original[i].clone();
+		}
+		return output;
 	}
 	public static Position RandomAdjacent(MyRobot robot, Position pos) {
 		for (int i = -1; i <= 1; i++) {

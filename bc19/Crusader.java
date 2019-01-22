@@ -7,6 +7,9 @@ public class Crusader extends MovingRobot implements Machine {
 
 	MyRobot robot;
 	boolean initialized;
+	Robot parent;
+	Position parentLocation;
+	Position targetCastle;
 	ArrayList<Position> castleLocations;
 	ArrayList<Position> enemyCastleLocations;
 	HashMap<Position, float[][]> routesToEnemies;
@@ -18,26 +21,22 @@ public class Crusader extends MovingRobot implements Machine {
 	public Action Execute() {
 		if (robot.me.turn == 1) {
 			InitializeVariables();
-		}
-		if (!initialized) {
-			Initialize();
-		}
-
-		CastleDown(robot, enemyCastleLocations, routesToEnemies);
-		Position closestEnemyCastle = null;
-		float[][] pathToEnemyCastle = new float[robot.map.length][robot.map[0].length];
-		if (initialized) {
-			closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);
-			if (initialized && closestEnemyCastle != null) {
-				pathToEnemyCastle = GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle, true);
+			parent = StructureBornFrom(robot);
+			parentLocation = new Position(parent.y, parent.x);
+			if (parent.unit == robot.SPECS.CHURCH) {
+				initialized = true;
 			}
 		}
-
-		if (Helper.EnemiesAround(robot)) {
+		if (!initialized) {
+			CastleInit();
+		}		
+		targetCastle = UpdateBattleStatus(robot,enemyCastleLocations, targetCastle);
+		if (Helper.EnemiesAround(robot) && robot.fuel > 10) {
 			ArrayList<Robot> prophets = EnemiesOfTypeInVision(new int[] { robot.SPECS.PROPHET });
 			if (prophets.size() > 0) {
 				Robot farthest = FarthestProphetOutOfRange(prophets);
-				if (farthest != null && initialized) {
+				Position closest = Helper.closestEnemy(robot, prophets); 
+				if (farthest != null && initialized && Helper.DistanceSquared(closest, robot.location) > 4) {
 					return MoveCloser(robot, new Position(farthest.y, farthest.x), false);
 				} else {
 					return AttackEnemies(prophets.toArray(new Robot[0]));
@@ -58,22 +57,40 @@ public class Crusader extends MovingRobot implements Machine {
 			ArrayList<Robot> preachers = EnemiesOfTypeInVision(new int[] { robot.SPECS.PREACHER });
 			pathToEnemyCastle = BlackOutPreacherPaths(pathToEnemyCastle, preachers);
 		}
-		if (initialized && closestEnemyCastle != null) {
-			return FloodPathing(robot, pathToEnemyCastle, closestEnemyCastle, false);
+		if (initialized && robot.fuel > 200) {
+			if (targetCastle == null && !Fortified(robot, parentLocation)) {
+				ArrayList<Position> valid = GetValidFortifiedPositions(robot, parentLocation);
+				if (valid.size() > 0) {
+					Position closest = Helper.ClosestPosition(robot, valid);
+					float[][] shortPath = CreateLayeredFloodPath(robot, closest, robot.location);
+					return FloodPathing(robot, shortPath, closest, true);
+				} else {
+					Position towardsCenter = TowardsCenter(robot);
+					float[][] shortPath = CreateLayeredFloodPath(robot, towardsCenter, robot.location);
+					return FloodPathing(robot, shortPath, towardsCenter, true);
+				}
+			} else if (targetCastle != null) {
+				CastleDown(robot, enemyCastleLocations, routesToEnemies);
+				if (Helper.ContainsPosition(enemyCastleLocations, targetCastle)) {
+
+				} else{		
+					Position closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);			
+					return FloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle, true), closestEnemyCastle, true);
+				}
+			}
 		}
 		return null;
 	}
 
-	void Initialize() {
-		if (!initialized) {
-			boolean[] signals = ReadInitialSignals(robot, castleLocations);
-			initialized = signals[0];
-			if (initialized) {
-				enemyCastleLocations = Helper.FindEnemyCastles(robot, robot.mapIsHorizontal, castleLocations);
-				for (int i = 0; i < enemyCastleLocations.size(); i++) {
-					GetOrCreateMap(robot, routesToEnemies, enemyCastleLocations.get(i), false);
-				}
+	void CastleInit() {
+		boolean[] signals = ReadInitialSignals(robot, castleLocations);
+		initialized = signals[0];
+		if (initialized) {
+			enemyCastleLocations = Helper.FindEnemyCastles(robot, robot.mapIsHorizontal, castleLocations);
+			for (int i = 0; i < enemyCastleLocations.size(); i++) {
+				GetOrCreateMap(robot, routesToEnemies, enemyCastleLocations.get(i), false);
 			}
+
 		}
 	}
 
@@ -81,7 +98,6 @@ public class Crusader extends MovingRobot implements Machine {
 		castleLocations = new ArrayList<>();
 		enemyCastleLocations = new ArrayList<>();
 		routesToEnemies = new HashMap<>();
-		initialized = false;
 	}
 
 	public Action AttackEnemies(Robot[] robots) {
@@ -162,11 +178,5 @@ public class Crusader extends MovingRobot implements Machine {
 		return output;
 	}
 
-	public static float[][] twoDimensionalArrayClone(float[][] original) {
-		float[][] output = new float[original.length][original[0].length];
-		for (int i = 0; i < original.length; i++) {
-			output[i] = original[i].clone();
-		}
-		return output;
-	}
+	
 }

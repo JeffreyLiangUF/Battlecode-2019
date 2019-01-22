@@ -57,6 +57,9 @@ public class MovingRobot {
 	}
 
 	public static Action FloodPathing(MyRobot robot, float[][] path, Position goal, boolean budget) {
+		if(path == null){
+			return null;
+		}
 		int tileMoveRange = budget ? 1 : robot.tileMovementRange;
 		float moveRange = budget ? 3 : robot.movementRange;
 		if (Helper.DistanceSquared(robot.location, goal) <= robot.movementRange) {
@@ -154,6 +157,9 @@ public class MovingRobot {
 	}
 
 	float[][] GetOrCreateMap(MyRobot robot, HashMap<Position, float[][]> maps, Position goal, boolean perfect) {
+		if(goal == null){
+			return null;
+		}
 		if (maps.containsKey(goal)) {
 			if (maps.get(goal)[robot.me.y][robot.me.x] <= 0) {
 				float[][] newMap = perfect ? CreateLayeredFloodPath(robot, goal)
@@ -257,25 +263,111 @@ public class MovingRobot {
 		outputRead[0] = true;
 		return outputRead;
 	}
+	Position UpdateBattleStatus(MyRobot robot, ArrayList<Position> enemies, Position enemy){
+		Position battleCry = ListenForBattleCry(robot);
+		if(battleCry != null){
+			if(Helper.ContainsPosition(enemies, battleCry)){
+				return battleCry;
+			}
+			else{
+				enemies.add(battleCry);
+				return battleCry;
+			}
+		}
+		return enemy;
+	}
 
-	
-
-	public void CastleDown(MyRobot robot, ArrayList<Position> enemyCastleLocations, HashMap<Position, float[][]> routesToEnemies){
+	Position ListenForBattleCry(MyRobot robot){
 		Robot[] robots = robot.getVisibleRobots();
-		for (int i = enemyCastleLocations.size() - 1; i >= 0; i--) {
-			if(Helper.DistanceSquared(enemyCastleLocations.get(i), robot.location) <= robot.visionRange){
-				for (int j = 0; j < robots.length; j++) {
-					if(Helper.TileEmpty(robot, enemyCastleLocations.get(i))){
-						routesToEnemies.remove(enemyCastleLocations.get(i));
-						enemyCastleLocations.remove(i);
+		for (int i = 0; i < robots.length; i++) {
+			Position enemyCastle = DecodeBattleCry(robots[i].signal);
+			if(enemyCastle != null){
+				if(robot.me.unit != robot.SPECS.PROPHET){
+					return enemyCastle;
+				}
+				else if(ProphetBattleCry(robots[i].signal)){
+					return enemyCastle;
+				}				
+			}
+		}
+		return null;
+	}
+	boolean ProphetBattleCry(int signal){
+		if(signal < 61440 && signal >= 45056){// starts with 1011 
+			return true;
+		}
+		return false;
+	}
+	Position DecodeBattleCry(int signal){
+		if(signal < 45056){//1011 followed by the cords
+			return null;
+		}
+		int x = signal & 63;
+		signal >>= 6;
+		int y = signal & 63;
+		return new Position(y, x);		
+	}
+	boolean Fortified(MyRobot robot, Position parent){
+		if(robot.getKarboniteMap()[robot.me.y][robot.me.x] || robot.getFuelMap()[robot.me.y][robot.me.x]){
+			return false;
+		}
+		if((Math.abs(robot.me.y - parent.y) % 2 == 0) && (Math.abs(robot.me.x - parent.x) % 2 == 0)){
+			return true;
+		}
+		if((Math.abs(robot.me.y - parent.y) % 2 == 1) && (Math.abs(robot.me.x - parent.x) % 2 == 1)){
+			return true;
+		}
+		return false;
+	}
+	Position TowardsCenter(MyRobot robot){
+		Position center = new Position(robot.map.length / 2, robot.map.length / 2);
+		int ySign = Helper.sign(center.y - robot.me.y);
+		int xSign = Helper.sign(center.x - robot.me.x);
+		return new Position(robot.me.y + (ySign * 5),robot.me.x + (xSign * 5));
+	}
+
+	ArrayList<Position> GetValidFortifiedPositions(MyRobot robot, Position parent){
+		ArrayList<Position> valid = new ArrayList<>();
+		for (int y = -robot.tileVisionRange; y <= robot.tileVisionRange; y++) {
+			for (int x = -robot.tileVisionRange; x <= robot.tileVisionRange; x++) {
+				Position possible = new Position(robot.me.y + y, robot.me.x + x);
+				if(Helper.DistanceSquared(robot.location, possible) < robot.visionRange && Helper.TileEmpty(robot,possible)){
+					if(robot.getKarboniteMap()[possible.y][possible.x] || robot.getFuelMap()[possible.y][possible.x]){
+						continue;
 					}
-					else if(Helper.RobotAtPosition(robot, enemyCastleLocations.get(i)).unit != robot.SPECS.CASTLE){
-						routesToEnemies.remove(enemyCastleLocations.get(i));
-						enemyCastleLocations.remove(i);
+					if(((parent.y - possible.y) % 2 == 0) && ((parent.x - possible.x) % 2 == 0)){
+						valid.add(possible);
+					}
+					else if(((parent.y - possible.y) % 2 == 1) && ((parent.x - possible.x) % 2 == 1)){
+						valid.add(possible);
 					}
 				}
 			}
 		}
+		return valid;
+	}
+
+	public void CastleDown(MyRobot robot, ArrayList<Position> enemyCastleLocations, HashMap<Position, float[][]> routesToEnemies){
+		Robot[] robots = robot.getVisibleRobots();
+		for (int i = enemyCastleLocations.size() - 1; i >= 0; i--) {			
+			for (int j = 0; j < robots.length; j++) {
+				if(StructureGone(robot, enemyCastleLocations.get(i))){
+					routesToEnemies.remove(enemyCastleLocations.get(i));
+					enemyCastleLocations.remove(i);
+				}
+			}			
+		}
+	}
+	public boolean StructureGone(MyRobot robot, Position structure){
+		if(Helper.DistanceSquared(structure, robot.location) <= robot.visionRange){
+			if(Helper.TileEmpty(robot, structure)){
+				return true;
+			}
+			else if(Helper.RobotAtPosition(robot, structure).unit != robot.SPECS.CASTLE){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	boolean WatchForSignal(MyRobot robot, int signal) {
@@ -297,6 +389,18 @@ public class MovingRobot {
 			}
 		}
 		return false;
+	}
+	public Robot StructureBornFrom(MyRobot robot){
+		Robot[] robots = robot.getVisibleRobots();
+		for(int i = 0; i < robots.length; i++){
+			Position robotPosition = new Position(robots[i].y, robots[i].x);
+			if(robots[i].team == robot.ourTeam && (robots[i].unit == robot.SPECS.CHURCH || robots[i].unit == robot.SPECS.CASTLE)){
+				if(Helper.DistanceSquared(robot.location, robotPosition) <= 3){
+					return robots[i];
+				}
+			}
+		}
+		return null;
 	}
 	
 	
