@@ -37,7 +37,7 @@ public class Prophet extends MovingRobot implements Machine {
 			if(initialized && closeEnemies.size() > 0 && robot.fuel > 200){
 				return Flee(closeEnemies);
 			}
-			else if(fuel > 10){
+			else if(robot.fuel > 10){
 				ArrayList<Robot> attackable = Helper.EnemiesWithin(robot, robot.attackRange[1]);
 				return AttackEnemies(attackable.toArray(new Robot[0]));
 			}
@@ -58,6 +58,7 @@ public class Prophet extends MovingRobot implements Machine {
 			} else if (targetCastle != null) {
 				CastleDown(robot, enemyCastleLocations, routesToEnemies);
 				if (Helper.ContainsPosition(enemyCastleLocations, targetCastle)) {
+					return FloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, targetCastle, true), targetCastle, true);
 
 				} else{		
 					Position closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);			

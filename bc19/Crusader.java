@@ -54,8 +54,6 @@ public class Crusader extends MovingRobot implements Machine {
 					return MoveCloser(robot, new Position(farthest.y, farthest.x), false);
 				}
 			}
-			ArrayList<Robot> preachers = EnemiesOfTypeInVision(new int[] { robot.SPECS.PREACHER });
-			pathToEnemyCastle = BlackOutPreacherPaths(pathToEnemyCastle, preachers);
 		}
 		if (initialized && robot.fuel > 200) {
 			if (targetCastle == null && !Fortified(robot, parentLocation)) {
@@ -71,11 +69,20 @@ public class Crusader extends MovingRobot implements Machine {
 				}
 			} else if (targetCastle != null) {
 				CastleDown(robot, enemyCastleLocations, routesToEnemies);
+				ArrayList<Robot> preachers = EnemiesOfTypeInVision(new int[] { robot.SPECS.PREACHER });
 				if (Helper.ContainsPosition(enemyCastleLocations, targetCastle)) {
-
+					float[][] pathingMap = GetOrCreateMap(robot, routesToEnemies, targetCastle, true);
+					if(preachers.size() > 0){
+						pathingMap = BlackOutPreacherPaths(pathingMap, preachers);
+					}
+					return FloodPathing(robot, pathingMap, targetCastle, true);
 				} else{		
-					Position closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);			
-					return FloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle, true), closestEnemyCastle, true);
+					Position closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);	
+					float[][] pathingMap = GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle, true);
+					if(preachers.size() > 0){
+						pathingMap = BlackOutPreacherPaths(pathingMap, preachers);
+					}		
+					return FloodPathing(robot, pathingMap, closestEnemyCastle, true);
 				}
 			}
 		}

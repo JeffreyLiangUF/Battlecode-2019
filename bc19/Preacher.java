@@ -50,7 +50,7 @@ public class Preacher extends MovingRobot implements Machine {
 			} else if (targetCastle != null) {
 				CastleDown(robot, enemyCastleLocations, routesToEnemies);
 				if (Helper.ContainsPosition(enemyCastleLocations, targetCastle)) {
-
+					return FloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, targetCastle, true), targetCastle, true);
 				} else{		
 					Position closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);			
 					return FloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle, true), closestEnemyCastle, true);
