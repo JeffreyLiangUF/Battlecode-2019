@@ -24,31 +24,6 @@ public class Helper {
 		return validPositions;
 	}
 
-	public static Position[] AllOpenInRangeInFormation(MyRobot robot, boolean[][] map, Position pos, int r,
-			int ourTeam) {
-		ArrayList<Position> validPositions = new ArrayList<>();
-		for (int i = -r; i <= r; i++) {
-			for (int j = -r; j <= r; j++) {
-				int y = (pos.y + i);
-				int x = (pos.x + j);
-				if (!inMap(map, new Position(y, x)) || robot.getVisibleRobotMap()[y][x] != 0) {
-					continue;
-				}
-				int distanceSquared = (y - pos.y) * (y - pos.y) + (x - pos.x) * (x - pos.x);
-				if (distanceSquared > r) {
-					continue;
-				}
-
-				Position valid = new Position(y, x);
-				if (IsSurroundingsOccupied(robot, robot.getVisibleRobotMap(), valid, ourTeam) > 1) {
-					continue;
-				}
-				validPositions.add(valid);
-			}
-		}
-		return validPositions.toArray(new Position[validPositions.size()]);
-	}
-
 	public static float DistanceSquared(Position pos1, Position pos2) {
 		return (pos2.y - pos1.y) * (pos2.y - pos1.y) + (pos2.x - pos1.x) * (pos2.x - pos1.x);
 	}
