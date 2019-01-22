@@ -369,16 +369,6 @@ public class MovingRobot {
 		}
 		return false;
 	}
-	
-	boolean WatchForSignal(MyRobot robot, int signal) {
-		Robot[] robots = robot.getVisibleRobots();
-		for (int i = 0; i < robots.length; i++) {
-			if (robots[i].signal == signal) {
-				return true;
-			}
-		}
-		return false;
-	}
 
 	public boolean ThreatsAround(MyRobot robot) {
 		Robot[] robots = robot.getVisibleRobots();
