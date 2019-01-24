@@ -39,26 +39,16 @@ public class StationairyRobot {
             return null;
     }
 
-    Action BuildAPilgrimIfNeeded(MyRobot robot) {
-        int resources = ResourcesAround(robot);
-        int pilgrims = PilgrimsAround(robot);
-        if (resources >= pilgrims) {
-            Position buildHere = Helper.RandomAdjacentNonResource(robot, robot.location);
-            if (buildHere != null && robot.karbonite >= 50 && robot.fuel > 250) {
-                return robot.buildUnit(robot.SPECS.PILGRIM, buildHere.x - robot.me.x, buildHere.y - robot.me.y);
-            }
-        }
-        return null;
-    }
+   
 
-    int ResourcesAround(MyRobot robot) {
+    int ResourcesAround(MyRobot robot, int tileRadius) {
         int numResources = 0;
-        for (int i = -robot.tileVisionRange; i <= robot.tileVisionRange; i++) {
-            for (int j = -robot.tileVisionRange; j <= robot.tileVisionRange; j++){
+        for (int i = -tileRadius; i <= tileRadius; i++) {
+            for (int j = -tileRadius; j <= tileRadius; j++){
              Position relative = new Position(robot.me.y + i, robot.me.x + j);
-                if (Helper.inMap(robot.map, relative) && Helper.DistanceSquared(relative, robot.location) <= robot.visionRange){
+                if (Helper.inMap(robot.map, relative)){
                     if(robot.getFuelMap()[relative.y][relative.x] || robot.getKarboniteMap()[relative.y][relative.x]) {
-                    numResources++;
+                        numResources++;
                     }
                 }
             }
@@ -66,11 +56,11 @@ public class StationairyRobot {
         return numResources;
     }
 
-    int PilgrimsAround(MyRobot robot) {
+    int PilgrimsAround(MyRobot robot, int tileRadius) {
         Robot[] robots = robot.getVisibleRobots();
         int numPilgrims = 0;
         for (int i = 0; i < robots.length; i++) {
-            if (robots[i].unit == robot.SPECS.PILGRIM) {
+            if (robots[i].unit == robot.SPECS.PILGRIM && Helper.DistanceSquared(robot.location, new Position(robots[i].y,robots[i].x)) < tileRadius * tileRadius) {
                 numPilgrims++;
             }
         }

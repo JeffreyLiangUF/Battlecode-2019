@@ -131,6 +131,9 @@ public class MovingRobot {
 	static Position LowestInRange(MyRobot robot, Position pos, int tileRange) {
 		float closest = Integer.MAX_VALUE;
 		Position output = null;
+		if(Helper.TileEmpty(robot, pos) && Helper.DistanceSquared(pos, robot.location) <= robot.movementRange){
+			return pos;
+		}
 		for (int y = -tileRange; y <= tileRange; y++) {
 			for (int x = -tileRange; x <= tileRange; x++) {
 				Position possible = new Position(robot.me.y + y, robot.me.x + x);
@@ -223,7 +226,7 @@ public class MovingRobot {
 
 
 	int[] ReadPilgrimSignals(MyRobot robot){
-		int[] outputRead = new int[6];
+		int[] outputRead = new int[2];
 		Robot spawnStructure = robot.me;
 		for (Robot r : robot.getVisibleRobots()) {
 			if (Helper.DistanceSquared(robot.location, new Position(r.y, r.x)) <= 3) {
@@ -233,30 +236,25 @@ public class MovingRobot {
 			}
 		}
 		int signal = spawnStructure.signal;
-		if (signal == -1) {
+		if (signal == -1 || signal > 31) {
 			outputRead[0] = 0;
 			return outputRead;
 		}
-		int x = signal & 63;
-		signal >>= 6;
-		int y = signal & 63;
-		signal >>= 6;
-		int depotNum = signal & 15;
+		
+		int depotNum = signal & 31;
 		if(spawnStructure.unit == robot.SPECS.CASTLE){
 			outputRead[0] = 1;//initted
-			outputRead[1] = spawnStructure.y;//my spawn y
-			outputRead[2] = spawnStructure.x;//my spawn x
-			outputRead[3] = depotNum;//depot num
-			outputRead[4] = y;	//church y
-			outputRead[5] = x;	//church x
+			outputRead[1] = 0;
+			outputRead[2] = depotNum;//depot num
+			outputRead[3] = spawnStructure.y;//my spawn y
+			outputRead[4] = spawnStructure.x;//my spawn x
 		}
 		else{
 			outputRead[0] = 1;//initted
-			outputRead[1] = spawnStructure.y;//my spawn y
-			outputRead[2] = spawnStructure.x;//my spawn x
-			outputRead[3] = depotNum;//depot num
-			outputRead[4] = -1;	//church y
-			outputRead[5] = -1;	//church x
+			outputRead[1] = 1;// church born
+			outputRead[2] = depotNum;//depot num
+			outputRead[3] = spawnStructure.y;//my spawn y
+			outputRead[4] = spawnStructure.x;//my spawn x
 		}
 		return outputRead;
 	}
@@ -284,33 +282,28 @@ public class MovingRobot {
 			outputRead[0] = 0;
 			return outputRead;
 		}
-		int x = signal & 63;
-		signal >>= 6;
-		int y = signal & 63;
-		signal >>= 6;
-		outputRead[1] = signal & 15;
-
-		if(outputRead[1] > 0){
-			if(robot.me.unit == robot.SPECS.PILGRIM){
-				outputRead[0] = 1;
-				outputRead[2] = y;
-				outputRead[3] = x;
-				return outputRead;
-			}
-			else{
-				outputRead[0] = 0;
-				return outputRead;
-			}
-		}
-		if (!Helper.ContainsPosition(castleLocations, new Position(y, x))) {
-			castleLocations.add(new Position(y, x));
+		Position castle = CombatInitSignal(signal);
+		if(castle != null && !Helper.ContainsPosition(castleLocations, castle)){			
 			outputRead[0] = 0;
-			return outputRead;
+			outputRead[1] = castle.y;
+			outputRead[2] = castle.x;
+			return outputRead;			
 		}
 		else{
 			outputRead[0] = 1;
+			outputRead[1] = -1;
+			outputRead[2] = -1;
 			return outputRead;
 		}
+	}
+	Position CombatInitSignal(int signal){
+		if(signal < 4096 || signal >= 8192){
+			return null;
+		}
+		int x = signal & 63;
+		signal >>= 6;
+		int y = signal & 63;
+		return new Position(y, x);
 	}
 
 	boolean Fortified(MyRobot robot, Position parent) {

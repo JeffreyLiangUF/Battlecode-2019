@@ -11,6 +11,11 @@ public class Castle extends StationairyRobot implements Machine {
 
     ArrayList<Position> allyCastlePositions;
     HashMap<Integer, Position> allyCastles;
+
+    ArrayList<Position> churchLocations;
+    int[] resourceDepots;
+    int depotNum;
+    
     int idDone;
     int positionInGrowthOrder = 0;
     int positionInSeigeOrder = 0;
@@ -25,15 +30,33 @@ public class Castle extends StationairyRobot implements Machine {
     }
 
     public Action Execute() {
-        robot.log("Turn : " + robot.me.turn);
+        robot.log("Turn : " + robot.me.turn + "  " + robot.location.toString());
+        
         if (!initialized) {
             Initialize();
         }
-        else{
-            DeclareAllyCastlePositions(13);
-            Position random = Helper.RandomAdjacent(robot, new Position(robot.me.y, robot.me.x));
-			return robot.buildUnit(robot.SPECS.PILGRIM, random.x - robot.me.x, random.y - robot.me.y);
-		}/*
+        
+        int resources = ResourcesAround(robot, 2);
+		int pilgrims = CastlePilgrims();
+		if (resources > pilgrims) {
+			Position buildHere = Helper.RandomAdjacentNonResource(robot, robot.location);
+			if (buildHere != null && Helper.Have(robot, 110, 400) || robot.getVisibleRobots().length < numCastles + 4) {
+				robot.signal(depotNum, 3);
+				return robot.buildUnit(robot.SPECS.PILGRIM, buildHere.x - robot.me.x, buildHere.y - robot.me.y);
+			}
+        }
+        else if(Helper.Have(robot, 110, 400) || robot.getVisibleRobots().length < numCastles + 4){
+            UpdateDepots();
+            Position pilgrimPosition = ShouldBuildPilgrim();
+            if(pilgrimPosition != null){
+                Position random = Helper.RandomAdjacent(robot, new Position(robot.me.y, robot.me.x));
+                SignalToPilgrim(pilgrimPosition);
+                return robot.buildUnit(robot.SPECS.PILGRIM, random.x - robot.me.x, random.y - robot.me.y);
+            }           
+        }
+       
+        
+        /*
         }
         
         
@@ -94,7 +117,9 @@ public class Castle extends StationairyRobot implements Machine {
             initialized = SetupAllyCastles();
         }
         if (initialized) {
+            robot.log("HERERERE");
             for (Position pos : allyCastles.values()) {
+                robot.log(pos.toString());
                 allyCastlePositions.add(pos);
             }
         }
@@ -109,9 +134,34 @@ public class Castle extends StationairyRobot implements Machine {
         positionInSeigeOrder = 0;
         allyCastles = new HashMap<>();
         allyCastlePositions = new ArrayList<>();
+        ArrayList<ResourceCluster> temp = Helper.FindClusters(robot, Helper.ResourcesOnOurHalfMap(robot));
+        churchLocations = Helper.ChurchLocationsFromClusters(robot, temp);
+        resourceDepots = new int[temp.size()];  
+        Position closestDepot = Helper.ClosestPosition(robot, churchLocations);
+        depotNum = churchLocations.indexOf(closestDepot) + 1;
+
         targetCastleIndex = 0;
     }
+    void UpdateDepots(){
+        for(int i = 0; i < resourceDepots.length; i++){
+            resourceDepots[i] = -(i + 1); 
+            Position church = churchLocations.get(i);
+            for (int j = 0; j < allyCastlePositions.size(); j++) {
+                Position otherCastle = allyCastlePositions.get(j);
 
+                if(!otherCastle.equals(robot.location) && Helper.DistanceSquared(otherCastle, church) < Helper.DistanceSquared(robot.location, church)){
+                    resourceDepots[i] = (i + 1); 
+                }
+            }
+        }
+        Robot[] robots = robot.getVisibleRobots();
+        for (int i = 0; i < robots.length; i++) {
+            int signal = robots[i].castle_talk;
+            if(signal <= resourceDepots.length){
+                resourceDepots[signal - 1] = signal;
+            }
+        }
+    }
     void SignalAttack() {
         Position otherCastlesCry = Helper.ListenForBattleCry(robot);
         targetCastleIndex = targetCastleIndex >= numCastles ? 0 : targetCastleIndex;
@@ -129,6 +179,30 @@ public class Castle extends StationairyRobot implements Machine {
             targetCastleIndex++;
         }
     }
+    Position ShouldBuildPilgrim(){
+        ArrayList<Position> available = new ArrayList<>();
+        for (int i = 0; i < churchLocations.size(); i++) {
+            robot.log(resourceDepots[i] + "  " + churchLocations.get(i).toString());           
+            if(resourceDepots[i] < 0){
+                available.add(churchLocations.get(i));
+            }
+        }
+        return Helper.ClosestPosition(robot, available);
+    }
+    void SignalToPilgrim(Position pos){
+        int depotNum = churchLocations.indexOf(pos) + 1;
+            robot.signal(depotNum, 3);
+    }
+    int CastlePilgrims(){
+        Robot[] robots = robot.getVisibleRobots();
+        int count = 0;
+        for (int i = 0; i < robots.length; i++) {
+            if(robots[i].castle_talk == depotNum){
+                count++;
+            }
+        }
+        return count;
+    }
 
     int CreateAttackSignal(Position pos, boolean finalAttack) {
         int output = finalAttack ? 11 : 15;
@@ -139,10 +213,15 @@ public class Castle extends StationairyRobot implements Machine {
         return output;
     }
 
+    
+
+
+
     boolean SetupAllyCastles() {
+        robot.log("getting called at least");
         Robot[] rs = robot.getVisibleRobots();
         ArrayList<Robot> robots = new ArrayList<>();
-        for (int i = 0; i < rs.length; i++) {// all to make sure we dont read enemy messages
+        for (int i = 0; i < rs.length; i++) {
             if (rs[i].team == robot.ourTeam) {
                 robots.add(rs[i]);
             }
@@ -162,24 +241,26 @@ public class Castle extends StationairyRobot implements Machine {
             numCastles = robots.size();
         } else {
             for (int i = 0; i < robots.size(); i++) {
-                if (robots.get(i).castle_talk > 0) {
+                if (robots.get(i).castle_talk > 31 && robots.get(i).id != robot.id) {
+
                     CastleLocation info = new CastleLocation(robots.get(i).castle_talk);
                     numCastles = info.threeCastles ? 3 : 2;
                     if (allyCastles.containsKey(robots.get(i).id)) {
                         Position current = allyCastles.get(robots.get(i).id);
-                        Position input = info.yValue ? new Position(info.location, current.x)
-                                : new Position(current.y, info.location);
+                        int newY = current.y == -1 ? info.location : current.y;
+                        int newX = current.x == -1 ? info.location : current.x;
+                        Position input = new Position(newY, newX);
                         allyCastles.put(robots.get(i).id, input);
                     } else {
-                        Position input = info.yValue ? new Position(info.location, -1)
-                                : new Position(-1, info.location);
+                        Position input = new Position(info.location, -1);
+
                         allyCastles.put(robots.get(i).id, input);
                     }
                 }
             }
         }
         if (allyCastles.containsKey(robot.me.id)) {
-            robot.castleTalk(CastleInfoTalk(numCastles == 3 ? true : false, false, robot.me.x));
+            robot.castleTalk(CastleInfoTalk(numCastles == 3 ? true : false, true, robot.me.x));
         } else {
             allyCastles.put(robot.me.id, robot.location);
             robot.castleTalk(CastleInfoTalk(numCastles == 3 ? true : false, true, robot.me.y));
@@ -258,32 +339,7 @@ public class Castle extends StationairyRobot implements Machine {
         return output;
     }
 
-    Position ClosestCastleToKarb() {
-        boolean[][] karbMap = robot.getKarboniteMap();
-        float lowestCastleDistance = Integer.MAX_VALUE;
-        Position closestCastle = null;
-        for (Position castlePos : allyCastles.values()) {
-            float lowestDist = Integer.MAX_VALUE;
-            for (int i = 0; i < karbMap.length; i++) {
-                for (int j = 0; j < karbMap[0].length; j++) {
-                    if (karbMap[i][j] == true) {
-                        Position karb = new Position(i, j);
-                        float least = Helper.DistanceSquared(castlePos, karb);
-                        if (least < lowestDist) {
-                            lowestDist = least;
-                        }
-                    } else {
-                        continue;
-                    }
-                }
-            }
-            if (lowestDist < lowestCastleDistance) {
-                lowestCastleDistance = lowestDist;
-                closestCastle = castlePos;
-            }
-        }
-        return closestCastle;
-    }
+  
 }
 
 enum CastleState {

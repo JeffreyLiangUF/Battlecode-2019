@@ -102,6 +102,13 @@ public class Helper {
 		return closest;
 	}
 
+	public static boolean Have(MyRobot robot, int karbonite, int fuel){
+		if(robot.karbonite >= karbonite && robot.fuel >= fuel){
+			return true;
+		}
+		return false;
+	}
+
 	public static Position closestEnemy(MyRobot robot, ArrayList<Robot> robots){
 		float dist = Integer.MAX_VALUE;
 		Position closest = null;
@@ -279,7 +286,6 @@ public class Helper {
 
 	public static boolean[][] ResourcesOnOurHalfMap(MyRobot robot)
 	{
-		robot.log("Map is Horinzontal : " + robot.mapIsHorizontal + "  " + robot.positiveSide);
 		boolean[][] halfResourceMap = robot.mapIsHorizontal ? new boolean[(robot.map.length + 1) / 2][robot.map.length] : new boolean[robot.map.length][(robot.map.length + 1) / 2];
 		robot.log(halfResourceMap.length + " " + halfResourceMap[0].length);
 
@@ -331,9 +337,9 @@ public class Helper {
 		int yAdd = 0;
 		int xAdd = 0;
 		if(robot.mapIsHorizontal && !robot.positiveSide){
-			yAdd = (robot.map.length - 1) / 2;
+			yAdd = (robot.map.length) / 2;
 		} else if(!robot.mapIsHorizontal && robot.positiveSide){
-			xAdd = (robot.map.length - 1) / 2;
+			xAdd = (robot.map.length) / 2;
 		}
 		for (int y = 0; y < resourceMap.length; y++) {
 			for (int x = 0; x < resourceMap[y].length; x++) {
@@ -353,35 +359,38 @@ public class Helper {
 				}
 			}
 		}
-		robot.log("Size : " + output.size());
 		return output;
 	}
 	public static ArrayList<Position> ChurchLocationsFromClusters(MyRobot robot, ArrayList<ResourceCluster> clusters){
 		ArrayList<Position> churchLocations = new ArrayList<>();
 		for(int i =0 ; i< clusters.size(); i++){
+			ResourceCluster cluster = clusters.get(i);
 			int yAvg = 0;
 			int xAvg = 0;
-			for (int j = 0; j < clusters.get(i).resourceLocations.size(); j++) {
-				Position resource = clusters.get(i).resourceLocations.get(j);
+			for (int j = 0; j < cluster.resourceLocations.size(); j++) {
+				Position resource = cluster.resourceLocations.get(j);
 				yAvg += resource.y;
 				xAvg += resource.x;
 			}
-			yAvg /= clusters.get(i).resourceLocations.size();
-			xAvg /= clusters.get(i).resourceLocations.size();
+			yAvg /= cluster.resourceLocations.size();
+			xAvg /= cluster.resourceLocations.size();
 			Position center = new Position(Math.round(yAvg), Math.round(xAvg));
 			float lowestDist = Integer.MAX_VALUE;
 			Position nonResourceCenter = center;
 			for (int y = -2; y <= 2; y++) {
 				for (int x = -2; x <= 2; x++) {
 					Position pos = new Position(center.y + y, center.x + x);
-					if(!ContainsPosition(clusters.get(i).resourceLocations,pos) && DistanceSquared(center, pos) < lowestDist){
-						lowestDist = DistanceSquared(center, pos);
+					int sum = 0;
+					for (int d = 0; d < cluster.resourceLocations.size(); d++) {
+						sum += Helper.DistanceSquared(pos, cluster.resourceLocations.get(d));
+					}
+					if(!ContainsPosition(clusters.get(i).resourceLocations,pos) && sum < lowestDist){
+						lowestDist = sum;
 						nonResourceCenter = pos;
 					}
 				}
 			}
 			churchLocations.add(nonResourceCenter);
-			robot.log("Prior Center : " + center.toString() + " New center : " + nonResourceCenter.toString());
 		}
 		return churchLocations;
 	}
