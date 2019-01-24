@@ -31,7 +31,7 @@ public class MyRobot extends BCAbstractRobot {
 		location = new Position(me.y, me.x);
 		currentHealth = me.health;
 
-		boolean[][] test = Helper.ResourcesOnOurHalfMap(this);
+	/*	boolean[][] test = Helper.ResourcesOnOurHalfMap(this);
 
 					 for (int i = 0; i < test.length; i++) { 
 						 String cat = ""; 
@@ -43,13 +43,7 @@ public class MyRobot extends BCAbstractRobot {
 						log(cat); 
 					}
 		Helper.ChurchLocationsFromClusters(this, Helper.FindClusters(this, test));
-
-		return null;
-		/*
-		if(me.team == 0){
-			return null;
-		}
-		
+		*/
 		if (robot == null) {
 			if (me.unit == SPECS.CASTLE) {
 				//log("I am a Castle");
@@ -71,7 +65,7 @@ public class MyRobot extends BCAbstractRobot {
 			}
 		}
 		return robot.Execute();
-		*/
+		
 		/*
 		if (me.unit == SPECS.CASTLE && me.turn % 5 == 0 && ourTeam == 1) {
 			Position random = Helper.RandomAdjacent(this, new Position(me.y, me.x));

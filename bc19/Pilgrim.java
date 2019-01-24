@@ -15,7 +15,6 @@ public class Pilgrim extends MovingRobot implements Machine {
     ArrayList<Position> dropOffLocations;
     HashMap<Position, float[][]> ourDropOffRoutes;
     int karbThreshold = 50, fuelThreshold = 500;// changed this by mistake
-    int oportunityKarbLostThreshold = 10;
     int[][] occupiedResources; // -1 if not resource, 0 unoccupied resource, 1 occupied by PILGRIM,
 
     public Pilgrim(MyRobot robot) {
@@ -82,8 +81,8 @@ public class Pilgrim extends MovingRobot implements Machine {
             InitializeVariables();
         }
         if (!initialized) {
-            boolean[] signals = ReadInitialSignals(robot, dropOffLocations);
-            initialized = signals[0];
+            int[] signals = ReadInitialSignals(robot, dropOffLocations);
+            initialized = signals[0] == 1 ? true : false;
             
             if (initialized) {
                 for (int i = 0; i < dropOffLocations.size(); i++) {
@@ -244,7 +243,7 @@ public class Pilgrim extends MovingRobot implements Machine {
         }
         return true;
     }
-    vo
+    
 }
 
 enum PilgrimState {

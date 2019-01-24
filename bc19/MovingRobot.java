@@ -220,51 +220,56 @@ public class MovingRobot {
 	 * if (lowestPos != null) { return robot.move(lowestPos.x - robot.me.x,
 	 * lowestPos.y - robot.me.y); } else { return MoveCloser(robot, goal); } }
 	 */
-	boolean[] ReadInitialSignals(MyRobot robot) {
-		return ReadInitialSignals(robot, new ArrayList<Position>());
-	}
 
-	boolean[] ReadInitialSignals(MyRobot robot, ArrayList<Position> castleLocations) {
 
-		boolean[] outputRead = new boolean[3];
-		Robot spawnCastle = robot.me;
+	int[] ReadInitialSignals(MyRobot robot, ArrayList<Position> castleLocations) {
+
+		int[] outputRead = new int[2];
+		Robot spawnStructure = robot.me;
 		for (Robot r : robot.getVisibleRobots()) {
 			if (Helper.DistanceSquared(robot.location, new Position(r.y, r.x)) <= 3) {
 				if (r.unit == robot.SPECS.CASTLE) {
-					spawnCastle = r;
+					spawnStructure = r;
 				} else if (r.unit == robot.SPECS.CHURCH) {
 					castleLocations.add(new Position(r.y, r.x));
-					outputRead[0] = true;// initialized
-					outputRead[1] = false;// return after 10 karb
+					outputRead[0] = 1;
 					return outputRead;
 				}
 			}
 		}
 		if (castleLocations.size() == 0) {
-			castleLocations.add(new Position(spawnCastle.y, spawnCastle.x));
+			castleLocations.add(new Position(spawnStructure.y, spawnStructure.x));
 		}
-		int signal = spawnCastle.signal;
+		int signal = spawnStructure.signal;
 		if (signal == -1) {
-			outputRead[0] = false;
+			outputRead[0] = 0;
 			return outputRead;
 		}
 		int x = signal & 63;
 		signal >>= 6;
 		int y = signal & 63;
 		signal >>= 6;
-		int numCastle = signal & 3;
-		signal >>= 2;
-		outputRead[2] = (signal & 1) == 1 ? true : false;
-		signal >>= 1;
-		outputRead[1] = (signal & 1) == 1 ? true : false;
+		outputRead[1] = signal & 15;
 
-		castleLocations.add(new Position(y, x));
-		if (castleLocations.size() < numCastle && numCastle == 3) {
-			outputRead[0] = false;
+		if(outputRead[1] > 0){
+			if(robot.me.unit == robot.SPECS.PILGRIM){
+				outputRead[0] = 1;
+				return outputRead;
+			}
+			else{
+				outputRead[0] = 0;
+				return outputRead;
+			}
+		}
+		if (!Helper.ContainsPosition(castleLocations, new Position(y, x))) {
+			castleLocations.add(new Position(y, x));
+			outputRead[0] = 0;
 			return outputRead;
 		}
-		outputRead[0] = true;
-		return outputRead;
+		else{
+			outputRead[0] = 1;
+			return outputRead;
+		}
 	}
 
 	boolean Fortified(MyRobot robot, Position parent) {

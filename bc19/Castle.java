@@ -29,9 +29,18 @@ public class Castle extends StationairyRobot implements Machine {
         if (!initialized) {
             Initialize();
         }
+        else{
+            DeclareAllyCastlePositions(13);
+            Position random = Helper.RandomAdjacent(robot, new Position(robot.me.y, robot.me.x));
+			return robot.buildUnit(robot.SPECS.PILGRIM, random.x - robot.me.x, random.y - robot.me.y);
+		}/*
+        }
+        
+        
+        /*
         robot.log("init problem?");
         if (initialized) {
-            DeclareAllyCastlePositions(false, false);
+            DeclareAllyCastlePositions(0);
             SignalAttack();
             if (Helper.EnemiesAround(robot)) {
                 Action canBuildDefense = EvaluateEnemyRatio(robot);
@@ -72,7 +81,7 @@ public class Castle extends StationairyRobot implements Machine {
                         random.y - robot.me.y);
             }
         }
-
+*/
         return null;
     }
 
@@ -198,9 +207,9 @@ public class Castle extends StationairyRobot implements Machine {
         return true;
     }
 
-    void DeclareAllyCastlePositions(boolean bit1, boolean bit2) {
+    void DeclareAllyCastlePositions(int message) {
         if (numCastles == 1) {
-            robot.signal(BinarySignalsForInitialization(bit1, bit2, robot.location), 3);
+            robot.signal(BinarySignalsForInitialization(message, robot.location), 3);
         }
 
         else if (numCastles == 2) {
@@ -211,7 +220,7 @@ public class Castle extends StationairyRobot implements Machine {
                 }
             }
             if (other != null && other.x >= 0 && other.y >= 0) {
-                robot.signal(BinarySignalsForInitialization(bit1, bit2, other), 3);
+                robot.signal(BinarySignalsForInitialization(message, other), 3);
             }
         } else if (numCastles == 3) {
             if (idDone == 0) {
@@ -223,7 +232,7 @@ public class Castle extends StationairyRobot implements Machine {
                     }
                 }
                 if (other != null && other.x >= 0 && other.y >= 0) {
-                    robot.signal(BinarySignalsForInitialization(bit1, bit2, other), 3);
+                    robot.signal(BinarySignalsForInitialization(message, other), 3);
                 }
             } else {
                 Position other = null;
@@ -234,20 +243,14 @@ public class Castle extends StationairyRobot implements Machine {
                     }
                 }
                 if (other != null && other.x >= 0 && other.y >= 0) {
-                    robot.signal(BinarySignalsForInitialization(bit1, bit2, other), 3);
+                    robot.signal(BinarySignalsForInitialization(message, other), 3);
                 }
             }
         }
     }
 
-    int BinarySignalsForInitialization(boolean bit1, boolean bit2, Position pos) {
-        int output = bit1 ? 1 : 0;
-        output <<= 1;
-        output += bit2 ? 1 : 0;
-
-        output <<= 2;
-        output += numCastles;
-
+    int BinarySignalsForInitialization(int message, Position pos) {
+        int output = message;
         output <<= 6;
         output += pos.y;
         output <<= 6;

@@ -20,8 +20,19 @@ public class Crusader extends MovingRobot implements Machine {
 
 	public Action Execute() {
 		robot.log("Crusader");
-
 		if (robot.me.turn == 1) {
+			InitializeVariables();
+			parent = StructureBornFrom(robot);
+			parentLocation = new Position(parent.y, parent.x);
+			if (parent.unit == robot.SPECS.CHURCH) {
+				initialized = true;
+			}
+		}
+		if (!initialized) {
+			CastleInit();
+		}	
+		robot.log(" " + castleLocations);
+		/*if (robot.me.turn == 1) {
 			InitializeVariables();
 			parent = StructureBornFrom(robot);
 			parentLocation = new Position(parent.y, parent.x);
@@ -87,13 +98,13 @@ public class Crusader extends MovingRobot implements Machine {
 					return FloodPathing(robot, pathingMap, closestEnemyCastle, true);
 				}
 			}
-		}
+		}*/
 		return null;
 	}
 
 	void CastleInit() {
-		boolean[] signals = ReadInitialSignals(robot, castleLocations);
-		initialized = signals[0];
+		int[] signals = ReadInitialSignals(robot, castleLocations);
+		initialized = signals[0] == 1 ? true : false;
 		if (initialized) {
 			enemyCastleLocations = Helper.FindEnemyCastles(robot, robot.mapIsHorizontal, castleLocations);
 			for (int i = 0; i < enemyCastleLocations.size(); i++) {

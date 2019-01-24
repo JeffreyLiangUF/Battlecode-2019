@@ -63,8 +63,8 @@ public class Preacher extends MovingRobot implements Machine {
 	}
 
 	void CastleInit() {
-		boolean[] signals = ReadInitialSignals(robot, castleLocations);
-		initialized = signals[0];
+		int[] signals = ReadInitialSignals(robot, castleLocations);
+		initialized = signals[0] == 1 ? true : false;
 		if (initialized) {
 			enemyCastleLocations = Helper.FindEnemyCastles(robot, robot.mapIsHorizontal, castleLocations);
 			for (int i = 0; i < enemyCastleLocations.size(); i++) {
