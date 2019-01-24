@@ -326,4 +326,71 @@ public class Helper {
 		
 		return halfResourceMap;
 	}
+	public static ArrayList<ResourceCluster> FindClusters(MyRobot robot, boolean[][] resourceMap){
+		ArrayList<ResourceCluster> output = new ArrayList<>();
+		int yAdd = 0;
+		int xAdd = 0;
+		if(robot.mapIsHorizontal && !robot.positiveSide){
+			yAdd = (robot.map.length - 1) / 2;
+		} else if(!robot.mapIsHorizontal && robot.positiveSide){
+			xAdd = (robot.map.length - 1) / 2;
+		}
+		for (int y = 0; y < resourceMap.length; y++) {
+			for (int x = 0; x < resourceMap[y].length; x++) {
+				if(resourceMap[y][x]){
+					ResourceCluster cluster = new ResourceCluster();
+					cluster.resourceLocations.add(new Position(y + yAdd, x + xAdd));
+					resourceMap[y][x] = false;
+					for(int i = -3; i <= 3; i++){
+						for(int j = -3; j <= 3; j++){
+							if(inMap(resourceMap, new Position(y + i, x + j)) && resourceMap[y + i][x + j]){
+								cluster.resourceLocations.add(new Position(y+yAdd + i, x + xAdd + j));
+								resourceMap[y+i][x+ j] = false;
+							}
+						}
+					}
+					output.add(cluster);
+				}
+			}
+		}
+		robot.log("Size : " + output.size());
+		return output;
+	}
+	public static ArrayList<Position> ChurchLocationsFromClusters(MyRobot robot, ArrayList<ResourceCluster> clusters){
+		ArrayList<Position> churchLocations = new ArrayList<>();
+		for(int i =0 ; i< clusters.size(); i++){
+			int yAvg = 0;
+			int xAvg = 0;
+			for (int j = 0; j < clusters.get(i).resourceLocations.size(); j++) {
+				Position resource = clusters.get(i).resourceLocations.get(j);
+				yAvg += resource.y;
+				xAvg += resource.x;
+			}
+			yAvg /= clusters.get(i).resourceLocations.size();
+			xAvg /= clusters.get(i).resourceLocations.size();
+			Position center = new Position(Math.round(yAvg), Math.round(xAvg));
+			float lowestDist = Integer.MAX_VALUE;
+			Position nonResourceCenter = center;
+			for (int y = -2; y <= 2; y++) {
+				for (int x = -2; x <= 2; x++) {
+					Position pos = new Position(center.y + y, center.x + x);
+					if(!ContainsPosition(clusters.get(i).resourceLocations,pos) && DistanceSquared(center, pos) < lowestDist){
+						lowestDist = DistanceSquared(center, pos);
+						nonResourceCenter = pos;
+					}
+				}
+			}
+			churchLocations.add(nonResourceCenter);
+			robot.log("Prior Center : " + center.toString() + " New center : " + nonResourceCenter.toString());
+		}
+		return churchLocations;
+	}
+
+}
+class ResourceCluster{
+	ArrayList<Position> resourceLocations;
+
+	ResourceCluster(){
+		resourceLocations = new ArrayList<>();
+	}
 }

@@ -42,6 +42,7 @@ public class MyRobot extends BCAbstractRobot {
 						} 
 						log(cat); 
 					}
+		Helper.ChurchLocationsFromClusters(this, Helper.FindClusters(this, test));
 
 		return null;
 		/*

@@ -244,6 +244,7 @@ public class Pilgrim extends MovingRobot implements Machine {
         }
         return true;
     }
+    vo
 }
 
 enum PilgrimState {
