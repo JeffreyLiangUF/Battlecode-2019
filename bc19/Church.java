@@ -11,7 +11,7 @@ public class Church extends StationairyRobot implements Machine {
 	public Action Execute() {
 		//robot.log("Church");
 
-
+//only build pilgrims for your depot unless the other parrell depot is close
 		Action defend = EvaluateEnemyRatio(robot);
 		if (defend == null) {
 			return BuildAPilgrimIfNeeded(robot);

@@ -222,7 +222,46 @@ public class MovingRobot {
 	 */
 
 
-	int[] ReadInitialSignals(MyRobot robot, ArrayList<Position> castleLocations) {
+	int[] ReadPilgrimSignals(MyRobot robot){
+		int[] outputRead = new int[6];
+		Robot spawnStructure = robot.me;
+		for (Robot r : robot.getVisibleRobots()) {
+			if (Helper.DistanceSquared(robot.location, new Position(r.y, r.x)) <= 3) {
+				if (r.unit == robot.SPECS.CASTLE || r.unit == robot.SPECS.CHURCH) {
+					spawnStructure = r;
+				} 
+			}
+		}
+		int signal = spawnStructure.signal;
+		if (signal == -1) {
+			outputRead[0] = 0;
+			return outputRead;
+		}
+		int x = signal & 63;
+		signal >>= 6;
+		int y = signal & 63;
+		signal >>= 6;
+		int depotNum = signal & 15;
+		if(spawnStructure.unit == robot.SPECS.CASTLE){
+			outputRead[0] = 1;//initted
+			outputRead[1] = spawnStructure.y;//my spawn y
+			outputRead[2] = spawnStructure.x;//my spawn x
+			outputRead[3] = depotNum;//depot num
+			outputRead[4] = y;	//church y
+			outputRead[5] = x;	//church x
+		}
+		else{
+			outputRead[0] = 1;//initted
+			outputRead[1] = spawnStructure.y;//my spawn y
+			outputRead[2] = spawnStructure.x;//my spawn x
+			outputRead[3] = depotNum;//depot num
+			outputRead[4] = -1;	//church y
+			outputRead[5] = -1;	//church x
+		}
+		return outputRead;
+	}
+
+	int[] ReadCombatSignals(MyRobot robot, ArrayList<Position> castleLocations) {
 
 		int[] outputRead = new int[2];
 		Robot spawnStructure = robot.me;
@@ -254,6 +293,8 @@ public class MovingRobot {
 		if(outputRead[1] > 0){
 			if(robot.me.unit == robot.SPECS.PILGRIM){
 				outputRead[0] = 1;
+				outputRead[2] = y;
+				outputRead[3] = x;
 				return outputRead;
 			}
 			else{
