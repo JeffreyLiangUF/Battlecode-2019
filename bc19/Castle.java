@@ -36,8 +36,9 @@ public class Castle extends StationairyRobot implements Machine {
             Initialize();
         }
         
-        int resources = ResourcesAround(robot, 2);
-		int pilgrims = CastlePilgrims();
+        int resources = ResourcesAround(robot, 3);
+        int pilgrims = CastlePilgrims();
+        robot.log("RESOURCES :  " + resources + " PILGRIMS : " + pilgrims);
 		if (resources > pilgrims) {
 			Position buildHere = Helper.RandomAdjacentNonResource(robot, robot.location);
 			if (buildHere != null && Helper.Have(robot, 110, 400) || robot.getVisibleRobots().length < numCastles + 4) {
@@ -63,7 +64,7 @@ public class Castle extends StationairyRobot implements Machine {
         /*
         robot.log("init problem?");
         if (initialized) {
-            DeclareAllyCastlePositions(0);
+            DeclareAllyCastlePositions(1);
             SignalAttack();
             if (Helper.EnemiesAround(robot)) {
                 Action canBuildDefense = EvaluateEnemyRatio(robot);
@@ -112,12 +113,10 @@ public class Castle extends StationairyRobot implements Machine {
         if (robot.me.turn == 1) {
             InitializeVariables();
         }
-        robot.log("initing variables");
         if (!initialized) {
             initialized = SetupAllyCastles();
         }
         if (initialized) {
-            robot.log("HERERERE");
             for (Position pos : allyCastles.values()) {
                 robot.log(pos.toString());
                 allyCastlePositions.add(pos);
@@ -172,7 +171,7 @@ public class Castle extends StationairyRobot implements Machine {
             Position enemyCastle = Helper.FindEnemyCastle(robot.map, robot.mapIsHorizontal,
                     allyCastlePositions.get(targetCastleIndex));
             robot.log("The Position is : " + enemyCastle);
-            robot.signal(CreateAttackSignal(enemyCastle, robot.me.turn == 200),
+            robot.signal(CreateAttackSignal(enemyCastle, robot.me.turn == 800),
                     robot.map.length * robot.map.length + robot.map.length * robot.map.length);
             robot.log("sent the signal");
         } else if (robot.me.turn % 100 == 0) {

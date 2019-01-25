@@ -17,9 +17,10 @@ public class Church extends StationairyRobot implements Machine {
 		}
 		// only build pilgrims for your depot unless the other parrell depot is close
 		Action defend = EvaluateEnemyRatio(robot);
+		robot.log("CHURCH : " + (defend == null));
 		if (defend == null) {
-			int resources = ResourcesAround(robot, 2);
-			int pilgrims = PilgrimsAround(robot, 2);
+			int resources = ResourcesAround(robot, 3);
+			int pilgrims = PilgrimsAround(robot, 3);
 			robot.log("DEPOT NUMBER : " + depotNum + " r " + resources + " p " + pilgrims);
 
 			if (resources > pilgrims) {

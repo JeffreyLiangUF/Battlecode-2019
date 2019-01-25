@@ -209,16 +209,54 @@ public class Helper {
 		return highest;
 	}
 	public static Position RandomAdjacentNonResource(MyRobot robot, Position pos) {
+		int lowest = Integer.MAX_VALUE;
+		Position best = null;
 		for (int i = -1; i <= 1; i++) {
 			for (int j = -1; j <= 1; j++) {
 				Position adjacent = new Position(pos.y + i, pos.x + j);
 				if (TileEmptyNonResource(robot, adjacent)) {
-					return new Position(adjacent.y, adjacent.x);
+					int count = 0;
+					for (int k = -1; k <= 1; k++) {
+						for (int l = -1; l <= 1; l++) {
+							if(!TileEmpty(robot, new Position(adjacent.y + k, adjacent.x + l))){
+								count++;
+							}
+						}
+					}
+					if(count < lowest){
+						lowest = count; 
+						best = adjacent;
+					}
 				}
 			}
 		}
-		return null;
+		return best;
 	}
+	public static Position RandomAdjacent(MyRobot robot, Position pos) {
+		int lowest = Integer.MAX_VALUE;
+		Position best = null;
+		for (int i = -1; i <= 1; i++) {
+			for (int j = -1; j <= 1; j++) {
+				Position adjacent = new Position(pos.y + i, pos.x + j);
+				if (TileEmpty(robot, adjacent)) {
+					int count = 0;
+					for (int k = -1; k <= 1; k++) {
+						for (int l = -1; l <= 1; l++) {
+							if(TileEmpty(robot, new Position(adjacent.y + k, adjacent.x + l))){
+								count++;
+							}
+						}
+					}
+					if(count < lowest){
+						lowest = count; 
+						best = adjacent;
+					}
+				}
+			}
+		}
+		return best;
+	}
+
 	public static Position RandomAdjacentMoveable(MyRobot robot, Position pos, float moveRange) {
 		for (int i = -1; i <= 1; i++) {
 			for (int j = -1; j <= 1; j++) {
@@ -238,17 +276,7 @@ public class Helper {
 		}
 		return output;
 	}
-	public static Position RandomAdjacent(MyRobot robot, Position pos) {
-		for (int i = -1; i <= 1; i++) {
-			for (int j = -1; j <= 1; j++) {
-				Position adjacent = new Position(pos.y + i, pos.x + j);
-				if (TileEmpty(robot, adjacent)) {
-					return new Position(adjacent.y, adjacent.x);
-				}
-			}
-		}
-		return null;
-	}
+	
 
 	public static boolean TileEmptyNonResource(MyRobot robot, Position pos){
 		if(TileEmpty(robot, pos) && !robot.getKarboniteMap()[pos.y][pos.x] && !robot.getFuelMap()[pos.y][pos.x]){
@@ -347,8 +375,8 @@ public class Helper {
 					ResourceCluster cluster = new ResourceCluster();
 					cluster.resourceLocations.add(new Position(y + yAdd, x + xAdd));
 					resourceMap[y][x] = false;
-					for(int i = -3; i <= 3; i++){
-						for(int j = -3; j <= 3; j++){
+					for(int i = 0; i <= 4; i++){
+						for(int j = -4; j <= 4; j++){
 							if(inMap(resourceMap, new Position(y + i, x + j)) && resourceMap[y + i][x + j]){
 								cluster.resourceLocations.add(new Position(y+yAdd + i, x + xAdd + j));
 								resourceMap[y+i][x+ j] = false;

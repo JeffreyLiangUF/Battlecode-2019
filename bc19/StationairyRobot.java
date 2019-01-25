@@ -57,11 +57,16 @@ public class StationairyRobot {
     }
 
     int PilgrimsAround(MyRobot robot, int tileRadius) {
-        Robot[] robots = robot.getVisibleRobots();
         int numPilgrims = 0;
-        for (int i = 0; i < robots.length; i++) {
-            if (robots[i].unit == robot.SPECS.PILGRIM && Helper.DistanceSquared(robot.location, new Position(robots[i].y,robots[i].x)) < tileRadius * tileRadius) {
-                numPilgrims++;
+        for (int i = -tileRadius; i <= tileRadius; i++) {
+            for (int j = -tileRadius; j <= tileRadius; j++){
+             Position relative = new Position(robot.me.y + i, robot.me.x + j);
+                if (Helper.inMap(robot.map, relative)){
+                    Robot onTile = Helper.RobotAtPosition(robot, relative);
+                    if(onTile != null && onTile.unit == robot.SPECS.PILGRIM && onTile.team == robot.ourTeam) {
+                        numPilgrims++;
+                    }
+                }
             }
         }
         return numPilgrims;

@@ -16,6 +16,14 @@ public class MovingRobot {
 		float[][] singleStep = new float[robot.map.length][robot.map[0].length];
 		Queue<PathingPosition> toBeVisited = new LinkedList<>();
 		toBeVisited.add(new PathingPosition(startPos, 0));
+		Robot[] robots = robot.getVisibleRobots();
+		for (int i = 0; i < robots.length; i++) {
+			if(Helper.DistanceSquared(robot.location, new Position(robots[i].y, robots[i].x)) <= robot.visionRange){
+				if(robots[i].unit == robot.SPECS.CASTLE || robots[i].unit == robot.SPECS.CHURCH){
+					singleStep[robots[i].y][robots[i].x] = -1;
+				}
+			}
+		}
 		while (toBeVisited.size() > 0) {
 			PathingPosition removed = toBeVisited.poll();
 
@@ -51,8 +59,7 @@ public class MovingRobot {
 					}
 				}
 			}
-
-		}
+		}		
 		return singleStep;
 	}
 
@@ -92,7 +99,7 @@ public class MovingRobot {
 
 	public static Position LowestOnPathInMoveRange(MyRobot robot, float[][] path, int tileMoveRange, float moveRange) {
 		ArrayList<Position> validPositions = Helper.AllOpenInRange(robot, robot.location, tileMoveRange, moveRange);
-		float lowest = path[robot.me.y][robot.me.x] == 0 ? Integer.MAX_VALUE : path[robot.me.y][robot.me.x];
+		float lowest = path[robot.me.y][robot.me.x] == 0 ? Integer.MAX_VALUE : path[robot.me.y][robot.me.x] + 1;
 		Position lowestPos = robot.location;
 
 		for (int i = 0; i < validPositions.size(); i++) {
@@ -104,7 +111,7 @@ public class MovingRobot {
 						lowestPos = possible;
 					}
 				} else {
-					if (path[possible.y][possible.x] < lowest - 1) {
+					if (path[possible.y][possible.x] <= lowest - 1) {
 						lowest = path[possible.y][possible.x];
 						lowestPos = possible;
 					}
