@@ -33,10 +33,10 @@ public class Preacher extends MovingRobot implements Machine {
 			CastleInit();
 		}
 		targetCastle = Helper.UpdateBattleStatus(robot,enemyCastleLocations, targetCastle);
-		if (Helper.EnemiesAround(robot) && robot.fuel > 110) {
+		if (Helper.EnemiesAround(robot) && Helper.Have(robot, 0, 300)) {
 			return AttackEnemies();
 		}
-		if (initialized && robot.fuel > 200) {
+		if (initialized && Helper.Have(robot, 0, 400)) {
 			if (targetCastle == null && !Fortified(robot, parentLocation)) {
 				ArrayList<Position> valid = GetValidFortifiedPositions(robot, parentLocation);
 				if (valid.size() > 0) {

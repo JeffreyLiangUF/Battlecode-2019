@@ -26,7 +26,7 @@ public class Pilgrim extends MovingRobot implements Machine {
     }
 
     public Action Execute() {
-         robot.log("Pilgrim");
+        robot.log("Pilgrim");
         robot.castleTalk(depotNum);
         if (!initialized) {
             Initialize();
@@ -35,24 +35,24 @@ public class Pilgrim extends MovingRobot implements Machine {
             robot.log("Position : " + robot.location.toString());
             if (ThreatsAround(robot)) {
                 state = PilgrimState.Returning;
-       //         robot.log("fleeding");
+                // robot.log("fleeding");
                 return ReturnToDropOff();
             }
 
             if (state == PilgrimState.GoingToResource) {
-        //        robot.log("gouing");
+                // robot.log("gouing");
 
                 return GoToMine();
             }
 
             if (state == PilgrimState.Mining) {
-         //       robot.log("minmgng");
+                // robot.log("minmgng");
 
                 return Mining();
             }
 
             if (state == PilgrimState.Returning) {
-        //        robot.log("returbing");
+                // robot.log("returbing");
 
                 return ReturnToDropOff();
             }
@@ -91,7 +91,6 @@ public class Pilgrim extends MovingRobot implements Machine {
                 initialized = true;
                 spawnLocation.pos = new Position(signals[3], signals[4]);
                 spawnLocation.map = CreateLayeredFloodPath(robot, robot.location);
-
                 depotNum = signals[2];
                 if (signals[1] == 0) {
                     myChurch.pos = Helper.ChurchLocationsFromClusters(robot,
@@ -125,7 +124,11 @@ public class Pilgrim extends MovingRobot implements Machine {
             return robot.give(dropOff.pos.x - robot.me.x, dropOff.pos.y - robot.me.y, robot.me.karbonite,
                     robot.me.fuel);
         }
-        return FloodPathing(robot, dropOff.map, dropOff.pos, true);
+        if (Helper.DistanceSquared(robot.location, dropOff.pos) <= 10) {
+            return MoveCloser(robot, dropOff.pos, true);
+        } else {
+            return FloodPathing(robot, dropOff.map, dropOff.pos, true);
+        }
     }
 
     Position GetNearestResource() {
@@ -135,8 +138,10 @@ public class Pilgrim extends MovingRobot implements Machine {
         for (int i = 0; i < chosenLocations.size(); i++) {
             Position pos = chosenLocations.get(i);
             float distance = Helper.DistanceSquared(pos, robot.location);
-         //   robot.log("Dist " + distance + " " + (Helper.RobotAtPosition(robot, pos) == null) + " "
-         //           + Helper.DistanceSquared(pos, myChurch.pos) + " " + ImTheClosestPilgrim(pos));
+            // robot.log("Dist " + distance + " " + (Helper.RobotAtPosition(robot, pos) ==
+            // null) + " "
+            // + Helper.DistanceSquared(pos, myChurch.pos) + " " +
+            // ImTheClosestPilgrim(pos));
             if (Helper.RobotAtPosition(robot, pos) == null && Helper.DistanceSquared(pos, myChurch.pos) <= 18
                     && ImTheClosestPilgrim(pos) && distance < lowest) {
                 lowest = distance;
@@ -148,8 +153,10 @@ public class Pilgrim extends MovingRobot implements Machine {
             for (int i = 0; i < chosenLocations.size(); i++) {
                 Position pos = chosenLocations.get(i);
                 float distance = Helper.DistanceSquared(pos, robot.location);
-          //      robot.log("Dist " + distance + " " + (Helper.RobotAtPosition(robot, pos) == null) + " "
-           //             + Helper.DistanceSquared(pos, myChurch.pos) + " " + ImTheClosestPilgrim(pos));
+                // robot.log("Dist " + distance + " " + (Helper.RobotAtPosition(robot, pos) ==
+                // null) + " "
+                // + Helper.DistanceSquared(pos, myChurch.pos) + " " +
+                // ImTheClosestPilgrim(pos));
 
                 if (Helper.RobotAtPosition(robot, pos) == null && Helper.DistanceSquared(pos, myChurch.pos) <= 18
                         && ImTheClosestPilgrim(pos) && distance < lowest) {
@@ -166,18 +173,18 @@ public class Pilgrim extends MovingRobot implements Machine {
 
         if (Helper.DistanceSquared(robot.location, myChurch.pos) <= 18) {
             if (robot.getKarboniteMap()[robot.me.y][robot.me.x] || robot.getFuelMap()[robot.me.y][robot.me.x]) {
-      //          robot.log("starting to mine");
+                // robot.log("starting to mine");
                 state = PilgrimState.Mining;
                 return robot.mine();
             } else {
 
-         //       robot.log("in church range going to spot");
+                // robot.log("in church range going to spot");
                 Position nearest = GetNearestResource();
-         //       robot.log("Nearest resource : " + nearest.toString());
+                // robot.log("Nearest resource : " + nearest.toString());
                 return MoveCloser(robot, nearest, true);
             }
         } else {
-        //    robot.log("need to get to depot");
+            // robot.log("need to get to depot");
             return FloodPathing(robot, myChurch.map, myChurch.pos, true);
         }
 
@@ -190,19 +197,22 @@ public class Pilgrim extends MovingRobot implements Machine {
                 if (Helper.DistanceSquared(myChurch.pos, robot.location) <= 3) {
                     state = PilgrimState.Returning;
                     haveAChurch = true;
-                //    robot.log("Building a church at : " + myChurch.pos.toString() + " Depot number : " + depotNum);
+                    // robot.log("Building a church at : " + myChurch.pos.toString() + " Depot
+                    // number : " + depotNum);
                     robot.signal(depotNum, 3);
                     return robot.buildUnit(robot.SPECS.CHURCH, myChurch.pos.x - robot.me.x,
                             myChurch.pos.y - robot.me.y);
                 } else {
-              //      robot.log("Not close enough to build church, I'm at : " + robot.location.toString()
-            //                + " Moving to : " + myChurch.pos.toString());
+                    // robot.log("Not close enough to build church, I'm at : " +
+                    // robot.location.toString()
+                    // + " Moving to : " + myChurch.pos.toString());
                     return MoveCloser(robot, Helper.RandomAdjacentMoveable(robot, myChurch.pos, robot.movementRange),
                             false);
                 }
-            } else if(Helper.DistanceSquared(robot.location, spawnLocation.pos) < 400){
-             //   robot.log(
-             //           "Can't afford a church returning to castle, Karb: " + robot.karbonite + " Fuel: " + robot.fuel);
+            } else if (Helper.DistanceSquared(robot.location, spawnLocation.pos) < 400) {
+                // robot.log(
+                // "Can't afford a church returning to castle, Karb: " + robot.karbonite + "
+                // Fuel: " + robot.fuel);
                 state = PilgrimState.Returning;
                 return ReturnToDropOff();
             }

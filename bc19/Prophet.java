@@ -34,7 +34,7 @@ public class Prophet extends MovingRobot implements Machine {
 		targetCastle = Helper.UpdateBattleStatus(robot,enemyCastleLocations, targetCastle);
 		if (Helper.EnemiesAround(robot)) {
 			ArrayList<Robot> closeEnemies = Helper.EnemiesWithin(robot, robot.attackRange[0]);
-			if(initialized && closeEnemies.size() > 0 && robot.fuel > 200){
+			if(initialized && closeEnemies.size() > 0 && Helper.Have(robot, 0, 400)){
 				return Flee(closeEnemies);
 			}
 			else if(robot.fuel > 110){
@@ -43,7 +43,7 @@ public class Prophet extends MovingRobot implements Machine {
 			}
 
 		}
-		if (initialized && robot.fuel > 200) {
+		if (initialized && Helper.Have(robot, 0, 400)) {
 			if (targetCastle == null && !Fortified(robot, parentLocation)) {
 				ArrayList<Position> valid = GetValidFortifiedPositions(robot, parentLocation);
 				if (valid.size() > 0) {

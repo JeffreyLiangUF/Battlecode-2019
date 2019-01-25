@@ -23,6 +23,15 @@ public class MyRobot extends BCAbstractRobot {
 
 	float[][] test;
 	int testCount;
+//Churchs, Rush Defense, Lattice Setup, Fuel Overages, Overdrawing, pilgrim pathing, losing early pilgrims.
+
+//1778191906 pathing/timeout failed
+//1686608114 pathing failing
+//185517169 losing because aggressive bot takes middle first
+//1772921400 losing to old bot, need to setup defense facing enemy, if pilgrims die early rebuild them.
+//162590698 running out of fuel during rush
+//805925611 pilgrims being dipshits and not mining/ not pathing to mine.
+//514126268 overdrawing and freezing pilgrim bois
 
 	public Action turn() {
 		if (me.turn == 1) {
