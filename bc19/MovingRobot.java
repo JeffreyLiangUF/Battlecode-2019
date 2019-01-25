@@ -266,9 +266,7 @@ public class MovingRobot {
 		return outputRead;
 	}
 
-	int[] ReadCombatSignals(MyRobot robot, ArrayList<Position> castleLocations) {
-
-		int[] outputRead = new int[2];
+	boolean ReadCombatSignals(MyRobot robot, ArrayList<Position> castleLocations) {		
 		Robot spawnStructure = robot.me;
 		for (Robot r : robot.getVisibleRobots()) {
 			if (Helper.DistanceSquared(robot.location, new Position(r.y, r.x)) <= 3) {
@@ -276,31 +274,26 @@ public class MovingRobot {
 					spawnStructure = r;
 				} else if (r.unit == robot.SPECS.CHURCH) {
 					castleLocations.add(new Position(r.y, r.x));
-					outputRead[0] = 1;
-					return outputRead;
+					return true;
 				}
 			}
 		}
+		robot.log("castle spawn position " + new Position(spawnStructure.y, spawnStructure.x) + toString());
 		if (castleLocations.size() == 0) {
 			castleLocations.add(new Position(spawnStructure.y, spawnStructure.x));
 		}
 		int signal = spawnStructure.signal;
 		if (signal == -1) {
-			outputRead[0] = 0;
-			return outputRead;
+			return false;
 		}
 		Position castle = CombatInitSignal(signal);
-		if(castle != null && !Helper.ContainsPosition(castleLocations, castle)){			
-			outputRead[0] = 0;
-			outputRead[1] = castle.y;
-			outputRead[2] = castle.x;
-			return outputRead;			
+		robot.log("Other castle " + castle.toString());
+		if(castle != null && !Helper.ContainsPosition(castleLocations, castle)){	
+			castleLocations.add(castle);
+			return false;	
 		}
 		else{
-			outputRead[0] = 1;
-			outputRead[1] = -1;
-			outputRead[2] = -1;
-			return outputRead;
+			return true;
 		}
 	}
 	Position CombatInitSignal(int signal){
@@ -315,6 +308,9 @@ public class MovingRobot {
 
 	boolean Fortified(MyRobot robot, Position parent) {
 		if (robot.getKarboniteMap()[robot.me.y][robot.me.x] || robot.getFuelMap()[robot.me.y][robot.me.x]) {
+			return false;
+		}
+		if(Helper.DistanceSquared(robot.location, parent) < 4){
 			return false;
 		}
 		if ((Math.abs(robot.me.y - parent.y) % 2 == 0) && (Math.abs(robot.me.x - parent.x) % 2 == 0)) {

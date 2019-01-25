@@ -19,20 +19,8 @@ public class Crusader extends MovingRobot implements Machine {
 	}
 
 	public Action Execute() {
-		robot.log("Crusader");
+		robot.log("Crusader");		
 		if (robot.me.turn == 1) {
-			InitializeVariables();
-			parent = StructureBornFrom(robot);
-			parentLocation = new Position(parent.y, parent.x);
-			if (parent.unit == robot.SPECS.CHURCH) {
-				initialized = true;
-			}
-		}
-		if (!initialized) {
-			CastleInit();
-		}	
-		robot.log(" " + castleLocations);
-		/*if (robot.me.turn == 1) {
 			InitializeVariables();
 			parent = StructureBornFrom(robot);
 			parentLocation = new Position(parent.y, parent.x);
@@ -69,6 +57,7 @@ public class Crusader extends MovingRobot implements Machine {
 			}
 		}
 		if (initialized && robot.fuel > 200) {
+			robot.log("Position :  " + robot.location.toString() + " " + Fortified(robot, parentLocation));
 			if (targetCastle == null && !Fortified(robot, parentLocation)) {
 				ArrayList<Position> valid = GetValidFortifiedPositions(robot, parentLocation);
 				if (valid.size() > 0) {
@@ -98,19 +87,18 @@ public class Crusader extends MovingRobot implements Machine {
 					return FloodPathing(robot, pathingMap, closestEnemyCastle, true);
 				}
 			}
-		}*/
+		}
 		return null;
 	}
 
 	void CastleInit() {
-		int[] signals = ReadCombatSignals(robot, castleLocations);
-		initialized = signals[0] == 1 ? true : false;
+		initialized = ReadCombatSignals(robot, castleLocations);
 		if (initialized) {
+			robot.log("GOT INITIAILIZED");
 			enemyCastleLocations = Helper.FindEnemyCastles(robot, robot.mapIsHorizontal, castleLocations);
 			for (int i = 0; i < enemyCastleLocations.size(); i++) {
 				GetOrCreateMap(robot, routesToEnemies, enemyCastleLocations.get(i), false);
 			}
-
 		}
 	}
 

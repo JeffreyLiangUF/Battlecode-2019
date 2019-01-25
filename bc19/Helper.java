@@ -156,26 +156,28 @@ public class Helper {
 	public static Position ListenForBattleCry(MyRobot robot){
 		Robot[] robots = robot.getVisibleRobots();
 		for (int i = 0; i < robots.length; i++) {
-			Position enemyCastle = DecodeBattleCry(robots[i].signal);
+			Position enemyCastle = DecodeBattleCry(robot, robots[i].signal);
 			if(enemyCastle != null){
 				if(robot.me.unit != robot.SPECS.PROPHET){
 					return enemyCastle;
 				}
-				else if(ProphetBattleCry(robots[i].signal)){
+				else if(ProphetBattleCry(robot, robots[i].signal)){
 					return enemyCastle;
 				}				
 			}
 		}
 		return null;
 	}
-	public static boolean ProphetBattleCry(int signal){
-		if(signal < 61440 && signal >= 45056){// starts with 1011 
+	public static boolean ProphetBattleCry(MyRobot robot, int signal){
+		//robot.log("Signal1 : " + signal);
+		if(signal <= 20479 && signal >= 16384){// starts with 0100 
 			return true;
 		}
 		return false;
 	}
-	public static Position DecodeBattleCry(int signal){
-		if(signal < 45056){//1011 followed by the cords
+	public static Position DecodeBattleCry(MyRobot robot, int signal){
+		//robot.log("Signal2 : " + signal);
+		if(signal > 20479 || signal < 8192){//0010 followed by the cords
 			return null;
 		}
 		int x = signal & 63;

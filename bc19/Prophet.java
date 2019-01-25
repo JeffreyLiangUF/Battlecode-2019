@@ -71,14 +71,13 @@ public class Prophet extends MovingRobot implements Machine {
 	}
 
 	void CastleInit() {
-		int[] signals = ReadCombatSignals(robot, castleLocations);
-		initialized = signals[0] == 1 ? true : false;
+		initialized = ReadCombatSignals(robot, castleLocations);
 		if (initialized) {
+			robot.log("GOT INITIAILIZED");
 			enemyCastleLocations = Helper.FindEnemyCastles(robot, robot.mapIsHorizontal, castleLocations);
 			for (int i = 0; i < enemyCastleLocations.size(); i++) {
 				GetOrCreateMap(robot, routesToEnemies, enemyCastleLocations.get(i), false);
 			}
-
 		}
 	}
 
