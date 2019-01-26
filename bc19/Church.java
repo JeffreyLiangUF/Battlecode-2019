@@ -20,7 +20,7 @@ public class Church extends StationairyRobot implements Machine {
 		int pilgrims = PilgrimsAround(robot, 3);
 		if (resources > pilgrims) {
 			Position buildHere = Helper.RandomAdjacentNonResource(robot, robot.location);
-			if (buildHere != null && Helper.Have(robot, 110, 400)) {
+			if (buildHere != null && Helper.Have(robot, 90, 100)) {
 				robot.signal(depotNum, 3);
 				return robot.buildUnit(robot.SPECS.PILGRIM, buildHere.x - robot.me.x, buildHere.y - robot.me.y);
 			}

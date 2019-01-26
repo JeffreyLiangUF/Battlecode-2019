@@ -84,11 +84,11 @@ public class MovingRobot {
 				}
 			}
 		} else {
-			Position lowestPos = LowestOnPathInMoveRange(robot, path, tileMoveRange, moveRange);
+			Position lowestPos = LowestOnPathInMoveRange(robot, path, goal, tileMoveRange, moveRange);
 			if (!lowestPos.equals(robot.location)) {
 				return robot.move(lowestPos.x - robot.me.x, lowestPos.y - robot.me.y);
 			}
-			lowestPos = LowestOnPathInMoveRange(robot, path, robot.tileMovementRange, robot.movementRange);
+			lowestPos = LowestOnPathInMoveRange(robot, path, goal, robot.tileMovementRange, robot.movementRange);
 			if (!lowestPos.equals(robot.location)) {
 				return robot.move(lowestPos.x - robot.me.x, lowestPos.y - robot.me.y);
 			}
@@ -97,7 +97,7 @@ public class MovingRobot {
 		return null;
 	}
 
-	public static Position LowestOnPathInMoveRange(MyRobot robot, float[][] path, int tileMoveRange, float moveRange) {
+	public static Position LowestOnPathInMoveRange(MyRobot robot, float[][] path, Position goal, int tileMoveRange, float moveRange) {
 		ArrayList<Position> validPositions = Helper.AllOpenInRange(robot, robot.location, tileMoveRange, moveRange);
 		float lowest = path[robot.me.y][robot.me.x] == 0 ? Integer.MAX_VALUE : path[robot.me.y][robot.me.x] + 1;
 		Position lowestPos = robot.location;
@@ -105,13 +105,13 @@ public class MovingRobot {
 		for (int i = 0; i < validPositions.size(); i++) {
 			Position possible = validPositions.get(i);
 			if (path[possible.y][possible.x] > 0 && !possible.equals(robot.location)) {
-				if (possible.x - robot.me.x == 0 || possible.y - robot.me.y == 0) {
-					if (path[possible.y][possible.x] <= lowest) {
+				if ((possible.x - robot.me.x) == 0 || (possible.y - robot.me.y) == 0) {
+					if (path[possible.y][possible.x] < lowest || (path[possible.y][possible.x] == lowest && (Helper.DistanceSquared(possible, goal) < Helper.DistanceSquared(lowestPos, goal)))) {
 						lowest = path[possible.y][possible.x];
 						lowestPos = possible;
-					}
+					}//back and forth, aswell as not moving because same value tile
 				} else {
-					if (path[possible.y][possible.x] <= lowest - 1) {
+					if (path[possible.y][possible.x] < lowest - 1 || (path[possible.y][possible.x] == lowest - 1 && (Helper.DistanceSquared(possible, goal) < Helper.DistanceSquared(lowestPos, goal)))) {
 						lowest = path[possible.y][possible.x];
 						lowestPos = possible;
 					}
@@ -287,7 +287,6 @@ public class MovingRobot {
 			return false;
 		}
 		Position castle = CombatInitSignal(signal);
-		robot.log("Other castle " + castle.toString());
 		if(castle != null && !Helper.ContainsPosition(castleLocations, castle)){	
 			castleLocations.add(castle);
 			return false;	
@@ -305,6 +304,107 @@ public class MovingRobot {
 		int y = signal & 63;
 		return new Position(y, x);
 	}
+	public static Position UpdateBattleStatus(MyRobot robot, ArrayList<Position> enemies, Position enemy){
+		Position battleCry = ListenForBattleCry(robot);
+		if(battleCry != null){
+			robot.log("Hearing the battle Cry");
+			if(Helper.ContainsPosition(enemies, battleCry)){
+				robot.log("My Position is " + robot.location.toString() + " I should be a castle boi");
+				robot.log("This is the battleCry " + battleCry.toString());
+				return battleCry;
+			}
+			else{
+				robot.log("My Position is " + robot.location.toString() + " I should be a church boi");
+				robot.log("This is the battleCry " + battleCry.toString());
+
+				enemies.add(battleCry);
+				return battleCry;
+			}
+		}
+		return enemy;
+	}
+
+	public static Position ListenForBattleCry(MyRobot robot){
+		Robot[] robots = robot.getVisibleRobots();
+		for (int i = 0; i < robots.length; i++) {
+			Position enemyCastle = DecodeBattleCry(robot, robots[i].signal);
+			if(enemyCastle != null){
+				if(robot.me.unit != robot.SPECS.PROPHET){
+					return enemyCastle;
+				}
+				else if(ProphetBattleCry(robot, robots[i].signal)){
+					return enemyCastle;
+				}				
+			}
+		}
+		return null;
+	}
+	public static boolean ProphetBattleCry(MyRobot robot, int signal){
+		//robot.log("Signal1 : " + signal);
+		if(signal <= 20479 && signal >= 16384){// starts with 0100 
+			return true;
+		}
+		return false;
+	}
+	public static Position DecodeBattleCry(MyRobot robot, int signal){
+		//robot.log("Signal2 : " + signal);
+		if(signal > 20479 || signal < 8192){//0010 followed by the cords
+			return null;
+		}
+		int x = signal & 63;
+		signal >>= 6;
+		int y = signal & 63;
+		return new Position(y, x);		
+	}
+
+	public Position ListenForDefense(MyRobot robot){
+		Robot[] robots = robot.getVisibleRobots();
+		for (int i = 0; i < robots.length; i++) {
+			Position enemyAttacker = DecodeDefenseCry(robot, robots[i].signal);			
+			if(enemyAttacker != null){
+				return enemyAttacker;							
+			}
+		}
+		return null;
+	}
+
+	public Position DecodeDefenseCry(MyRobot robot, int signal){
+		//robot.log("Signal2 : " + signal);
+		robot.log("Signals : " + signal);
+		if(signal > 36863 || signal < 32768){//1000 followed by the cords
+			return null;
+		}
+		int x = signal & 63;
+		signal >>= 6;
+		int y = signal & 63;
+		robot.log(new Position(y,x).toString());
+		return new Position(y, x);		
+	}
+
+	ArrayList<Position> GetValidDefense(MyRobot robot, Position parent, Position invader) {
+		ArrayList<Position> valid = new ArrayList<>();
+		for (int y = -7; y <= 7; y++) {
+			for (int x = -7; x <= 7; x++) {
+				Position possible = new Position(parent.y + y, parent.x + x);
+				if (Helper.BetweenTwoPoints(robot, possible, parent, invader) && Helper.DistanceSquared(robot.location, possible) <= 49) {
+					if (robot.getKarboniteMap()[possible.y][possible.x] || robot.getFuelMap()[possible.y][possible.x]) {
+						continue;
+					}
+					if (Helper.TileEmpty(robot, possible) && !Helper.IsSurroundingsOccupied(robot, possible)){
+						if ((Math.abs(possible.y - parent.y) % 2 == 0) && (Math.abs(possible.x - parent.x) % 2 == 0)) {
+							valid.add(possible);
+						}
+						else if ((Math.abs(possible.y - parent.y) % 2 == 1) && (Math.abs(possible.x - parent.x) % 2 == 1)) {
+							valid.add(possible);
+						}
+					}
+				}
+			}
+		}
+		return valid;
+	}
+
+
 
 	boolean Fortified(MyRobot robot, Position parent) {
 		if (robot.getKarboniteMap()[robot.me.y][robot.me.x] || robot.getFuelMap()[robot.me.y][robot.me.x]) {

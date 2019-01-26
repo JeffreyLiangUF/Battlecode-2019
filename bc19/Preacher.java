@@ -13,6 +13,7 @@ public class Preacher extends MovingRobot implements Machine {
 	ArrayList<Position> castleLocations;
 	ArrayList<Position> enemyCastleLocations;
 	HashMap<Position, float[][]> routesToEnemies;
+	Position defensePosition;
 
 	public Preacher(MyRobot robot) {
 		this.robot = robot;
@@ -32,11 +33,25 @@ public class Preacher extends MovingRobot implements Machine {
 		if (!initialized) {
 			CastleInit();
 		}
-		targetCastle = Helper.UpdateBattleStatus(robot,enemyCastleLocations, targetCastle);
-		if (Helper.EnemiesAround(robot) && Helper.Have(robot, 0, 300)) {
-			return AttackEnemies();
+		targetCastle = UpdateBattleStatus(robot, enemyCastleLocations, targetCastle);
+		Position invader = ListenForDefense(robot);
+
+		if (Helper.Have(robot, 0, 50)) {
+			if (Helper.EnemiesAround(robot)) {
+				return AttackEnemies();
+			} else if (invader != null) {
+				if (defensePosition == null) {
+					ArrayList<Position> defensePositions = GetValidDefense(robot, parentLocation, invader);
+					defensePosition = Helper.ClosestPosition(robot, defensePositions);
+				} 
+				robot.log(defensePosition.toString() + " Defense " + robot.location);
+				if (!defensePosition.equals(robot.location)) {
+					float[][] shortPath = CreateLayeredFloodPath(robot, defensePosition, robot.location);
+					return FloodPathing(robot, shortPath, defensePosition, false);
+				}
+			}
 		}
-		if (initialized && Helper.Have(robot, 0, 400)) {
+		if (initialized && Helper.Have(robot, 0, 325)) {
 			if (targetCastle == null && !Fortified(robot, parentLocation)) {
 				ArrayList<Position> valid = GetValidFortifiedPositions(robot, parentLocation);
 				if (valid.size() > 0) {
@@ -51,10 +66,12 @@ public class Preacher extends MovingRobot implements Machine {
 			} else if (targetCastle != null) {
 				CastleDown(robot, enemyCastleLocations, routesToEnemies);
 				if (Helper.ContainsPosition(enemyCastleLocations, targetCastle)) {
-					return FloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, targetCastle, true), targetCastle, true);
-				} else{		
-					Position closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);			
-					return FloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle, true), closestEnemyCastle, true);
+					return FloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, targetCastle, true), targetCastle,
+							true);
+				} else {
+					Position closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);
+					return FloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle, true),
+							closestEnemyCastle, true);
 				}
 			}
 		}
@@ -63,9 +80,10 @@ public class Preacher extends MovingRobot implements Machine {
 	}
 
 	void CastleInit() {
+		robot.log("init1");
 		initialized = ReadCombatSignals(robot, castleLocations);
+		robot.log("init2");
 		if (initialized) {
-			robot.log("GOT INITIAILIZED");
 			enemyCastleLocations = Helper.FindEnemyCastles(robot, robot.mapIsHorizontal, castleLocations);
 			for (int i = 0; i < enemyCastleLocations.size(); i++) {
 				GetOrCreateMap(robot, routesToEnemies, enemyCastleLocations.get(i), false);

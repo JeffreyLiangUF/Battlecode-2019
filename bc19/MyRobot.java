@@ -24,8 +24,8 @@ public class MyRobot extends BCAbstractRobot {
 	float[][] test;
 	int testCount;
 //Churchs, Rush Defense, Lattice Setup, Fuel Overages, Overdrawing, pilgrim pathing, losing early pilgrims.
+//Crusaders avoiding preachers, three move crusaders when rushing half way
 
-//Test the in between two points
 
 //1778191906 pathing/timeout failed
 //1686608114 pathing failing
@@ -33,7 +33,7 @@ public class MyRobot extends BCAbstractRobot {
 //1772921400 losing to old bot, need to setup defense facing enemy, if pilgrims die early rebuild them.
 //162590698 running out of fuel during rush
 //805925611 pilgrims being dipshits and not mining/ not pathing to mine.
-//514126268 overdrawing and freezing pilgrim bois
+//514126268 not building churchs !!!!!!!!!!!!!!
 
 	public Action turn() {
 		if (me.turn == 1) {
@@ -41,7 +41,7 @@ public class MyRobot extends BCAbstractRobot {
 		}
 		location = new Position(me.y, me.x);
 		currentHealth = me.health;
-
+/*
 if(me.turn == 1){
 for (int l = 0; l < 3; l++) {
 	tileMovementRange = 2;
@@ -59,7 +59,7 @@ if(me.turn == 2) {
 	log(me.time - 20 + " Time");
 }
 
-return null;/*
+return null;*/
 		
 		if (robot == null) {
 			if (me.unit == SPECS.CASTLE) {

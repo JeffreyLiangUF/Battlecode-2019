@@ -127,6 +127,11 @@ public class Pilgrim extends MovingRobot implements Machine {
         if (Helper.DistanceSquared(robot.location, dropOff.pos) <= 10) {
             return MoveCloser(robot, dropOff.pos, true);
         } else {
+          /*  for (int i = 0; i < dropOff.map.length; i++) { String cat = ""; for (int j = 0; j <
+            dropOff.map[0].length; j++) { String temp = " " + Math.round(dropOff.map[i][j]);
+            if(temp.length() == 1){ temp = "   " + temp; } else if(temp.length() == 2){
+            temp = "  " + temp; } else if(temp.length() == 3){ temp = " " + temp; } cat
+            += temp; } robot.log(cat); }*/
             return FloodPathing(robot, dropOff.map, dropOff.pos, true);
         }
     }
@@ -192,7 +197,7 @@ public class Pilgrim extends MovingRobot implements Machine {
 
     Action Mining() {
         if (robot.me.karbonite >= robot.karbCapacity || robot.me.fuel >= robot.fuelCapacity) {
-            if (!haveAChurch && Helper.Have(robot, 110, 400)
+            if (!haveAChurch && Helper.Have(robot, 80, 300)
                     && Helper.DistanceSquared(robot.location, spawnLocation.pos) > 12) {
                 if (Helper.DistanceSquared(myChurch.pos, robot.location) <= 3) {
                     state = PilgrimState.Returning;

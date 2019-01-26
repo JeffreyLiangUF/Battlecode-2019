@@ -37,12 +37,11 @@ public class Castle extends StationairyRobot implements Machine {
         if (!initialized) {
             Initialize();
         }
-
-
-        if(initialized && Helper.Have(robot, 110, 400)){
+/*
+        positionInSpawnOrder = positionInSpawnOrder == spawnOrder.length ? 0 : positionInSpawnOrder;
+        if(initialized && Helper.Have(robot, 80 + robot.SPECS.UNITS[spawnOrder[positionInSpawnOrder]].CONSTRUCTION_KARBONITE, 500)){
             Position buildHere = Helper.RandomAdjacentNonResource(robot, robot.location);
-            if (buildHere != null) {
-                positionInSpawnOrder = positionInSpawnOrder == spawnOrder.length ? 0 : positionInSpawnOrder;
+            if (buildHere != null) {                
                 output = robot.buildUnit(spawnOrder[positionInSpawnOrder], buildHere.x - robot.me.x, buildHere.y - robot.me.y);
                 positionInSpawnOrder++;               
             }
@@ -67,11 +66,12 @@ public class Castle extends StationairyRobot implements Machine {
                 signal = SignalToPilgrim(pilgrimPosition);
                 output = robot.buildUnit(robot.SPECS.PILGRIM, random.x - robot.me.x, random.y - robot.me.y);
             }
-        }
+        }*/
         if (Helper.EnemiesAround(robot)) {
             Action canBuildDefense = EvaluateEnemyRatio(robot);
             if (canBuildDefense != null) {
                 signal = CreateAttackSignal(Helper.closestEnemy(robot, Helper.EnemiesWithin(robot, robot.visionRange)), 8);
+                robot.log("Castles outgoing signal " + signal);
                 output = canBuildDefense;
             } else {
                 ArrayList<Robot> enemiesAttacking = Helper.EnemiesWithin(robot, robot.attackRange[1]);
@@ -85,7 +85,9 @@ public class Castle extends StationairyRobot implements Machine {
         signal = atkSignal == -1 ? signal : atkSignal;
         signalRadius = atkSignal == -1 ? 3 : robot.map.length * robot.map.length + robot.map.length * robot.map.length;
         signal = signal == -1 ? DeclareAllyCastlePositions(1) : signal;
-        robot.signal(signal, signalRadius);
+        if(signal > -1){
+            robot.signal(signal, signalRadius);
+        }
         return output;
     }
 
@@ -142,7 +144,7 @@ public class Castle extends StationairyRobot implements Machine {
     }
 
     int SignalAttack() {
-        Position otherCastlesCry = Helper.ListenForBattleCry(robot);
+        Position otherCastlesCry = MovingRobot.ListenForBattleCry(robot);
         targetCastleIndex = targetCastleIndex >= numCastles ? 0 : targetCastleIndex;
         if (otherCastlesCry == null && robot.me.turn % 200 == 0) {
             Position enemyCastle = Helper.FindEnemyCastle(robot.map, robot.mapIsHorizontal, allyCastlePositions.get(targetCastleIndex));
