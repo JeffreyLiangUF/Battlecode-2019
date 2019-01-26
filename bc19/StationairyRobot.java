@@ -40,7 +40,14 @@ public class StationairyRobot {
             return null;
     }
 
-   
+    int CreateAttackSignal(Position pos, int code) {
+        int output = code;
+        output <<= 6;
+        output += pos.y;
+        output <<= 6;
+        output += pos.x;
+        return output;
+    }
 
     int ResourcesAround(MyRobot robot, int tileRadius) {
         int numResources = 0;

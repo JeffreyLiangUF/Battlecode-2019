@@ -104,7 +104,7 @@ public class MovingRobot {
 
 		for (int i = 0; i < validPositions.size(); i++) {
 			Position possible = validPositions.get(i);
-			if (path[possible.y][possible.x] > 0 && !possible.equals(robot.location)) {
+			if (path[possible.y][possible.x] > 0 && !possible.equals(robot.location) && !possible.equals(robot.previousLocation)) {
 				if ((possible.x - robot.me.x) == 0 || (possible.y - robot.me.y) == 0) {
 					if (path[possible.y][possible.x] < lowest || (path[possible.y][possible.x] == lowest && (Helper.DistanceSquared(possible, goal) < Helper.DistanceSquared(lowestPos, goal)))) {
 						lowest = path[possible.y][possible.x];
@@ -370,7 +370,6 @@ public class MovingRobot {
 
 	public Position DecodeDefenseCry(MyRobot robot, int signal){
 		//robot.log("Signal2 : " + signal);
-		robot.log("Signals : " + signal);
 		if(signal > 36863 || signal < 32768){//1000 followed by the cords
 			return null;
 		}
@@ -381,12 +380,14 @@ public class MovingRobot {
 		return new Position(y, x);		
 	}
 
-	ArrayList<Position> GetValidDefense(MyRobot robot, Position parent, Position invader) {
+	ArrayList<Position> GetValidDefense(MyRobot robot, HashMap<Position,float[][]> routesToEnemy, Position parent, Position invader) {
 		ArrayList<Position> valid = new ArrayList<>();
 		for (int y = -7; y <= 7; y++) {
 			for (int x = -7; x <= 7; x++) {
 				Position possible = new Position(parent.y + y, parent.x + x);
-				if (Helper.BetweenTwoPoints(robot, possible, parent, invader) && Helper.DistanceSquared(robot.location, possible) <= 49) {
+
+
+				if (Helper.BetweenTwoPoints(robot, possible, parent, invader) && Helper.DistanceSquared(robot.location, possible) <= 49 && Helper.inMap(robot.map, possible)) {
 					if (robot.getKarboniteMap()[possible.y][possible.x] || robot.getFuelMap()[possible.y][possible.x]) {
 						continue;
 					}
@@ -395,6 +396,7 @@ public class MovingRobot {
 							valid.add(possible);
 						}
 						else if ((Math.abs(possible.y - parent.y) % 2 == 1) && (Math.abs(possible.x - parent.x) % 2 == 1)) {
+
 							valid.add(possible);
 						}
 					}

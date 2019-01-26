@@ -18,13 +18,25 @@ public class MyRobot extends BCAbstractRobot {
 	int ourTeam;
 	int startHealth;
 	int currentHealth;
+	Position previousLocation;
 	boolean mapIsHorizontal;
 	boolean positiveSide;
 
 	float[][] test;
 	int testCount;
-//Churchs, Rush Defense, Lattice Setup, Fuel Overages, Overdrawing, pilgrim pathing, losing early pilgrims.
-//Crusaders avoiding preachers, three move crusaders when rushing half way
+//spam crusaders at round 950 for health value
+
+//pick resource near the center first to populate with pilgrims
+
+
+//sending church units to take over opposing church
+
+
+//412323315
+//1292314770, sorta a semi
+//369842273
+
+//514565 cool seed
 
 
 //1778191906 pathing/timeout failed
@@ -34,11 +46,13 @@ public class MyRobot extends BCAbstractRobot {
 //162590698 running out of fuel during rush
 //805925611 pilgrims being dipshits and not mining/ not pathing to mine.
 //514126268 not building churchs !!!!!!!!!!!!!!
+//1134967893 no churchs on center, bad defense placement
 
 	public Action turn() {
 		if (me.turn == 1) {
 			Setup();
 		}
+		previousLocation = location;
 		location = new Position(me.y, me.x);
 		currentHealth = me.health;
 /*
@@ -181,6 +195,7 @@ return null;*/
 		mapIsHorizontal = Helper.FindSymmetry(map);
 		startHealth = SPECS.UNITS[me.unit].STARTING_HP;
 		positiveSide = Helper.PositiveOrNegativeMap(this);
+		previousLocation = new Position(me.y, me.x);
 	}
 }
 
