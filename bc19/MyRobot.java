@@ -39,21 +39,25 @@ public class MyRobot extends BCAbstractRobot {
 		}
 		location = new Position(me.y, me.x);
 		currentHealth = me.health;
-/*
-		if(me.turn == 1){
-		boolean[][] test = Helper.ResourcesOnOurHalfMap(this);
 
-					 for (int i = 0; i < test.length; i++) { 
-						 String cat = ""; 
-						 for (int j = 0; j < test[0].length; j++) 
-						 { 
-							 String temp = test[i][j] ? " " + 1 : " " + 0;							 		
-							cat  += temp; 
-						} 
-						log(cat); 
-					}
-		Helper.ChurchLocationsFromClusters(this, Helper.FindClusters(this, test));
-		}return null;*/
+if(me.turn == 1){
+for (int l = 0; l < 1; l++) {
+	tileMovementRange = 3;
+	movementRange = 9;
+	test = MovingRobot.CreateLayeredFloodPath(this, new Position(53, 40));
+	
+	  for (int i = 0; i < test.length; i++) { String cat = ""; for (int j = 0; j <
+	  test[0].length; j++) { String temp = " " + Math.round(test[i][j]);
+	  if(temp.length() == 1){ temp = "   " + temp; } else if(temp.length() == 2){
+	  temp = "  " + temp; } else if(temp.length() == 3){ temp = " " + temp; } cat
+	  += temp; } log(cat); }
+	 
+}}
+if(me.turn == 2) {
+	log(me.time - 20 + " Time");
+}
+
+return null;/*
 		
 		if (robot == null) {
 			if (me.unit == SPECS.CASTLE) {
@@ -115,16 +119,7 @@ public class MyRobot extends BCAbstractRobot {
 		/*
 		if (me.unit == SPECS.CRUSADER) {
 			if (me.turn == 1) {
-				for (int l = 0; l < 3; l++) {
-					test = MovingRobot.CreateLayeredFloodPath(this, new Position(1, 29));
-					
-					  for (int i = 0; i < test.length; i++) { String cat = ""; for (int j = 0; j <
-					  test[0].length; j++) { String temp = " " + Math.round(test[i][j]);
-					  if(temp.length() == 1){ temp = "   " + temp; } else if(temp.length() == 2){
-					  temp = "  " + temp; } else if(temp.length() == 3){ temp = " " + temp; } cat
-					  += temp; } log(cat); }
-					 
-				}
+				
 				
 			}
 			
