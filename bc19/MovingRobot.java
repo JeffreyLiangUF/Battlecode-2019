@@ -50,9 +50,9 @@ public class MovingRobot {
 						if (singleStep[relativePosition.y][relativePosition.x] != 0) {
 							continue;
 						}
-						int decrementedRange = (robot.tileMovementRange - 1) * (robot.tileMovementRange - 1);
+						int decrementedRange = robot.tileMovementRange == 2 ? 2 : 6;
 						singleStep[relativePosition.y][relativePosition.x] = newCumulitive;
-						if (Helper.DistanceSquared(relativePosition, removed.pos) > decrementedRange) {
+						if (Helper.DistanceSquared(relativePosition, removed.pos) >= decrementedRange) {
 							toBeVisited.add(new PathingPosition(relativePosition, newCumulitive));
 						}
 

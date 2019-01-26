@@ -25,6 +25,8 @@ public class MyRobot extends BCAbstractRobot {
 	int testCount;
 //Churchs, Rush Defense, Lattice Setup, Fuel Overages, Overdrawing, pilgrim pathing, losing early pilgrims.
 
+//Test the in between two points
+
 //1778191906 pathing/timeout failed
 //1686608114 pathing failing
 //185517169 losing because aggressive bot takes middle first
@@ -41,9 +43,9 @@ public class MyRobot extends BCAbstractRobot {
 		currentHealth = me.health;
 
 if(me.turn == 1){
-for (int l = 0; l < 1; l++) {
-	tileMovementRange = 3;
-	movementRange = 9;
+for (int l = 0; l < 3; l++) {
+	tileMovementRange = 2;
+	movementRange = 4;
 	test = MovingRobot.CreateLayeredFloodPath(this, new Position(53, 40));
 	
 	  for (int i = 0; i < test.length; i++) { String cat = ""; for (int j = 0; j <

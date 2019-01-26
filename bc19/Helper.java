@@ -186,6 +186,25 @@ public class Helper {
 		return new Position(y, x);		
 	}
 
+	
+
+	public static boolean BetweenTwoUnorderedNumbers(Position point, Position pos1, Position pos2)
+    {
+		Position vector1to2 = new Position(pos2.y - pos1.y, pos2.x - pos1.x);
+		Position vector2to1 = new Position(pos1.y - pos2.y, pos1.x - pos2.x);
+		Position onePerpVec = new Position(vector1to2.x, vector2to1.y * -1);
+		Position twoPerpVec = new Position(vector2to1.x, vector2to1.y * -1);
+		Position pos1SecP = new Position(pos1.y + onePerpVec.y, pos1.x + onePerpVec.y);
+		Position pos2SecP = new Position(pos2.y + twoPerpVec.y, pos2.x + twoPerpVec.y);
+		if(!leftOfLine(point, pos1, pos1SecP) && leftOfLine(point, pos2, pos2SecP)){
+			return true;
+		}
+		return false;
+	}
+	public static boolean leftOfLine(Position point, Position pos1, Position pos2){
+		return ((pos2.y - pos1.y)*(point.x - pos1.x) - (pos2.x - pos1.x)*(point.y - pos1.y)) > 0;
+   }
+
 	public static int IsSurroundingsOccupied(MyRobot robot, int[][] map, Position pos, int ourTeam) {
 		int highest = 0;
 		for (int i = -2; i <= 2; i++) {
