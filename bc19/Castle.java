@@ -15,6 +15,7 @@ public class Castle extends StationairyRobot implements Machine {
     ArrayList<Position> churchLocations;
     int[] resourceDepots;
     int depotNum;
+    int starterPilgrims;
 
     int idDone;
     int positionInSpawnOrder = 0;
@@ -52,16 +53,17 @@ public class Castle extends StationairyRobot implements Machine {
 
         if (resources > pilgrims) {
             Position buildHere = Helper.RandomAdjacentNonResource(robot, robot.location);
-            if (buildHere != null && Helper.Have(robot, 110, 400) || robot.getVisibleRobots().length < numCastles + 4) {
+            if (buildHere != null && Helper.Have(robot, 110, 400)  || starterPilgrims < 4) {
                 signal = depotNum;
+                starterPilgrims ++;
                 output = robot.buildUnit(robot.SPECS.PILGRIM, buildHere.x - robot.me.x, buildHere.y - robot.me.y);
             }
-        } else if (Helper.Have(robot, 110, 400) || robot.getVisibleRobots().length < numCastles + 4) {
+        } else if (Helper.Have(robot, 110, 400) || starterPilgrims < 4) {
             UpdateDepots();
             Position pilgrimPosition = ShouldBuildPilgrim();
             if (pilgrimPosition != null) {
                 Position random = Helper.RandomAdjacent(robot, new Position(robot.me.y, robot.me.x));
-
+                starterPilgrims ++;
                 signal = SignalToPilgrim(pilgrimPosition);
                 output = robot.buildUnit(robot.SPECS.PILGRIM, random.x - robot.me.x, random.y - robot.me.y);
             }

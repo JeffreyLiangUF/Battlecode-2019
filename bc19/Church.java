@@ -12,28 +12,23 @@ public class Church extends StationairyRobot implements Machine {
 	public Action Execute() {
 		// robot.log("Church");
 		if (robot.me.turn == 1) {
-			robot.log("reading depot unber");
 			SetDepotNumer();
 		}
-		// only build pilgrims for your depot unless the other parrell depot is close
-		Action defend = EvaluateEnemyRatio(robot);
-		robot.log("CHURCH : " + (defend == null));
-		if (defend == null) {
-			int resources = ResourcesAround(robot, 3);
-			int pilgrims = PilgrimsAround(robot, 3);
-			robot.log("DEPOT NUMBER : " + depotNum + " r " + resources + " p " + pilgrims);
+		Action output = null;
 
-			if (resources > pilgrims) {
-				Position buildHere = Helper.RandomAdjacentNonResource(robot, robot.location);
-				if (buildHere != null && Helper.Have(robot, 110, 400)) {
-					robot.log("Built pilgrim at : " + buildHere.toString());
-					robot.signal(depotNum, 3);
-					return robot.buildUnit(robot.SPECS.PILGRIM, buildHere.x - robot.me.x, buildHere.y - robot.me.y);
-				}
+		int resources = ResourcesAround(robot, 3);
+		int pilgrims = PilgrimsAround(robot, 3);
+		if (resources > pilgrims) {
+			Position buildHere = Helper.RandomAdjacentNonResource(robot, robot.location);
+			if (buildHere != null && Helper.Have(robot, 110, 400)) {
+				robot.signal(depotNum, 3);
+				return robot.buildUnit(robot.SPECS.PILGRIM, buildHere.x - robot.me.x, buildHere.y - robot.me.y);
 			}
 		}
 
-		return defend;
+		output = EvaluateEnemyRatio(robot);
+
+		return output;
 	}
 
 	public void SetDepotNumer() {

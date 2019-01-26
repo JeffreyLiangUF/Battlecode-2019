@@ -32,7 +32,7 @@ public class Crusader extends MovingRobot implements Machine {
 			CastleInit();
 		}		
 		targetCastle = Helper.UpdateBattleStatus(robot,enemyCastleLocations, targetCastle);
-		if (Helper.EnemiesAround(robot) && robot.fuel > 110) {
+		if (Helper.EnemiesAround(robot) && Helper.Have(robot, 0, 300)) {
 			ArrayList<Robot> prophets = EnemiesOfTypeInVision(new int[] { robot.SPECS.PROPHET });
 			if (prophets.size() > 0) {
 				Robot farthest = FarthestProphetOutOfRange(prophets);
@@ -56,7 +56,7 @@ public class Crusader extends MovingRobot implements Machine {
 				}
 			}
 		}
-		if (initialized && robot.fuel > 200) {
+		if (initialized && Helper.Have(robot, 0, 400)) {
 			robot.log("Position :  " + robot.location.toString() + " " + Fortified(robot, parentLocation));
 			if (targetCastle == null && !Fortified(robot, parentLocation)) {
 				ArrayList<Position> valid = GetValidFortifiedPositions(robot, parentLocation);

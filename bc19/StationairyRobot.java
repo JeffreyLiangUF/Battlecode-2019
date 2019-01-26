@@ -18,22 +18,23 @@ public class StationairyRobot {
                     }else if (r.unit == robot.SPECS.PROPHET) {
                         enemyProphet++;
                     }  else {
-                        enemyPassive++;
+                        enemyPassive = 1;
                     }
                 } else {
                     if (r.unit == robot.SPECS.PREACHER) {
                         enemyPreacherCrusader--;
                     }else if (r.unit == robot.SPECS.CRUSADER) {
                         enemyProphet--;
+                        enemyPassive--;
                     }
                 }
             }
         }
         if (enemyPreacherCrusader > 0 && Helper.CanAfford(robot, robot.SPECS.PREACHER)) {
-            Position random = Helper.RandomAdjacentNonResource(robot, robot.location);
+            Position random = Helper.RandomAdjacent(robot, robot.location);
             return robot.buildUnit(robot.SPECS.PREACHER, random.x - robot.me.x, random.y - robot.me.y);
         } else if ((enemyProphet > 0 || enemyPassive > 0) && Helper.CanAfford(robot, robot.SPECS.CRUSADER)) {
-            Position random = Helper.RandomAdjacentNonResource(robot, robot.location);
+            Position random = Helper.RandomAdjacent(robot, robot.location);
             return robot.buildUnit(robot.SPECS.CRUSADER, random.x - robot.me.x, random.y - robot.me.y);
         } else
             return null;
