@@ -5,7 +5,6 @@ import java.util.ArrayList;
 public class Church extends StationairyRobot implements Machine {
 
 	MyRobot robot;
-	int depotNum;
 	int[] spawnOrder;
 	int positionInSpawnOrder = 0;
 
@@ -15,16 +14,15 @@ public class Church extends StationairyRobot implements Machine {
 
 	public Action Execute() {
 		if (robot.me.turn == 1) {
-			SetDepotNumer();
-			spawnOrder = new int[] { robot.SPECS.CRUSADER,
-                robot.SPECS.CRUSADER, robot.SPECS.PREACHER, robot.SPECS.PROPHET };
+			spawnOrder = new int[] { robot.SPECS.PROPHET,
+                robot.SPECS.CRUSADER, robot.SPECS.CRUSADER, robot.SPECS.CRUSADER, robot.SPECS.PREACHER};
 		}
 		Action output = null;
 		int signal = -1;
 
 
 		positionInSpawnOrder = positionInSpawnOrder == spawnOrder.length ? 0 : positionInSpawnOrder;
-        if(Helper.Have(robot, 80 + robot.SPECS.UNITS[spawnOrder[positionInSpawnOrder]].CONSTRUCTION_KARBONITE, 500)){
+        if(Helper.Have(robot, 50 + robot.SPECS.UNITS[spawnOrder[positionInSpawnOrder]].CONSTRUCTION_KARBONITE, 500)){
             Position buildHere = Helper.RandomAdjacentNonResource(robot, robot.location);
             if (buildHere != null) {                
                 output = robot.buildUnit(spawnOrder[positionInSpawnOrder], buildHere.x - robot.me.x, buildHere.y - robot.me.y);
@@ -33,11 +31,10 @@ public class Church extends StationairyRobot implements Machine {
         }
 
 		int resources = ResourcesAround(robot, 10);
-		int pilgrims = PilgrimsAround(robot, 3);
+		int pilgrims = UnitAround(robot,robot.location, 10, robot.SPECS.PILGRIM);
 		if (!Helper.EnemiesAround(robot) && resources > pilgrims) {
 			Position buildHere = Helper.RandomAdjacentNonResource(robot, robot.location);
-			if (buildHere != null && Helper.Have(robot, 80, 100)) {
-				signal = depotNum;
+			if (buildHere != null && Helper.Have(robot, 20, 100)) {
 				output = robot.buildUnit(robot.SPECS.PILGRIM, buildHere.x - robot.me.x, buildHere.y - robot.me.y);
 			}
 		}
@@ -60,15 +57,6 @@ public class Church extends StationairyRobot implements Machine {
             robot.signal(signal, 3);
         }
         return output;
-	}
-
-	public void SetDepotNumer() {
-		Robot[] robots = robot.getVisibleRobots();
-		for (int i = 0; i < robots.length; i++) {
-			if (robots[i].signal <= 31 && robots[i].signal > 0) {
-				depotNum = robots[i].signal;
-			}
-		}
 	}
 	
 }

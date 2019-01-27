@@ -33,26 +33,23 @@ public class MyRobot extends BCAbstractRobot {
 
 
 //WATCH OUR WINS VS GOOD TEAMS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+//clean up pilgrims
+//if you see an enemy pilgrim as a solo pilgrim build a church
+//3 crusader, 3 prophet, 1 preacher
+//cant get to church build a new one, drop off anwhere
+
+//rushing through chokes
+//lattice failing in weird maps 104555415
+
+
+
 //rushing with on maps with no karb and too few units
-//pilgrims do the black out method like knights
 
 
-
-//412323315
-//1292314770, sorta a semi
-//369842273
-
-//514565 cool seed
+//not rushing castle 2
 
 
-//1778191906 pathing/timeout failed
-//1686608114 pathing failing
-//185517169 losing because aggressive bot takes middle first
-//1772921400 losing to old bot, need to setup defense facing enemy, if pilgrims die early rebuild them.
-//162590698 running out of fuel during rush
-//805925611 pilgrims being dipshits and not mining/ not pathing to mine.
-//514126268 not building churchs !!!!!!!!!!!!!!
-//1134967893 no churchs on center, bad defense placement
 
 	public Action turn() {
 		if (me.turn == 1) {
@@ -62,25 +59,13 @@ public class MyRobot extends BCAbstractRobot {
 		location = new Position(me.y, me.x);
 		currentHealth = me.health;
 /*
-if(me.turn == 1){
-for (int l = 0; l < 3; l++) {
-	tileMovementRange = 2;
-	movementRange = 4;
-	test = MovingRobot.CreateLayeredFloodPath(this, new Position(53, 40));
-	
 	  for (int i = 0; i < test.length; i++) { String cat = ""; for (int j = 0; j <
 	  test[0].length; j++) { String temp = " " + Math.round(test[i][j]);
 	  if(temp.length() == 1){ temp = "   " + temp; } else if(temp.length() == 2){
 	  temp = "  " + temp; } else if(temp.length() == 3){ temp = " " + temp; } cat
 	  += temp; } log(cat); }
-	 
-}}
-if(me.turn == 2) {
-	log(me.time - 20 + " Time");
-}
 
-return null;*/
-		
+		*/
 		if (robot == null) {
 			if (me.unit == SPECS.CASTLE) {
 				//log("I am a Castle");
@@ -102,86 +87,6 @@ return null;*/
 			}
 		}
 		return robot.Execute();
-		
-		
-		
-		
-		/*
-		if (me.unit == SPECS.CASTLE && me.turn > 5 && ourTeam == 0) {
-			Position random = Helper.RandomAdjacent(this, new Position(me.y, me.x));
-			if(testCount < 5){	testCount++;
-			return buildUnit(SPECS.PILGRIM, random.x - me.x, random.y - me.y);
-		
-			}
-		else if(testCount >= 5 && me.turn > 15 && Helper.CanAfford(this, SPECS.PROPHET)){
-			return buildUnit(SPECS.PROPHET, random.x - me.x, random.y - me.y);
-		}
-		}
-		if(me.unit == SPECS.CASTLE){
-			return robot.Execute();
-		}
-		if(me.unit == SPECS.CRUSADER){
-		//	log("crusader");
-			return robot.Execute();
-		}
-		if(me.unit == SPECS.PREACHER){
-		//	log("preacher");
-			return robot.Execute();
-		}
-		if(me.unit == SPECS.PROPHET){
-	//		log("prophet");
-			return robot.Execute();
-		}
-		if(me.unit == SPECS.PILGRIM){
-		//	log("pilgrim");
-			return robot.Execute();
-		}
-		return null;*/
-		
-		/*
-		if (me.unit == SPECS.CRUSADER) {
-			if (me.turn == 1) {
-				
-				
-			}
-			
-			//return MovingRobot.FloodPathing(this, test, new Position(57, 37));
-			movementRange = 4;
-			tileMovementRange = 2;
-			if (me.turn == 2) {
-					log("Time Used : " + (me.time ));
-				}
-		}
-		
-				return null;*/
-		/*
-		if (robot == null) {
-			if (me.unit == SPECS.CASTLE) {
-				log("I am a Castle");
-			//	if (me.turn == 1) {
-			//		Position random = Helper.RandomNonResourceAdjacentPosition(this, new Position(me.y, me.x));
-			//		return buildUnit(SPECS.PROPHET, random.x - me.x, random.y - me.y);
-				//}
-				 robot = new Castle(this);
-			} else if (me.unit == SPECS.CHURCH) {
-				log("I am a Church");
-				robot = new Church(this);
-			} else if (me.unit == SPECS.PILGRIM) {
-				log("I am a Pilgrim");
-				robot = new Pilgrim(this);
-			} else if (me.unit == SPECS.CRUSADER) {
-				robot = new Crusader(this);
-			} else if (me.unit == SPECS.PROPHET) {
-				log("I am a Prophet");
-				robot = new Prophet(this);
-			} else if (me.unit == SPECS.PREACHER) {
-				log("I am a Preacher");
-				robot = new Preacher(this);
-			}
-		}
-		return robot.Execute();*/
-		// return null;
-		// return robot.Execute();*/
 	}
 
 	void Setup() {

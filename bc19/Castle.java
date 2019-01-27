@@ -38,9 +38,10 @@ public class Castle extends StationairyRobot implements Machine {
         }
 
         positionInSpawnOrder = positionInSpawnOrder == spawnOrder.length ? 0 : positionInSpawnOrder;
-        if(initialized && Helper.Have(robot, 80 + robot.SPECS.UNITS[spawnOrder[positionInSpawnOrder]].CONSTRUCTION_KARBONITE, 500)){
+        if(initialized && Helper.Have(robot, 50 + robot.SPECS.UNITS[spawnOrder[positionInSpawnOrder]].CONSTRUCTION_KARBONITE, 500)){
             Position buildHere = Helper.RandomAdjacentNonResource(robot, robot.location);
-            if (buildHere != null) {                
+            if (buildHere != null) {   
+                signal = DeclareAllyCastlePositions(1);             
                 output = robot.buildUnit(spawnOrder[positionInSpawnOrder], buildHere.x - robot.me.x, buildHere.y - robot.me.y);
                 positionInSpawnOrder++;               
             }
@@ -51,17 +52,26 @@ public class Castle extends StationairyRobot implements Machine {
 
         if (resources > pilgrims) {
             Position buildHere = Helper.RandomAdjacentNonResource(robot, robot.location);
-            if (buildHere != null && Helper.Have(robot, 80, 125)  || starterPilgrims < 4) {
+            if (buildHere != null && Helper.Have(robot, 20, 125)  || starterPilgrims < 4) {
                 signal = depotNum;
                 starterPilgrims ++;
                 output = robot.buildUnit(robot.SPECS.PILGRIM, buildHere.x - robot.me.x, buildHere.y - robot.me.y);
             }
-        } else if (Helper.Have(robot, 80, 125) || starterPilgrims < 4) {
+        } else if (Helper.Have(robot, 20, 125) || starterPilgrims < 4) {
             UpdateDepots();
             Position pilgrimPosition = ShouldBuildPilgrim();
             if (pilgrimPosition != null) {
                 Position random = Helper.RandomAdjacent(robot, new Position(robot.me.y, robot.me.x));
                 starterPilgrims ++;
+                signal = SignalToPilgrim(pilgrimPosition);
+                output = robot.buildUnit(robot.SPECS.PILGRIM, random.x - robot.me.x, random.y - robot.me.y);
+            }
+        }
+        if (NumPilgrims() < 2) {
+            UpdateDepots();
+            Position pilgrimPosition = ShouldBuildPilgrim();
+            if (pilgrimPosition != null) {
+                Position random = Helper.RandomAdjacent(robot, new Position(robot.me.y, robot.me.x));
                 signal = SignalToPilgrim(pilgrimPosition);
                 output = robot.buildUnit(robot.SPECS.PILGRIM, random.x - robot.me.x, random.y - robot.me.y);
             }
@@ -80,20 +90,11 @@ public class Castle extends StationairyRobot implements Machine {
             }
         }       
         
-        if (NumPilgrims() < 4) {
-            UpdateDepots();
-            Position pilgrimPosition = ShouldBuildPilgrim();
-            if (pilgrimPosition != null) {
-                Position random = Helper.RandomAdjacent(robot, new Position(robot.me.y, robot.me.x));
-                signal = SignalToPilgrim(pilgrimPosition);
-                output = robot.buildUnit(robot.SPECS.PILGRIM, random.x - robot.me.x, random.y - robot.me.y);
-            }
-        }
+        
         
         int atkSignal = SignalAttack();
         signal = atkSignal == -1 ? signal : atkSignal;
         signalRadius = atkSignal == -1 ? 3 : robot.map.length * robot.map.length + robot.map.length * robot.map.length;
-        signal = signal == -1 ? DeclareAllyCastlePositions(1) : signal;
 
         if(robot.getVisibleRobots().length == numCastles){
             Position buildHere = Helper.RandomAdjacentNonResource(robot, robot.location);
@@ -104,7 +105,11 @@ public class Castle extends StationairyRobot implements Machine {
                 output = robot.buildUnit(robot.SPECS.PILGRIM, buildHere.x - robot.me.x, buildHere.y - robot.me.y);
             }
         }
-        
+        if(robot.me.turn == 1 && numCastles == 1){
+            signal = CreateAttackSignal(Helper.FindEnemyCastle(robot.map, robot.mapIsHorizontal, robot.location), 8);
+            Position random = RandomAdjacentTowardsEnemy(robot, Helper.FindEnemyCastle(robot.map, robot.mapIsHorizontal, robot.location));               
+            output = robot.buildUnit(robot.SPECS.PREACHER, random.x - robot.me.x, random.y - robot.me.y);            
+        }
 
 
         if(signal > -1){
@@ -128,8 +133,8 @@ public class Castle extends StationairyRobot implements Machine {
     }
 
     void InitializeVariables() {
-        spawnOrder = new int[] { robot.SPECS.PROPHET, robot.SPECS.PROPHET, robot.SPECS.CRUSADER,
-                robot.SPECS.CRUSADER, robot.SPECS.PREACHER };
+        spawnOrder = new int[] { robot.SPECS.PROPHET, 
+            robot.SPECS.CRUSADER, robot.SPECS.CRUSADER, robot.SPECS.CRUSADER, robot.SPECS.PREACHER};
         positionInSpawnOrder = 0;
         allyCastles = new HashMap<>();
         allyCastlePositions = new ArrayList<>();

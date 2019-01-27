@@ -145,7 +145,7 @@ public class MovingRobot {
 			for (int x = -tileRange; x <= tileRange; x++) {
 				Position possible = new Position(robot.me.y + y, robot.me.x + x);
 				if (Helper.TileEmpty(robot, possible)
-						&& Helper.DistanceSquared(robot.location, possible) <= robot.movementRange) {
+						&& Helper.DistanceSquared(robot.location, possible) <= robot.movementRange && !possible.equals(robot.previousLocation)) {
 					if (Helper.DistanceSquared(pos, possible) < closest) {
 						closest = Helper.DistanceSquared(pos, possible);
 						output = possible;
@@ -233,7 +233,7 @@ public class MovingRobot {
 
 
 	int[] ReadPilgrimSignals(MyRobot robot){
-		int[] outputRead = new int[2];
+		int[] outputRead = new int[1];
 		Robot spawnStructure = robot.me;
 		for (Robot r : robot.getVisibleRobots()) {
 			if (Helper.DistanceSquared(robot.location, new Position(r.y, r.x)) <= 3) {
@@ -243,27 +243,16 @@ public class MovingRobot {
 			}
 		}
 		int signal = spawnStructure.signal;
-		if (signal == -1 || signal > 31) {
-			outputRead[0] = 0;
+		if (signal != -1 && signal <= 31) {
+			int depotNum = signal & 31;
+			outputRead[0] = depotNum;
 			return outputRead;
 		}
-		
-		int depotNum = signal & 31;
-		if(spawnStructure.unit == robot.SPECS.CASTLE){
-			outputRead[0] = 1;//initted
-			outputRead[1] = 0;
-			outputRead[2] = depotNum;//depot num
-			outputRead[3] = spawnStructure.y;//my spawn y
-			outputRead[4] = spawnStructure.x;//my spawn x
-		}
 		else{
-			outputRead[0] = 1;//initted
-			outputRead[1] = 1;// church born
-			outputRead[2] = depotNum;//depot num
-			outputRead[3] = spawnStructure.y;//my spawn y
-			outputRead[4] = spawnStructure.x;//my spawn x
+			outputRead[0] = -1;
+			return outputRead;	
 		}
-		return outputRead;
+		
 	}
 
 	boolean ReadCombatSignals(MyRobot robot, ArrayList<Position> castleLocations) {		
@@ -323,7 +312,7 @@ public class MovingRobot {
 		for (int i = 0; i < robots.length; i++) {
 			Position enemyCastle = DecodeBattleCry(robot, robots[i].signal);
 			if(enemyCastle != null){
-				if(robot.me.unit != robot.SPECS.PROPHET){
+				if(robot.me.unit != robot.SPECS.PROPHET && robot.me.unit != robot.SPECS.PREACHER){
 					return enemyCastle;
 				}
 				else if(ProphetBattleCry(robot, robots[i].signal)){
@@ -334,14 +323,12 @@ public class MovingRobot {
 		return null;
 	}
 	public static boolean ProphetBattleCry(MyRobot robot, int signal){
-		//robot.log("Signal1 : " + signal);
 		if(signal <= 20479 && signal >= 16384){// starts with 0100 
 			return true;
 		}
 		return false;
 	}
 	public static Position DecodeBattleCry(MyRobot robot, int signal){
-		//robot.log("Signal2 : " + signal);
 		if(signal > 20479 || signal < 8192){//0010 followed by the cords
 			return null;
 		}
@@ -380,7 +367,7 @@ public class MovingRobot {
 				Position possible = new Position(parent.y + y, parent.x + x);
 
 
-				if (Helper.BetweenTwoPoints(robot, possible, parent, invader) && Helper.DistanceSquared(robot.location, possible) <= 49 && Helper.inMap(robot.map, possible)) {
+				if (Helper.BetweenTwoPoints(robot, possible, invader, parent) && Helper.DistanceSquared(robot.location, possible) <= 49 && Helper.inMap(robot.map, possible)) {
 					if (robot.getKarboniteMap()[possible.y][possible.x] || robot.getFuelMap()[possible.y][possible.x]) {
 						continue;
 					}
@@ -401,17 +388,15 @@ public class MovingRobot {
 
 
 
-	boolean Fortified(MyRobot robot, Position parent) {
-		if (robot.getKarboniteMap()[robot.me.y][robot.me.x] || robot.getFuelMap()[robot.me.y][robot.me.x]) {
+	boolean Fortified(MyRobot robot, Position tile) {
+
+		if (robot.getKarboniteMap()[tile.y][tile.x] || robot.getFuelMap()[tile.y][tile.x] ||  StationairyRobot.UnitAround(robot,tile, 2, robot.SPECS.CHURCH) > 0 || StationairyRobot.UnitAround(robot,tile, 2, robot.SPECS.CASTLE) > 0) {
 			return false;
 		}
-		if(Helper.DistanceSquared(robot.location, parent) < 4){
-			return false;
-		}
-		if ((Math.abs(robot.me.y - parent.y) % 2 == 0) && (Math.abs(robot.me.x - parent.x) % 2 == 0)) {
+		if ((Math.abs(tile.y) % 2 == 0) && (Math.abs(tile.x) % 2 == 0)) {
 			return true;
 		}
-		if ((Math.abs(robot.me.y - parent.y) % 2 == 1) && (Math.abs(robot.me.x - parent.x) % 2 == 1)) {
+		if ((Math.abs(tile.y) % 2 == 1) && (Math.abs(tile.x) % 2 == 1)) {
 			return true;
 		}
 		return false;
@@ -429,14 +414,14 @@ public class MovingRobot {
 		for (int y = -robot.tileVisionRange; y <= robot.tileVisionRange; y++) {
 			for (int x = -robot.tileVisionRange; x <= robot.tileVisionRange; x++) {
 				Position possible = new Position(robot.me.y + y, robot.me.x + x);
-				if (Helper.DistanceSquared(robot.location, possible) < robot.visionRange
+				if (Helper.DistanceSquared(robot.location, possible) <= robot.visionRange
 						&& Helper.TileEmpty(robot, possible)) {
-					if (robot.getKarboniteMap()[possible.y][possible.x] || robot.getFuelMap()[possible.y][possible.x]) {
+					if (!Fortified(robot, possible)) {
 						continue;
 					}
-					if (((parent.y - possible.y) % 2 == 0) && ((parent.x - possible.x) % 2 == 0)) {
+					if (((possible.y) % 2 == 0) && ((possible.x) % 2 == 0)) {
 						valid.add(possible);
-					} else if (((parent.y - possible.y) % 2 == 1) && ((parent.x - possible.x) % 2 == 1)) {
+					} else if (((possible.y) % 2 == 1) && ((possible.x) % 2 == 1)) {
 						valid.add(possible);
 					}
 				}

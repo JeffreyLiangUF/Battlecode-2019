@@ -140,13 +140,9 @@ public class Helper {
 		Position vector2to1 = new Position(pos1.y - pos2.y, pos1.x - pos2.x);
 		Position onePerpVec = new Position(vector1to2.x, vector1to2.y * -1);
 		Position twoPerpVec = new Position(vector2to1.x, vector2to1.y * -1);
-		//robot.log("1to2 " + vector1to2.toString() + " per1" + onePerpVec + "2to1 " + vector2to1.toString() + " perp" + twoPerpVec);
 
 		Position pos1SecP = new Position(pos1.y + onePerpVec.y, pos1.x + onePerpVec.x);
 		Position pos2SecP = new Position(pos2.y + twoPerpVec.y, pos2.x + twoPerpVec.x);
-	//	robot.log("Point : " + point);
-	//	robot.log("Pos1 " + pos1.toString() + " pos1sec" + pos1SecP + "Pos1 " + pos2.toString() + " pos1sec" + pos2SecP);
-	//	robot.log(!leftOfLine(robot, point, pos1SecP, pos1) + "  " + leftOfLine(robot, point, pos2, pos2SecP));
 		if (!leftOfLine(robot, point, pos1SecP, pos1) && leftOfLine(robot, point, pos2, pos2SecP)) {
 			return true;
 		}
@@ -154,7 +150,6 @@ public class Helper {
 	}
 
 	public static boolean leftOfLine(MyRobot robot, Position point, Position pos1, Position pos2) {
-	//	robot.log( "Pos" + (((pos2.x - pos1.x) * (pos1.y - point.y)) - ((pos1.y - pos2.y) * (point.x - pos1.x))));
 		return (((pos2.x - pos1.x) * (pos1.y - point.y)) - ((pos1.y - pos2.y) * (point.x - pos1.x))) >= 0;
 	}
 
@@ -196,6 +191,7 @@ public class Helper {
 		}
 		return best;
 	}
+	
 
 	public static Position RandomAdjacent(MyRobot robot, Position pos) {
 		int lowest = Integer.MAX_VALUE;
