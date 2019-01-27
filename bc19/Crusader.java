@@ -19,7 +19,6 @@ public class Crusader extends MovingRobot implements Machine {
 	}
 
 	public Action Execute() {
-		robot.log("Crusader");
 		if (robot.me.turn == 1) {
 			InitializeVariables();
 			parent = StructureBornFrom(robot);
@@ -40,7 +39,7 @@ public class Crusader extends MovingRobot implements Machine {
 				if (prophets.size() > 0) {
 					Robot farthest = FarthestProphetOutOfRange(prophets);
 					Position closest = Helper.closestEnemy(robot, prophets);
-					if (farthest != null && initialized && Helper.DistanceSquared(closest, robot.location) > 4) {
+					if (farthest != null && initialized && Helper.DistanceSquared(closest, robot.location) > 9) {
 						return MoveCloser(robot, new Position(farthest.y, farthest.x), false);
 					} else {
 						return AttackEnemies(prophets.toArray(new Robot[0]));
@@ -66,7 +65,6 @@ public class Crusader extends MovingRobot implements Machine {
 		}
 
 		if (initialized && Helper.Have(robot, 0, 325)) {
-			robot.log("Position :  " + robot.location.toString() + " " + Fortified(robot, parentLocation));
 			if (targetCastle == null && !Fortified(robot, parentLocation)) {
 				ArrayList<Position> valid = GetValidFortifiedPositions(robot, parentLocation);
 				if (valid.size() > 0) {
@@ -112,7 +110,6 @@ public class Crusader extends MovingRobot implements Machine {
 	void CastleInit() {
 		initialized = ReadCombatSignals(robot, castleLocations);
 		if (initialized) {
-			robot.log("GOT INITIAILIZED");
 			enemyCastleLocations = Helper.FindEnemyCastles(robot, robot.mapIsHorizontal, castleLocations);
 			for (int i = 0; i < enemyCastleLocations.size(); i++) {
 				GetOrCreateMap(robot, routesToEnemies, enemyCastleLocations.get(i), false);

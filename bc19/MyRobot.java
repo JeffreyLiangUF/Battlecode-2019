@@ -32,15 +32,9 @@ public class MyRobot extends BCAbstractRobot {
 //sending church units to take over opposing church
 
 
-
-
-//1445480039, send only 1 pilgrim, 3000 fuel to rush, church bug
-
-
-
-
-
-
+//WATCH OUR WINS VS GOOD TEAMS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//rushing with on maps with no karb and too few units
+//pilgrims do the black out method like knights
 
 
 

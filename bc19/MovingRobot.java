@@ -278,7 +278,6 @@ public class MovingRobot {
 				}
 			}
 		}
-		robot.log("castle spawn position " + new Position(spawnStructure.y, spawnStructure.x) + toString());
 		if (castleLocations.size() == 0) {
 			castleLocations.add(new Position(spawnStructure.y, spawnStructure.x));
 		}
@@ -307,15 +306,10 @@ public class MovingRobot {
 	public static Position UpdateBattleStatus(MyRobot robot, ArrayList<Position> enemies, Position enemy){
 		Position battleCry = ListenForBattleCry(robot);
 		if(battleCry != null){
-			robot.log("Hearing the battle Cry");
 			if(Helper.ContainsPosition(enemies, battleCry)){
-				robot.log("My Position is " + robot.location.toString() + " I should be a castle boi");
-				robot.log("This is the battleCry " + battleCry.toString());
 				return battleCry;
 			}
 			else{
-				robot.log("My Position is " + robot.location.toString() + " I should be a church boi");
-				robot.log("This is the battleCry " + battleCry.toString());
 
 				enemies.add(battleCry);
 				return battleCry;
@@ -376,7 +370,6 @@ public class MovingRobot {
 		int x = signal & 63;
 		signal >>= 6;
 		int y = signal & 63;
-		robot.log(new Position(y,x).toString());
 		return new Position(y, x);		
 	}
 

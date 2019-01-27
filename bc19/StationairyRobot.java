@@ -25,7 +25,7 @@ public class StationairyRobot {
                         enemyPreacherCrusader--;
                     }else if (r.unit == robot.SPECS.CRUSADER) {
                         enemyProphet--;
-                        enemyPassive--;
+                        enemyPassive = -10;
                     }
                 }
             }
@@ -54,7 +54,7 @@ public class StationairyRobot {
         for (int i = -tileRadius; i <= tileRadius; i++) {
             for (int j = -tileRadius; j <= tileRadius; j++){
              Position relative = new Position(robot.me.y + i, robot.me.x + j);
-                if (Helper.inMap(robot.map, relative)){
+                if (Helper.inMap(robot.map, relative) && Helper.DistanceSquared(robot.location, relative) < robot.visionRange){
                     if(robot.getFuelMap()[relative.y][relative.x] || robot.getKarboniteMap()[relative.y][relative.x]) {
                         numResources++;
                     }

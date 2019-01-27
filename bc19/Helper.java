@@ -212,7 +212,6 @@ public class Helper {
 							}
 						}
 					}
-					robot.log("Adj " + adjacent + " " + count);
 					if (count < lowest) {
 						lowest = count;
 						best = adjacent;
@@ -277,7 +276,6 @@ public class Helper {
 	public static boolean[][] ResourcesOnOurHalfMap(MyRobot robot) {
 		boolean[][] halfResourceMap = robot.mapIsHorizontal ? new boolean[(robot.map.length + 1) / 2][robot.map.length]
 				: new boolean[robot.map.length][(robot.map.length + 1) / 2];
-		robot.log(halfResourceMap.length + " " + halfResourceMap[0].length);
 
 		if (robot.positiveSide && robot.mapIsHorizontal) {
 			for (int i = 0; i < (robot.map.length + 1) / 2; i++) {

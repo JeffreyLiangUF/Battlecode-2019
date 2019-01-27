@@ -29,7 +29,6 @@ public class Castle extends StationairyRobot implements Machine {
     }
 
     public Action Execute() {
-        robot.log("Turn : " + robot.me.turn + "  " + robot.location.toString());
         Action output = null;
         int signal = -1;
         int signalRadius = 0;
@@ -79,12 +78,23 @@ public class Castle extends StationairyRobot implements Machine {
                     output = robot.attack(closestEnemy.x - robot.me.x, closestEnemy.y - robot.me.y);
                 }
             }
+        }       
+        
+        if (NumPilgrims() < 4) {
+            UpdateDepots();
+            Position pilgrimPosition = ShouldBuildPilgrim();
+            if (pilgrimPosition != null) {
+                Position random = Helper.RandomAdjacent(robot, new Position(robot.me.y, robot.me.x));
+                signal = SignalToPilgrim(pilgrimPosition);
+                output = robot.buildUnit(robot.SPECS.PILGRIM, random.x - robot.me.x, random.y - robot.me.y);
+            }
         }
+        
         int atkSignal = SignalAttack();
         signal = atkSignal == -1 ? signal : atkSignal;
         signalRadius = atkSignal == -1 ? 3 : robot.map.length * robot.map.length + robot.map.length * robot.map.length;
         signal = signal == -1 ? DeclareAllyCastlePositions(1) : signal;
-        
+
         if(robot.getVisibleRobots().length == numCastles){
             Position buildHere = Helper.RandomAdjacentNonResource(robot, robot.location);
             if (buildHere != null) {
@@ -94,6 +104,7 @@ public class Castle extends StationairyRobot implements Machine {
                 output = robot.buildUnit(robot.SPECS.PILGRIM, buildHere.x - robot.me.x, buildHere.y - robot.me.y);
             }
         }
+        
 
 
         if(signal > -1){
@@ -111,7 +122,6 @@ public class Castle extends StationairyRobot implements Machine {
         }
         if (initialized) {
             for (Position pos : allyCastles.values()) {
-                robot.log(pos.toString());
                 allyCastlePositions.add(pos);
             }
         }
@@ -130,6 +140,16 @@ public class Castle extends StationairyRobot implements Machine {
         depotNum = churchLocations.indexOf(closestDepot) + 1;
 
         targetCastleIndex = 0;
+    }
+    int NumPilgrims(){
+        Robot[] robots = robot.getVisibleRobots();
+        int count = 0;
+        for (int i = 0; i < robots.length; i++) {
+            if(robots[i].castle_talk > 0 && robots[i].castle_talk <= 31){
+                count++;
+            }
+        }
+        return count;
     }
 
     void UpdateDepots() {
@@ -157,7 +177,7 @@ public class Castle extends StationairyRobot implements Machine {
     int SignalAttack() {
         Position otherCastlesCry = MovingRobot.ListenForBattleCry(robot);
         targetCastleIndex = targetCastleIndex >= numCastles ? 0 : targetCastleIndex;
-        if (otherCastlesCry == null && robot.me.turn % 200 == 0 && Helper.Have(robot, 0, 3000)) {
+        if (otherCastlesCry == null && robot.me.turn % 300 == 0 && Helper.Have(robot, 0, 80 * robot.map.length)) {
             Position enemyCastle = Helper.FindEnemyCastle(robot.map, robot.mapIsHorizontal, allyCastlePositions.get(targetCastleIndex));
             targetCastleIndex++;
             return CreateAttackSignal(enemyCastle, robot.me.turn == 900 ? 4 : 2);
@@ -192,7 +212,6 @@ public class Castle extends StationairyRobot implements Machine {
                 }
             }
         }
-        robot.log("CLOSETS" + closest);
         return closest;
     }
 
@@ -217,7 +236,6 @@ public class Castle extends StationairyRobot implements Machine {
    
 
     boolean SetupAllyCastles() {
-        robot.log("getting called at least");
         Robot[] rs = robot.getVisibleRobots();
         ArrayList<Robot> robots = new ArrayList<>();
         for (int i = 0; i < rs.length; i++) {

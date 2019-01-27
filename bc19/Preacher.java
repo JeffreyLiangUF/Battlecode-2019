@@ -20,7 +20,6 @@ public class Preacher extends MovingRobot implements Machine {
 	}
 
 	public Action Execute() {
-		robot.log("Preacher");
 
 		if (robot.me.turn == 1) {
 			InitializeVariables();
@@ -40,13 +39,10 @@ public class Preacher extends MovingRobot implements Machine {
 			if (Helper.EnemiesAround(robot)) {
 				return AttackEnemies();
 			} else if (invader != null) {
-				robot.log("my position " + robot.location);
 				if (defensePosition == null) {
 					ArrayList<Position> defensePositions = GetValidDefense(robot,routesToEnemies,  parentLocation, invader);
 					defensePosition = Helper.ClosestPosition(robot, defensePositions);
-					robot.log("DEFENSE POSITION : " + defensePosition);
 				} 
-				robot.log(defensePosition.toString() + " Defense " + robot.location);
 				if (!defensePosition.equals(robot.location)) {
 					return MoveCloser(robot, defensePosition, false);
 				}
@@ -88,9 +84,7 @@ public class Preacher extends MovingRobot implements Machine {
 	}
 
 	void CastleInit() {
-		robot.log("init1");
 		initialized = ReadCombatSignals(robot, castleLocations);
-		robot.log("init2");
 		if (initialized) {
 			enemyCastleLocations = Helper.FindEnemyCastles(robot, robot.mapIsHorizontal, castleLocations);
 			for (int i = 0; i < enemyCastleLocations.size(); i++) {

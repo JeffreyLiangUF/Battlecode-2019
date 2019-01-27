@@ -14,7 +14,6 @@ public class Church extends StationairyRobot implements Machine {
 	}
 
 	public Action Execute() {
-		// robot.log("Church");
 		if (robot.me.turn == 1) {
 			SetDepotNumer();
 			spawnOrder = new int[] { robot.SPECS.CRUSADER,
@@ -33,10 +32,9 @@ public class Church extends StationairyRobot implements Machine {
             }
         }
 
-		int resources = ResourcesAround(robot, 3);
-		int resourcesTotal = ResourcesAround(robot, 7);
+		int resources = ResourcesAround(robot, 10);
 		int pilgrims = PilgrimsAround(robot, 3);
-		if ((resources > pilgrims && Helper.EnemiesWithin(robot, 64).size() == 0) || (!Helper.EnemiesAround(robot) && resourcesTotal > pilgrims)) {
+		if (!Helper.EnemiesAround(robot) && resources > pilgrims) {
 			Position buildHere = Helper.RandomAdjacentNonResource(robot, robot.location);
 			if (buildHere != null && Helper.Have(robot, 80, 100)) {
 				signal = depotNum;

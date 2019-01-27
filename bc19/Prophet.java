@@ -19,7 +19,6 @@ public class Prophet extends MovingRobot implements Machine {
 	}
 
 	public Action Execute() {
-		robot.log("Prophet");
 		if (robot.me.turn == 1) {
 			InitializeVariables();
 			parent = StructureBornFrom(robot);
@@ -73,7 +72,6 @@ public class Prophet extends MovingRobot implements Machine {
 	void CastleInit() {
 		initialized = ReadCombatSignals(robot, castleLocations);
 		if (initialized) {
-			robot.log("GOT INITIAILIZED");
 			enemyCastleLocations = Helper.FindEnemyCastles(robot, robot.mapIsHorizontal, castleLocations);
 			for (int i = 0; i < enemyCastleLocations.size(); i++) {
 				GetOrCreateMap(robot, routesToEnemies, enemyCastleLocations.get(i), false);
