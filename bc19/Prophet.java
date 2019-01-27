@@ -21,7 +21,6 @@ public class Prophet extends MovingRobot implements Machine {
 	}
 
 	public Action Execute() {
-		robot.log("prophet");
 		if (robot.me.turn == 1) {
 			InitializeVariables();
 			parent = StructureBornFrom(robot);

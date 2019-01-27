@@ -63,7 +63,6 @@ public class Pilgrim extends MovingRobot implements Machine {
             return ReturnToDropOff();
         }
 
-        // robot.log("My turn " + robot.me.turn + " No logic :(");
         return null;
 
     }
@@ -209,40 +208,31 @@ public class Pilgrim extends MovingRobot implements Machine {
     Action GoToMine() {
 
         Position nearestInGeneral = GetNearestResource(robot.location);
-        robot.log("  " + nearestInGeneral);
         if (depotNum >= 0) {
             Position nearestToChurch = GetNearestResource(churchLocation);
-            robot.log("church nearest " + nearestToChurch);
 
             if (Helper.DistanceSquared(robot.location, churchLocation) <= 16) {
-                robot.log("here1");
                 if (robot.getKarboniteMap()[robot.me.y][robot.me.x] || robot.getFuelMap()[robot.me.y][robot.me.x]) {
                     state = PilgrimState.Mining;
-                    robot.log("here2");
 
                     return robot.mine();
                 } else if (Helper.DistanceSquared(churchLocation, nearestToChurch) <= 16) {
-                    robot.log("here3");
 
                     return MoveCloser(robot, nearestToChurch, false);
                 } else {
-                    robot.log("here4");
                     return FloodPathing(robot, CreateLayeredFloodPath(robot, nearestToChurch, robot.location),
                             nearestInGeneral, true);
 
                 }
             } else {
-                robot.log("here5");
 
                 return FloodPathing(robot, CreateLayeredFloodPath(robot, churchLocation, robot.location),
                         churchLocation, false);
             }
         } else {
-            robot.log("here6");
 
             if (robot.getKarboniteMap()[robot.me.y][robot.me.x] || robot.getFuelMap()[robot.me.y][robot.me.x]) {
                 state = PilgrimState.Mining;
-                robot.log("here7");
 
                 return robot.mine();
             } else
@@ -254,14 +244,11 @@ public class Pilgrim extends MovingRobot implements Machine {
     Action Mining() {
         int numChurchs = StationairyRobot.UnitAround(robot,robot.location, 6, robot.SPECS.CHURCH);
         int numPilgrims = StationairyRobot.UnitAround(robot,robot.location, 6, robot.SPECS.PILGRIM);
-        robot.log("churchs " + numChurchs + " pilgrims " + numPilgrims);
-        robot.log(((int) ((numChurchs * 8) / numPilgrims) == 0) + " "  +(Helper.DistanceSquared(robot.location, GetNearestDropOff()) >= 9) + " " + StationairyRobot.UnitAround(robot,robot.location, 6, robot.SPECS.CASTLE));
         if ((int)((numChurchs * 8) / numPilgrims) == 0 && Helper.Have(robot, 50, 250) && StationairyRobot.UnitAround(robot,robot.location, 6, robot.SPECS.CASTLE) == 0 && Helper.DistanceSquared(robot.location, GetNearestDropOff()) >= 9) {
             Position random = ChurchBuildPosition(robot, robot.location);
             return robot.buildUnit(robot.SPECS.CHURCH, random.x - robot.me.x, random.y - robot.me.y);
         }
         if (robot.me.karbonite >= robot.karbCapacity || robot.me.fuel >= robot.fuelCapacity) {
-            robot.log("Counter : " + counter);
             state = PilgrimState.Returning;           
         } else {
             return robot.mine();
@@ -299,7 +286,6 @@ public class Pilgrim extends MovingRobot implements Machine {
 							}
 						}
                     }
-                    robot.log(adjacent +  " " + count);
 					if (count > highest) {
 						highest = count;
 						best = adjacent;

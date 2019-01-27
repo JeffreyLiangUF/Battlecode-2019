@@ -24,30 +24,6 @@ public class MyRobot extends BCAbstractRobot {
 
 	float[][] test;
 	int testCount;
-//spam crusaders at round 950 for health value
-
-//pick resource near the center first to populate with pilgrims
-
-
-//sending church units to take over opposing church
-
-
-//WATCH OUR WINS VS GOOD TEAMS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-//clean up pilgrims
-//if you see an enemy pilgrim as a solo pilgrim build a church
-//3 crusader, 3 prophet, 1 preacher
-//cant get to church build a new one, drop off anwhere
-
-//rushing through chokes
-//lattice failing in weird maps 104555415
-
-
-
-//rushing with on maps with no karb and too few units
-
-
-//not rushing castle 2
 
 
 

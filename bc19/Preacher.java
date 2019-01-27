@@ -21,7 +21,6 @@ public class Preacher extends MovingRobot implements Machine {
 	}
 
 	public Action Execute() {
-		robot.log("preacher");
 		if (robot.me.turn == 1) {
 			InitializeVariables();
 			parent = StructureBornFrom(robot);
