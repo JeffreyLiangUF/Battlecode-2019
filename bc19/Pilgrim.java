@@ -33,6 +33,7 @@ public class Pilgrim extends MovingRobot implements Machine {
         }
         if (initialized) {
             robot.log("Position : " + robot.location.toString());
+            haveAChurch = ChurchLost();
             if (ThreatsAround(robot)) {
                 state = PilgrimState.Returning;
                 // robot.log("fleeding");
@@ -243,6 +244,16 @@ public class Pilgrim extends MovingRobot implements Machine {
             }
         }
         return true;
+    }
+
+    boolean ChurchLost(){
+        Robot[] robots = robot.getVisibleRobots();
+        for (int i = 0; i < robots.length; i++) {
+            if(robots[i].unit == robot.SPECS.CHURCH && robots[i].team == robot.ourTeam){
+                return true;
+            }
+        }
+        return false;
     }
 }
 

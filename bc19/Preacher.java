@@ -58,11 +58,11 @@ public class Preacher extends MovingRobot implements Machine {
 				if (valid.size() > 0) {
 					Position closest = Helper.ClosestPosition(robot, valid);
 					float[][] shortPath = CreateLayeredFloodPath(robot, closest, robot.location);
-					return FloodPathing(robot, shortPath, closest, true);
+					return FloodPathing(robot, shortPath, closest, false);
 				} else {
 					Position towardsCenter = TowardsCenter(robot);
 					float[][] shortPath = CreateLayeredFloodPath(robot, towardsCenter, robot.location);
-					return FloodPathing(robot, shortPath, towardsCenter, true);
+					return FloodPathing(robot, shortPath, towardsCenter, false);
 				}
 			} else if (targetCastle != null) {
 				boolean rushTime = true;

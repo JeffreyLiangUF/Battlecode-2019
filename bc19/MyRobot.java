@@ -32,6 +32,18 @@ public class MyRobot extends BCAbstractRobot {
 //sending church units to take over opposing church
 
 
+
+
+//1445480039, send only 1 pilgrim, 3000 fuel to rush, church bug
+
+
+
+
+
+
+
+
+
 //412323315
 //1292314770, sorta a semi
 //369842273

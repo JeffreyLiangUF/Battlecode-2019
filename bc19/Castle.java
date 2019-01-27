@@ -85,7 +85,7 @@ public class Castle extends StationairyRobot implements Machine {
         signalRadius = atkSignal == -1 ? 3 : robot.map.length * robot.map.length + robot.map.length * robot.map.length;
         signal = signal == -1 ? DeclareAllyCastlePositions(1) : signal;
         
-        if(robot.me.turn == 1){
+        if(robot.getVisibleRobots().length == numCastles){
             Position buildHere = Helper.RandomAdjacentNonResource(robot, robot.location);
             if (buildHere != null) {
                 UpdateDepots();
@@ -157,7 +157,7 @@ public class Castle extends StationairyRobot implements Machine {
     int SignalAttack() {
         Position otherCastlesCry = MovingRobot.ListenForBattleCry(robot);
         targetCastleIndex = targetCastleIndex >= numCastles ? 0 : targetCastleIndex;
-        if (otherCastlesCry == null && robot.me.turn % 200 == 0) {
+        if (otherCastlesCry == null && robot.me.turn % 200 == 0 && Helper.Have(robot, 0, 3000)) {
             Position enemyCastle = Helper.FindEnemyCastle(robot.map, robot.mapIsHorizontal, allyCastlePositions.get(targetCastleIndex));
             targetCastleIndex++;
             return CreateAttackSignal(enemyCastle, robot.me.turn == 900 ? 4 : 2);
