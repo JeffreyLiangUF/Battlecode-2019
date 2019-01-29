@@ -70,7 +70,7 @@ public class StationairyRobot {
         return output;
     }
 
-    int ResourcesAround(MyRobot robot, int tileRadius) {
+    public static int ResourcesAround(MyRobot robot, int tileRadius) {
         int numResources = 0;
         for (int i = -tileRadius; i <= tileRadius; i++) {
             for (int j = -tileRadius; j <= tileRadius; j++){

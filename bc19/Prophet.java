@@ -21,6 +21,8 @@ public class Prophet extends MovingRobot implements Machine {
 	}
 
 	public Action Execute() {
+		//robot.log("Prophet : " + robot.location);
+
 		if (robot.me.turn == 1) {
 			InitializeVariables();
 			parent = StructureBornFrom(robot);
@@ -36,9 +38,9 @@ public class Prophet extends MovingRobot implements Machine {
 		if (Helper.EnemiesAround(robot)) {
 			ArrayList<Robot> closeEnemies = Helper.EnemiesWithin(robot, robot.attackRange[0]);
 			if(initialized && closeEnemies.size() > 0 && Helper.Have(robot, 0, 50)){
-				return Flee(closeEnemies);
+				return Flee(robot, closeEnemies);
 			}
-			else if(robot.fuel > 110){
+			else if(Helper.Have(robot, 0, 75)){
 				ArrayList<Robot> attackable = Helper.EnemiesWithin(robot, robot.attackRange[1]);
 				return AttackEnemies(attackable.toArray(new Robot[0]));
 			}
@@ -54,7 +56,7 @@ public class Prophet extends MovingRobot implements Machine {
 				if (valid.size() > 0) {
 					Position closest = Helper.ClosestPosition(robot, valid);
 					float[][] shortPath = CreateLayeredFloodPath(robot, closest, robot.location);
-					return FloodPathing(robot, shortPath, closest, false);
+					return FloodPathing(robot, shortPath, closest, false, new ArrayList<Robot>());
 				} else {
 					Position goal = null;
 					if(robot.mapIsHorizontal){
@@ -73,16 +75,25 @@ public class Prophet extends MovingRobot implements Machine {
 							goal = new Position(robot.me.y, robot.map.length - 1);
 						}
 					}			
-					return FloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, goal, false), goal, false);
+					return FloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, goal, false), goal, false, new ArrayList<Robot>());
 				}
 			} else if (targetCastle != null) {
+				ArrayList<Robot> crusaders = EnemiesOfTypeInVision(robot, new int[] { robot.SPECS.CRUSADER });
 				CastleDown(robot, enemyCastleLocations, routesToEnemies);
 				if (Helper.ContainsPosition(enemyCastleLocations, targetCastle)) {
-					return FloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, targetCastle, true), targetCastle, true);
+					float[][] pathingMap = GetOrCreateMap(robot, routesToEnemies, targetCastle, true);
+					if (crusaders.size() > 0) {
+						pathingMap = BlackOutPaths(robot, pathingMap, crusaders);					}
+
+					return FloodPathing(robot, pathingMap, targetCastle, true, crusaders);
 
 				} else{		
-					Position closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);			
-					return FloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle, true), closestEnemyCastle, true);
+					Position closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);
+					float[][] pathingMap = GetOrCreateMap(robot, routesToEnemies, closestEnemyCastle, true);
+					if (crusaders.size() > 0) {
+						pathingMap = BlackOutPaths(robot, pathingMap, crusaders);
+					}							
+					return FloodPathing(robot, pathingMap, closestEnemyCastle, true, crusaders);
 				}
 			}
 		}
@@ -120,13 +131,7 @@ public class Prophet extends MovingRobot implements Machine {
 		}
 		return robot.attack(attackTile.x - robot.me.x, attackTile.y - robot.me.y);
 	}
-	Action Flee(ArrayList<Robot> robots){
-		Position closest = Helper.closestEnemy(robot, robots);
-		int dx = closest.x - robot.me.x;
-		int dy = closest.y - robot.me.y;
-		Position opposite = new Position(robot.me.y - dy, robot.me.x - dx);
-		return MoveCloser(robot, opposite, false);
-	}
+	
 	
 	Position GetMyCastlePosition(){
 		Robot[] robots = robot.getVisibleRobots();

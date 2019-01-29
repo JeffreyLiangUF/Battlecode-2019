@@ -166,6 +166,33 @@ public class Helper {
 		}
 		return false;
 	}
+	public static Position HighestResourceBuildPosition(MyRobot robot, Position pos) {
+        int highest = -100;
+        Position best = null;
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                Position adjacent = new Position(pos.y + i, pos.x + j);
+                if (Helper.inMap(robot.map, adjacent) && Helper.TileEmptyNonResource(robot, adjacent)) {
+                    int count = 0;
+                    for (int k = -1; k <= 1; k++) {
+                        for (int l = -1; l <= 1; l++) {
+                            Position surround = new Position(adjacent.y + k, adjacent.x + l);
+                            if (Helper.inMap(robot.map, surround) && (robot.getKarboniteMap()[surround.y][surround.x]
+                                    || robot.getFuelMap()[surround.y][surround.x])) {
+                                count++;
+                            }
+                        }
+                    }
+
+                    if (count > highest) {
+                        highest = count;
+                        best = adjacent;
+                    }
+                }
+            }
+        }
+        return best;
+    }
 
 	public static Position RandomAdjacentNonResource(MyRobot robot, Position pos) {
 		int lowest = Integer.MAX_VALUE;
@@ -261,11 +288,11 @@ public class Helper {
 
 	}
 
-	public static boolean PositiveOrNegativeMap(MyRobot robot) {
+	public static boolean PositiveOrNegativeMap(MyRobot robot, Position pos) {
 		if (robot.mapIsHorizontal) {
-			return (robot.me.y < ((robot.map.length + 1) / 2)) ? true : false;
+			return (pos.y < ((robot.map.length + 1) / 2)) ? true : false;
 		} else {
-			return (robot.me.x > ((robot.map[0].length + 1) / 2)) ? true : false;
+			return (pos.x > ((robot.map[0].length + 1) / 2)) ? true : false;
 		}
 	}
 

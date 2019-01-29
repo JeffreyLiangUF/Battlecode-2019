@@ -17,6 +17,7 @@ public class MyRobot extends BCAbstractRobot {
 	int constructionFuel;
 	int ourTeam;
 	int startHealth;
+	int previousHealth;
 	int currentHealth;
 	Position previousLocation;
 	boolean mapIsHorizontal;
@@ -33,6 +34,7 @@ public class MyRobot extends BCAbstractRobot {
 		}
 		previousLocation = location;
 		location = new Position(me.y, me.x);
+		previousHealth = currentHealth;
 		currentHealth = me.health;
 /*
 	  for (int i = 0; i < test.length; i++) { String cat = ""; for (int j = 0; j <
@@ -66,6 +68,7 @@ public class MyRobot extends BCAbstractRobot {
 	}
 
 	void Setup() {
+		location = new Position(me.y, me.x);
 		visionRange = SPECS.UNITS[me.unit].VISION_RADIUS;
 		tileVisionRange = (int) Math.sqrt(visionRange);
 		attackRange = SPECS.UNITS[me.unit].ATTACK_RADIUS;
@@ -81,8 +84,9 @@ public class MyRobot extends BCAbstractRobot {
 		ourTeam = me.team == SPECS.RED ? 0 : 1;
 		mapIsHorizontal = Helper.FindSymmetry(map);
 		startHealth = SPECS.UNITS[me.unit].STARTING_HP;
-		positiveSide = Helper.PositiveOrNegativeMap(this);
+		positiveSide = Helper.PositiveOrNegativeMap(this, location);
 		previousLocation = new Position(me.y, me.x);
+		
 	}
 }
 
