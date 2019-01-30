@@ -21,6 +21,11 @@ public class Castle extends StationairyRobot implements Machine {
     int positionInSpawnOrder = 0;
     int targetCastleIndex = 0;
     int[] spawnOrder;
+    HashMap<Position, Integer> crusaderNumbers;
+    int ourCrusaders;
+    int totalCrusaders;
+    int castleCrusaders;
+    boolean imMostCentral;
     // hashmap of ids and unit types to keep track of number of assualt units and
     // such
 
@@ -29,7 +34,9 @@ public class Castle extends StationairyRobot implements Machine {
     }
 
     public Action Execute() {
-        robot.log("Turn : " + robot.me.turn + "  " + robot.location.toString());
+        robot.log("TTTTTTTTTTTTTTTTurn " + robot.me.turn + "  " + robot.fuel);
+        // robot.log("Castle : " + robot.location + " Turn : " + robot.me.turn);
+
         Action output = null;
         int signal = -1;
         int signalRadius = 0;
@@ -37,41 +44,64 @@ public class Castle extends StationairyRobot implements Machine {
         if (!initialized) {
             Initialize();
         }
-
-
-        if(initialized && Helper.Have(robot, 110, 400)){
+        if (initialized) {
+            ReadCrusaders();
+        }
+        positionInSpawnOrder = positionInSpawnOrder == spawnOrder.length ? 0 : positionInSpawnOrder;
+        if (robot.me.turn > 4
+                && initialized && Helper.Have(robot,
+                        50 + robot.SPECS.UNITS[spawnOrder[positionInSpawnOrder]].CONSTRUCTION_KARBONITE, 500)
+                && ourCrusaders <= castleCrusaders / numCastles) {
             Position buildHere = Helper.RandomAdjacentNonResource(robot, robot.location);
             if (buildHere != null) {
-                positionInSpawnOrder = positionInSpawnOrder == spawnOrder.length ? 0 : positionInSpawnOrder;
-                output = robot.buildUnit(spawnOrder[positionInSpawnOrder], buildHere.x - robot.me.x, buildHere.y - robot.me.y);
-                positionInSpawnOrder++;               
+                signal = DeclareAllyCastlePositions(1);
+                output = robot.buildUnit(spawnOrder[positionInSpawnOrder], buildHere.x - robot.me.x,
+                        buildHere.y - robot.me.y);
+                positionInSpawnOrder++;
             }
         }
-        
-        int resources = ResourcesAround(robot, 3);
-        int pilgrims = CastlePilgrims();
+        UpdateDepots();
 
-        if (resources > pilgrims) {
-            Position buildHere = Helper.RandomAdjacentNonResource(robot, robot.location);
-            if (buildHere != null && Helper.Have(robot, 110, 400)  || starterPilgrims < 4) {
-                signal = depotNum;
-                starterPilgrims ++;
-                output = robot.buildUnit(robot.SPECS.PILGRIM, buildHere.x - robot.me.x, buildHere.y - robot.me.y);
-            }
-        } else if (Helper.Have(robot, 110, 400) || starterPilgrims < 4) {
+        Position closest = DepotClosestToCenter(MyCenterDepots());
+        if (((closest == null && robot.karbonite > 35) || robot.me.turn > 6)
+                && (Helper.Have(robot, 20, 125) || starterPilgrims < 4)) {
             UpdateDepots();
-            Position pilgrimPosition = ShouldBuildPilgrim();
+            Position pilgrimPosition = DepotClosestToCenter(AvailableDepots());
             if (pilgrimPosition != null) {
-                Position random = Helper.RandomAdjacent(robot, new Position(robot.me.y, robot.me.x));
-                starterPilgrims ++;
+                Position random = Helper.HighestResourceBuildPosition(robot, new Position(robot.me.y, robot.me.x));
+                starterPilgrims++;
                 signal = SignalToPilgrim(pilgrimPosition);
                 output = robot.buildUnit(robot.SPECS.PILGRIM, random.x - robot.me.x, random.y - robot.me.y);
+            }
+        } else if (((closest == null && robot.karbonite > 35) || robot.me.turn > 6) && NumPilgrims() < 2) {
+            UpdateDepots();
+            Position pilgrimPosition = DepotClosestToCenter(AvailableDepots());
+            if (pilgrimPosition != null) {
+                Position random = Helper.HighestResourceBuildPosition(robot, new Position(robot.me.y, robot.me.x));
+                starterPilgrims++;
+                signal = SignalToPilgrim(pilgrimPosition);
+                output = robot.buildUnit(robot.SPECS.PILGRIM, random.x - robot.me.x, random.y - robot.me.y);
+            }
+        }
+        int resources = ResourcesAround(robot, 3);
+        int pilgrims = CastlePilgrims();
+        robot.log((closest == null && robot.karbonite > 35) + "   Bool");
+        robot.log(closest + "  closest");
+
+        if ((robot.me.turn < ((numCastles == 1) ? 6 : 2) || (closest == null && robot.karbonite > 35)
+                || robot.me.turn > 6) && resources > pilgrims) {
+            Position buildHere = Helper.HighestResourceBuildPosition(robot, robot.location);
+            if (buildHere != null && Helper.Have(robot, 20, 125) || starterPilgrims < 4) {
+                signal = depotNum;
+                starterPilgrims++;
+                output = robot.buildUnit(robot.SPECS.PILGRIM, buildHere.x - robot.me.x, buildHere.y - robot.me.y);
             }
         }
         if (Helper.EnemiesAround(robot)) {
             Action canBuildDefense = EvaluateEnemyRatio(robot);
             if (canBuildDefense != null) {
-                signal = CreateAttackSignal(Helper.closestEnemy(robot, Helper.EnemiesWithin(robot, robot.visionRange)), 8);
+                signal = CreateAttackSignal(Helper.closestEnemy(robot, Helper.EnemiesWithin(robot, robot.visionRange)),
+                        8);
                 output = canBuildDefense;
             } else {
                 ArrayList<Robot> enemiesAttacking = Helper.EnemiesWithin(robot, robot.attackRange[1]);
@@ -81,11 +111,46 @@ public class Castle extends StationairyRobot implements Machine {
                 }
             }
         }
+
         int atkSignal = SignalAttack();
         signal = atkSignal == -1 ? signal : atkSignal;
-        signalRadius = atkSignal == -1 ? 3 : robot.map.length * robot.map.length + robot.map.length * robot.map.length;
-        signal = signal == -1 ? DeclareAllyCastlePositions(1) : signal;
-        robot.signal(signal, signalRadius);
+        signalRadius = atkSignal == -1 ? 3 : FindSignalRadius();
+
+        if (robot.me.turn == 3 && numCastles == 1) {
+            signal = CreateAttackSignal(Helper.FindEnemyCastle(robot.map, robot.mapIsHorizontal, robot.location), 8);
+            Position random = RandomAdjacentTowardsEnemy(robot,
+                    Helper.FindEnemyCastle(robot.map, robot.mapIsHorizontal, robot.location));
+            output = robot.buildUnit(robot.SPECS.PREACHER, random.x - robot.me.x, random.y - robot.me.y);
+        }
+
+        if (closest != null && robot.me.turn <= 6) {
+            robot.log("in loop");
+            if (robot.me.turn == (numCastles == 1 ? 1 : 3) + (robot.me.turn > 4 ? 2 : 0)) {
+                Position churchAcross = Helper.FindEnemyCastle(robot.map, robot.mapIsHorizontal, closest);
+                Position validNear = Helper.RandomAdjacentNonResource(robot, churchAcross);
+                Position buildHere = RandomAdjacentTowardsEnemy(robot, churchAcross);
+                if (buildHere != null) {
+                    signal = CreateAttackSignal(validNear, 12);
+                    starterPilgrims++;
+                    output = robot.buildUnit(robot.SPECS.CRUSADER, buildHere.x - robot.me.x, buildHere.y - robot.me.y);
+                }
+            }
+            if (robot.me.turn == (numCastles == 1 ? 2 : 4) + (robot.me.turn > 5 ? 2 : 0)) {
+                Position buildHere = RandomAdjacentTowardsEnemy(robot,
+                        Helper.FindEnemyCastle(robot.map, robot.mapIsHorizontal, robot.location));
+                if (buildHere != null) {
+                    UpdateDepots();
+                    signal = SignalToPilgrim(closest);
+                    starterPilgrims++;
+                    output = robot.buildUnit(robot.SPECS.PILGRIM, buildHere.x - robot.me.x, buildHere.y - robot.me.y);
+                }
+            }
+
+        }
+
+        if (signal > -1) {
+            robot.signal(signal, signalRadius);
+        }
         return output;
     }
 
@@ -98,14 +163,14 @@ public class Castle extends StationairyRobot implements Machine {
         }
         if (initialized) {
             for (Position pos : allyCastles.values()) {
-                robot.log(pos.toString());
                 allyCastlePositions.add(pos);
+                crusaderNumbers.put(pos, 0);
             }
         }
     }
 
     void InitializeVariables() {
-        spawnOrder = new int[] { robot.SPECS.PROPHET, robot.SPECS.PROPHET, robot.SPECS.CRUSADER,
+        spawnOrder = new int[] { robot.SPECS.PROPHET, robot.SPECS.CRUSADER, robot.SPECS.CRUSADER, robot.SPECS.PROPHET,
                 robot.SPECS.CRUSADER, robot.SPECS.PREACHER };
         positionInSpawnOrder = 0;
         allyCastles = new HashMap<>();
@@ -115,8 +180,20 @@ public class Castle extends StationairyRobot implements Machine {
         resourceDepots = new int[temp.size()];
         Position closestDepot = Helper.ClosestPosition(robot, churchLocations);
         depotNum = churchLocations.indexOf(closestDepot) + 1;
+        crusaderNumbers = new HashMap<>();
 
         targetCastleIndex = 0;
+    }
+
+    int NumPilgrims() {
+        Robot[] robots = robot.getVisibleRobots();
+        int count = 0;
+        for (int i = 0; i < robots.length; i++) {
+            if (robots[i].castle_talk > 0 && robots[i].castle_talk <= 31) {
+                count++;
+            }
+        }
+        return count;
     }
 
     void UpdateDepots() {
@@ -142,25 +219,151 @@ public class Castle extends StationairyRobot implements Machine {
     }
 
     int SignalAttack() {
-        Position otherCastlesCry = Helper.ListenForBattleCry(robot);
+        Position otherCastlesCry = MovingRobot.ListenForBattleCry(robot);
         targetCastleIndex = targetCastleIndex >= numCastles ? 0 : targetCastleIndex;
-        if (otherCastlesCry == null && robot.me.turn % 200 == 0) {
-            Position enemyCastle = Helper.FindEnemyCastle(robot.map, robot.mapIsHorizontal, allyCastlePositions.get(targetCastleIndex));
+        if (RushParameters(otherCastlesCry)) {
+            Position enemyCastle = Helper.FindEnemyCastle(robot.map, robot.mapIsHorizontal,
+                    allyCastlePositions.get(targetCastleIndex));
             targetCastleIndex++;
-            return CreateAttackSignal(enemyCastle, robot.me.turn == 800 ? 4 : 2);
-        } 
+            return CreateAttackSignal(enemyCastle, robot.me.turn == 900 ? 4 : 2);
+        }
         return -1;
     }
 
-    Position ShouldBuildPilgrim() {
+    boolean RushParameters(Position other) {
+        if (other != null) {
+            return false;
+        }
+        if (robot.me.turn != 300 && robot.me.turn != 500 && robot.me.turn != 700 && robot.me.turn != 900) {
+            return false;
+        }
+        int distance = (int) Math.sqrt(Helper.DistanceSquared(robot.location,
+                Helper.FindEnemyCastle(robot.map, robot.mapIsHorizontal, robot.location)));
+        if (!Helper.Have(robot, 0, (int) (distance * 1.1f) * totalCrusaders)) {
+            return false;
+        }
+        int twoThirds = (robot.fuel * 2) / 3;
+        if (totalCrusaders * 75 < twoThirds) {
+            return false;
+        }
+        return true;
+    }
+
+    int FindSignalRadius() {
+        int farthest = 0;
+        Position[] corners = new Position[] { new Position(0, 0), new Position(0, robot.map.length),
+                new Position(robot.map.length, 0), new Position(robot.map.length, robot.map.length) };
+        for (int i = 0; i < corners.length; i++) {
+            int distance = (int) Helper.DistanceSquared(robot.location, corners[i]);
+            if (distance > farthest) {
+                farthest = distance;
+            }
+        }
+        return farthest;
+    }
+
+    void ReadCrusaders() {
+        Robot[] robots = robot.getVisibleRobots();
+        totalCrusaders = 0;
+        ourCrusaders = 0;
+        castleCrusaders = 0;
+        for (int i = 0; i < allyCastlePositions.size(); i++) {
+            crusaderNumbers.put(allyCastlePositions.get(i), 0);
+        }
+        for (int i = 0; i < robots.length; i++) {
+            Robot r = robots[i];
+            if (r.castle_talk >= 128 && r.castle_talk < 192) {
+                totalCrusaders++;
+                continue;
+            } else if (r.castle_talk >= 192) {
+                int difference = Integer.MAX_VALUE;
+                Position closest = null;
+                for (Position pos : crusaderNumbers.keySet()) {
+                    int distance = Helper.abs((r.castle_talk - 192) - (robot.mapIsHorizontal ? pos.x : pos.y));
+                    if (distance < difference) {
+                        difference = distance;
+                        closest = pos;
+                    }
+                }
+                totalCrusaders++;
+                castleCrusaders++;
+                if (robot.location.equals(closest)) {
+                    ourCrusaders++;
+                }
+                crusaderNumbers.put(closest, crusaderNumbers.get(closest) + 1);
+            }
+        }
+
+    }
+
+    ArrayList<Position> AvailableDepots() {
         ArrayList<Position> available = new ArrayList<>();
         for (int i = 0; i < churchLocations.size(); i++) {
-            robot.log(resourceDepots[i] + "  " + churchLocations.get(i).toString());
             if (resourceDepots[i] < 0) {
                 available.add(churchLocations.get(i));
             }
         }
-        return Helper.ClosestPosition(robot, available);
+        return available;
+    }
+
+    ArrayList<Position> MyCenterDepots() {
+        ArrayList<Position> mine = new ArrayList<>();
+        for (int i = 0; i < churchLocations.size(); i++) {
+            int length = 0;
+            if (Helper.DistanceSquared(robot.location,
+                    Helper.FindEnemyCastle(robot.map, robot.mapIsHorizontal, robot.location)) > Helper.DistanceSquared(
+                            churchLocations.get(i),
+                            Helper.FindEnemyCastle(robot.map, robot.mapIsHorizontal, churchLocations.get(i)))) {
+                if (robot.mapIsHorizontal) {
+                    length = Helper.abs(churchLocations.get(i).y - ((robot.map.length + 1) / 2));
+                } else {
+                    length = Helper.abs(churchLocations.get(i).x - ((robot.map.length + 1) / 2));
+                }
+                if (length <= 7) {
+                    int lowest = (int) Helper.DistanceSquared(robot.location, churchLocations.get(i));
+                    Position closest = robot.location;
+                    // robot.log(allyCastlePositions.size() + " THIS IS THE SIZER");
+                    for (int j = 0; j < allyCastlePositions.size(); j++) {
+                        int distance = (int) Helper.DistanceSquared(allyCastlePositions.get(j), churchLocations.get(i));
+                        if (distance < lowest) {
+                            lowest = distance;
+                            closest = allyCastlePositions.get(j);
+                        }
+
+                    }
+                    // robot.log(churchLocations.get(i).toString() + "this is the church");
+                    // robot.log("closets " + closest);
+                    // robot.log("me " + robot.location);
+                    // robot.log("the valie " + resourceDepots[i]);
+                    if (closest.equals(robot.location) && resourceDepots[i] < 0) {
+                        // robot.log("ADDED ");
+                        mine.add(churchLocations.get(i));
+                    }
+                }
+            }
+        }
+
+        robot.log("the size " + mine.size());
+        return mine;
+    }
+
+    Position DepotClosestToCenter(ArrayList<Position> depotLocations) {
+        int lowest = 128;
+        Position closest = null;
+        for (int i = 0; i < depotLocations.size(); i++) {
+            int current = Integer.MAX_VALUE;
+            if (robot.mapIsHorizontal) {
+                current = Helper.abs(depotLocations.get(i).y - ((robot.map.length + 1) / 2));
+            } else {
+                current = Helper.abs(depotLocations.get(i).x - ((robot.map.length + 1) / 2));
+            }
+            if (current < lowest) {
+                lowest = current;
+                closest = depotLocations.get(i);
+            }
+
+        }
+        return closest;
     }
 
     int SignalToPilgrim(Position pos) {
@@ -179,17 +382,7 @@ public class Castle extends StationairyRobot implements Machine {
         return count;
     }
 
-    int CreateAttackSignal(Position pos, int code) {
-        int output = code;
-        output <<= 6;
-        output += pos.y;
-        output <<= 6;
-        output += pos.x;
-        return output;
-    }
-
     boolean SetupAllyCastles() {
-        robot.log("getting called at least");
         Robot[] rs = robot.getVisibleRobots();
         ArrayList<Robot> robots = new ArrayList<>();
         for (int i = 0; i < rs.length; i++) {

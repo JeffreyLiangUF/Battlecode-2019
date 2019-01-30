@@ -17,50 +17,76 @@ public class MyRobot extends BCAbstractRobot {
 	int constructionFuel;
 	int ourTeam;
 	int startHealth;
+	int previousHealth;
 	int currentHealth;
+	Position previousLocation;
 	boolean mapIsHorizontal;
 	boolean positiveSide;
 
 	float[][] test;
 	int testCount;
-//Churchs, Rush Defense, Lattice Setup, Fuel Overages, Overdrawing, pilgrim pathing, losing early pilgrims.
 
-//Test the in between two points
+/*
 
-//1778191906 pathing/timeout failed
-//1686608114 pathing failing
-//185517169 losing because aggressive bot takes middle first
-//1772921400 losing to old bot, need to setup defense facing enemy, if pilgrims die early rebuild them.
-//162590698 running out of fuel during rush
-//805925611 pilgrims being dipshits and not mining/ not pathing to mine.
-//514126268 overdrawing and freezing pilgrim bois
+http://battlecode.org/replays/9vp2h1y5y19.bc19 arnold bot win (rush signal doesn't work on everyone, lattice breaking)
+http://battlecode.org/replays/jw6xn7eor4.bc19 arnold bot win (rush signal fails to go out
+http://battlecode.org/replays/ljmxdrm4z7.bc19 arnold bot win (pilgrims need to not move into enemies for resources)
+http://battlecode.org/replays/lej92oq73rs.bc19 team 3 win (bug on pathing not going to one of the resources, need to send out cross map pilgrims earlier
+http://battlecode.org/replays/4v9be62vsek.bc19 team 3 loss (not enough resources small map, ineffective rushes)
+https://battlecode.org/replays/3wjkzmqh70n.bc19 team 3 win (pilgrims getting produced cross, because one keeps losing vision)
+http://battlecode.org/replays/oflthgf2wsr.bc19 justice of war loss (lose eco then get rolled, we arnt the first to build a church
+http://battlecode.org/replays/u9s02w7t2zc.bc19 justice of war loss (rushing on a small map)
+http://battlecode.org/replays/5mgyq2pcufq.bc19 justice of war win (small map ineffecitve rushes, however 2:1 karb to fuel makes it work
+http://battlecode.org/replays/e5wapqgw5uj.bc19 double j win (send cross map pilgrims on church spawn)
+http://battlecode.org/replays/y83jh9wou9r.bc19 double j win (clean win
+http://battlecode.org/replays/fl9vg6k4fop.bc19 double j loss (need to have churchs not spawn defense over castle, so raise church conditions
+http://battlecode.org/replays/nj6jrogrk0g.bc19 Freedom Dive (wrong direction lattice, not attacking preachers)
+http://battlecode.org/replays/9xo35793kwm.bc19 Freedom dive(Set up lattice towards enemy)
+http://battlecode.org/replays/721c6w48gbc.bc19 Freedom dive(clean win 
+http://battlecode.org/replays/2d4d45bgkk9.bc19 Big Red win(didnt build church at center resource built it elsewhere)
+https://battlecode.org/replays/zlxzxsnmvn.bc19 Big Red win(relatively clean)
+https://battlecode.org/replays/u35x8icp39.bc19 Big Red loss (bug on pathing, pilgrim not going around unit to get to resource)
+http://battlecode.org/replays/tgfd62ntczf.bc19 NPCGW loss (small map, little resource, useless rushes)						X
+http://battlecode.org/replays/8hhhirey8cr.bc19 NPCGW loss (large map, lost mid eco, spawning from church instead of castle)
+https://battlecode.org/replays/rg52o6y0ig.bc19 NPCGW win (small map, win the eco but crusaders dont attk)
+
+1491091196 seed Im breaking on in terms of over spawning of stuff
+
+lattice blockup
+over spawning pilgrims for cross map
+possible make it a prophet if close to castle
+
+bc19run -b C:\Users\boput\Desktop\BCode19\bc19 --rc C:\Users\boput\Desktop\BCode19\Compiled\stand_still.js -s 109
+
+
+
+
+
+
+
+
+
+
+*/
+
+
 
 	public Action turn() {
 		if (me.turn == 1) {
 			Setup();
 		}
+		previousLocation = location;
 		location = new Position(me.y, me.x);
+		previousHealth = currentHealth;
 		currentHealth = me.health;
-
-if(me.turn == 1){
-for (int l = 0; l < 1; l++) {
-	tileMovementRange = 2;
-	movementRange = 4;
-	test = MovingRobot.CreateLayeredFloodPath(this, new Position(53, 40));
-	
+/*
 	  for (int i = 0; i < test.length; i++) { String cat = ""; for (int j = 0; j <
 	  test[0].length; j++) { String temp = " " + Math.round(test[i][j]);
 	  if(temp.length() == 1){ temp = "   " + temp; } else if(temp.length() == 2){
 	  temp = "  " + temp; } else if(temp.length() == 3){ temp = " " + temp; } cat
 	  += temp; } log(cat); }
-	 
-}}
-if(me.turn == 2) {
-	log(me.time - 20 + " Time");
-}
 
-return null;/*
-		
+		*/
 		if (robot == null) {
 			if (me.unit == SPECS.CASTLE) {
 				//log("I am a Castle");
@@ -82,89 +108,10 @@ return null;/*
 			}
 		}
 		return robot.Execute();
-		
-		
-		
-		
-		/*
-		if (me.unit == SPECS.CASTLE && me.turn > 5 && ourTeam == 0) {
-			Position random = Helper.RandomAdjacent(this, new Position(me.y, me.x));
-			if(testCount < 5){	testCount++;
-			return buildUnit(SPECS.PILGRIM, random.x - me.x, random.y - me.y);
-		
-			}
-		else if(testCount >= 5 && me.turn > 15 && Helper.CanAfford(this, SPECS.PROPHET)){
-			return buildUnit(SPECS.PROPHET, random.x - me.x, random.y - me.y);
-		}
-		}
-		if(me.unit == SPECS.CASTLE){
-			return robot.Execute();
-		}
-		if(me.unit == SPECS.CRUSADER){
-		//	log("crusader");
-			return robot.Execute();
-		}
-		if(me.unit == SPECS.PREACHER){
-		//	log("preacher");
-			return robot.Execute();
-		}
-		if(me.unit == SPECS.PROPHET){
-	//		log("prophet");
-			return robot.Execute();
-		}
-		if(me.unit == SPECS.PILGRIM){
-		//	log("pilgrim");
-			return robot.Execute();
-		}
-		return null;*/
-		
-		/*
-		if (me.unit == SPECS.CRUSADER) {
-			if (me.turn == 1) {
-				
-				
-			}
-			
-			//return MovingRobot.FloodPathing(this, test, new Position(57, 37));
-			movementRange = 4;
-			tileMovementRange = 2;
-			if (me.turn == 2) {
-					log("Time Used : " + (me.time ));
-				}
-		}
-		
-				return null;*/
-		/*
-		if (robot == null) {
-			if (me.unit == SPECS.CASTLE) {
-				log("I am a Castle");
-			//	if (me.turn == 1) {
-			//		Position random = Helper.RandomNonResourceAdjacentPosition(this, new Position(me.y, me.x));
-			//		return buildUnit(SPECS.PROPHET, random.x - me.x, random.y - me.y);
-				//}
-				 robot = new Castle(this);
-			} else if (me.unit == SPECS.CHURCH) {
-				log("I am a Church");
-				robot = new Church(this);
-			} else if (me.unit == SPECS.PILGRIM) {
-				log("I am a Pilgrim");
-				robot = new Pilgrim(this);
-			} else if (me.unit == SPECS.CRUSADER) {
-				robot = new Crusader(this);
-			} else if (me.unit == SPECS.PROPHET) {
-				log("I am a Prophet");
-				robot = new Prophet(this);
-			} else if (me.unit == SPECS.PREACHER) {
-				log("I am a Preacher");
-				robot = new Preacher(this);
-			}
-		}
-		return robot.Execute();*/
-		// return null;
-		// return robot.Execute();*/
 	}
 
 	void Setup() {
+		location = new Position(me.y, me.x);
 		visionRange = SPECS.UNITS[me.unit].VISION_RADIUS;
 		tileVisionRange = (int) Math.sqrt(visionRange);
 		attackRange = SPECS.UNITS[me.unit].ATTACK_RADIUS;
@@ -180,7 +127,9 @@ return null;/*
 		ourTeam = me.team == SPECS.RED ? 0 : 1;
 		mapIsHorizontal = Helper.FindSymmetry(map);
 		startHealth = SPECS.UNITS[me.unit].STARTING_HP;
-		positiveSide = Helper.PositiveOrNegativeMap(this);
+		positiveSide = Helper.PositiveOrNegativeMap(this, location);
+		previousLocation = new Position(me.y, me.x);
+		
 	}
 }
 
