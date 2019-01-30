@@ -103,11 +103,11 @@ public class MovingRobot {
 
 			if (!lowestPos.equals(robot.location)) {
 				return robot.move(lowestPos.x - robot.me.x, lowestPos.y - robot.me.y);
-			}
-			lowestPos = LowestOnPathInMoveRange(robot, path, goal, robot.tileMovementRange, robot.movementRange);
-			if (!lowestPos.equals(robot.location)) {
+			}				
+			if (robot.location.equals(robot.previousLocation)) {
+				lowestPos = LowestOnPathInMoveRange(robot, path, goal, robot.tileMovementRange - 1, robot.movementRange - 3);
 				return robot.move(lowestPos.x - robot.me.x, lowestPos.y - robot.me.y);
-			}
+			}	
 			return null;
 		}
 		return null;
@@ -125,13 +125,13 @@ public class MovingRobot {
 					&& !possible.equals(robot.location) && !possible.equals(robot.previousLocation)) {
 				if ((possible.x - robot.me.x) == 0 || (possible.y - robot.me.y) == 0) {
 					if (path[possible.y][possible.x] < lowest || (path[possible.y][possible.x] == lowest
-							&& (Helper.DistanceSquared(possible, goal) < Helper.DistanceSquared(lowestPos, goal)))) {
+							&& (Helper.DistanceSquared(possible, goal) <= Helper.DistanceSquared(lowestPos, goal)))) {
 						lowest = path[possible.y][possible.x];
 						lowestPos = possible;
 					} // back and forth, aswell as not moving because same value tile
 				} else {
 					if (path[possible.y][possible.x] < lowest - 1 || (path[possible.y][possible.x] == lowest - 1
-							&& (Helper.DistanceSquared(possible, goal) < Helper.DistanceSquared(lowestPos, goal)))) {
+							&& (Helper.DistanceSquared(possible, goal) <= Helper.DistanceSquared(lowestPos, goal)))) {
 						lowest = path[possible.y][possible.x];
 						lowestPos = possible;
 					}
@@ -177,16 +177,18 @@ public class MovingRobot {
 		return output;
 	}
 
-	Position ClosestEnemyCastle(MyRobot robot, HashMap<Position, float[][]> maps) {
+	Position ClosestEnemyCastle(MyRobot robot, HashMap<Position, float[][]> maps, ArrayList<Position> castles) {
 		float lowest = Integer.MAX_VALUE;
 		Position output = null;
-		for (Map.Entry<Position, float[][]> entry : maps.entrySet()) {
 
-			if (entry.getValue()[robot.me.y][robot.me.x] < lowest) {
-				lowest = entry.getValue()[robot.me.y][robot.me.x];
-				output = entry.getKey();
+		for (int i = 0; i < castles.size(); i++) {
+			float[][] flood = GetOrCreateMap(robot, maps, castles.get(i), true);
+			if(flood[robot.me.y][robot.me.x] < lowest){
+				lowest = flood[robot.me.y][robot.me.x];
+				output = castles.get(i);
 			}
 		}
+		
 		return output;
 	}
 
@@ -317,10 +319,12 @@ public class MovingRobot {
 	public static Position UpdateBattleStatus(MyRobot robot, ArrayList<Position> enemies, Position enemy) {
 		Position battleCry = ListenForBattleCry(robot);
 		if (battleCry != null) {
+			Position crossMap = new Position(robot.mapIsHorizontal ? battleCry.y : robot.me.y, robot.mapIsHorizontal ? robot.me.x : battleCry.x);
 			if (Helper.ContainsPosition(enemies, battleCry)) {
-				return Helper.FindEnemyCastle(robot.map, robot.mapIsHorizontal, robot.location);
+				return crossMap;
 			} else {
 				enemies.add(battleCry);
+				enemies.add(crossMap);
 				return Helper.FindEnemyCastle(robot.map, robot.mapIsHorizontal, robot.location);
 			}
 		}
@@ -434,10 +438,7 @@ public class MovingRobot {
 				|| StationairyRobot.UnitAround(robot, tile, 2, robot.SPECS.CASTLE) > 0) {
 			return false;
 		}
-		if ((Math.abs(tile.y) % 2 == 0) && (Math.abs(tile.x) % 2 == 0)) {
-			return true;
-		}
-		if ((Math.abs(tile.y) % 2 == 1) && (Math.abs(tile.x) % 2 == 1)) {
+		if ((tile.x % 2 == 0 && tile.y % 2 == 0) || (tile.x % 2 == 1 && tile.y % 2 == 0) || (tile.x % 2 == 0 && tile.y % 2 == 1)) {
 			return true;
 		}
 		return false;

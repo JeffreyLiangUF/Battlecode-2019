@@ -9,11 +9,12 @@ public class Crusader extends MovingRobot implements Machine {
 	boolean initialized;
 	Robot parent;
 	Position parentLocation;
-	Position targetCastle;
+
 	ArrayList<Position> castleLocations;
 	ArrayList<Position> enemyCastleLocations;
 	HashMap<Position, float[][]> routesToEnemies;
 	boolean manualFort;
+	Position rushPosition;
 	int fortCount;
 	Position crossMapTarget;
 
@@ -22,11 +23,17 @@ public class Crusader extends MovingRobot implements Machine {
 	}
 
 	public Action Execute() {
-		// robot.log("Crusader : " + robot.location);
+		robot.log("Crusader : " + robot.location);
 
 		if (robot.me.turn == 1) {
 			InitializeVariables();
 			parent = StructureBornFrom(robot);
+			if (parent.signal >= 49152) {
+				int x = parent.signal & 63;
+				parent.signal >>= 6;
+				int y = parent.signal & 63;
+				rushPosition = new Position(y, x);
+			}
 			parentLocation = new Position(parent.y, parent.x);
 			if (parent.unit == robot.SPECS.CHURCH) {
 				initialized = true;
@@ -37,56 +44,91 @@ public class Crusader extends MovingRobot implements Machine {
 		}
 		if (parent.unit == robot.SPECS.CASTLE) {
 			robot.castleTalk(192 + (robot.mapIsHorizontal ? robot.me.x : robot.me.y));
-		}else{
+		} else {
 
 			robot.castleTalk(128 + (robot.mapIsHorizontal ? robot.me.x : robot.me.y));
 		}
-		if(UpdateBattleStatus(robot, enemyCastleLocations, crossMapTarget) != crossMapTarget){
+		if (UpdateBattleStatus(robot, enemyCastleLocations, crossMapTarget) != crossMapTarget) {
 			crossMapTarget = UpdateBattleStatus(robot, enemyCastleLocations, crossMapTarget);
 		}
-		targetCastle = UpdateBattleStatus(robot, enemyCastleLocations, targetCastle);
 		Position invader = ListenForDefense(robot);
-
+/*
 		if (Helper.Have(robot, 0, 50)) {
 			if (Helper.EnemiesAround(robot)) {
-				ArrayList<Robot> prophets = EnemiesOfTypeInVision(robot, new int[] { robot.SPECS.PROPHET });
-				if (prophets.size() > 0) {
-					Robot farthest = FarthestProphetOutOfRange(prophets);
-					Position closest = Helper.closestEnemy(robot, prophets);
-					if (farthest != null && initialized && Helper.DistanceSquared(closest, robot.location) > 16) {
-						return MoveCloser(robot, new Position(farthest.y, farthest.x), false);
-					} else {
-						return AttackEnemies(prophets.toArray(new Robot[0]));
-					}
-				}
 
-				ArrayList<Robot> crusadersAndHarmless = EnemiesOfTypeInVision(robot, new int[] { robot.SPECS.CHURCH,
-						robot.SPECS.CASTLE, robot.SPECS.PILGRIM, robot.SPECS.CRUSADER });
-				if (crusadersAndHarmless.size() > 0) {
-					ArrayList<Robot> withinAttackRange = InAttackRange(crusadersAndHarmless);
+				ArrayList<Robot> harmless = EnemiesOfTypeInVision(robot,
+						new int[] { robot.SPECS.CHURCH, robot.SPECS.CASTLE, robot.SPECS.PILGRIM });
+				if (harmless.size() > 0) {
+					ArrayList<Robot> withinAttackRange = InAttackRange(harmless);
 					if (withinAttackRange.size() > 0) {
 						return AttackEnemies(withinAttackRange.toArray(new Robot[0]));
 					} else if (initialized) {
-						Robot farthest = FarthestProphetOutOfRange(crusadersAndHarmless);
+						Robot farthest = FarthestProphetOutOfRange(harmless);
 						return MoveCloser(robot, new Position(farthest.y, farthest.x), false);
 					}
 				}
+				ArrayList<Robot> prophets = EnemiesOfTypeInVision(robot, new int[] { robot.SPECS.PROPHET });
+				if (prophets.size() > 0) {
+					ArrayList<Robot> withinAttackRange = InAttackRange(prophets);
+					if (withinAttackRange.size() > 0) {
+						return AttackEnemies(withinAttackRange.toArray(new Robot[0]));
+					} else if (initialized) {
+						Robot farthest = FarthestProphetOutOfRange(prophets);
+						return MoveCloser(robot, new Position(farthest.y, farthest.x), false);
+					}
+				}
+				ArrayList<Robot> crusaders = EnemiesOfTypeInVision(robot, new int[] { robot.SPECS.CRUSADER });
+				if (crusaders.size() > 0) {
+					ArrayList<Robot> withinAttackRange = InAttackRange(crusaders);
+					if (withinAttackRange.size() > 0) {
+						return AttackEnemies(withinAttackRange.toArray(new Robot[0]));
+					} else if (initialized) {
+						Robot farthest = FarthestProphetOutOfRange(crusaders);
+						return MoveCloser(robot, new Position(farthest.y, farthest.x), false);
+					}
+				}
+
+				ArrayList<Robot> preachers = EnemiesOfTypeInVision(robot, new int[] { robot.SPECS.PREACHER });
+				if (preachers.size() > 0) {
+					ArrayList<Robot> withinAttackRange = InAttackRange(preachers);
+					if (withinAttackRange.size() > 0) {
+						return AttackEnemies(withinAttackRange.toArray(new Robot[0]));
+					}
+				}
+
 			} else if (invader != null) {
 				float[][] shortPath = CreateLayeredFloodPath(robot, invader, robot.location);
 				return FloodPathing(robot, shortPath, invader, false, new ArrayList<Robot>());
 			}
 
 		}
-
+*/
 		if (Helper.Have(robot, 0, 50) && robot.currentHealth < robot.previousHealth && EnemiesOfTypeInVision(robot,
 				new int[] { robot.SPECS.CRUSADER, robot.SPECS.PREACHER, robot.SPECS.PROPHET }).size() == 0) {
-			Position otherSide = Helper.FindEnemyCastle(robot.map, robot.mapIsHorizontal, robot.location);
+			int x = robot.mapIsHorizontal ? parentLocation.x
+					: Helper.FindEnemyCastle(robot.map, robot.mapIsHorizontal, parentLocation).x;
+			int y = robot.mapIsHorizontal ? Helper.FindEnemyCastle(robot.map, robot.mapIsHorizontal, parentLocation).y
+					: parentLocation.y;
+
+			Position otherSide = new Position(y, x);
 			return FloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, otherSide, false), otherSide, false,
 					new ArrayList<Robot>());
 		}
+		if (rushPosition != null && Helper.DistanceSquared(rushPosition, robot.location) <= 4) {
+			rushPosition = null;
+		}
+		if (rushPosition != null) {
+			ArrayList<Robot> preachers = EnemiesOfTypeInVision(robot, new int[] { robot.SPECS.PREACHER });
+			float[][] pathingMap = GetOrCreateMap(robot, routesToEnemies, rushPosition, true);
+			if (preachers.size() > 0) {
+				pathingMap = BlackOutPreacherPaths(pathingMap, preachers);
+			}
+
+			return FloodPathing(robot, pathingMap, rushPosition, false, preachers);
+		}
 
 		if (initialized && Helper.Have(robot, 0, 325)) {
-			if (targetCastle == null && !Fortified(robot, robot.location) && !manualFort) {
+			if (crossMapTarget == null && !Fortified(robot, robot.location) && !manualFort) {
 				fortCount++;
 				if (fortCount > 10) {
 					manualFort = true;
@@ -114,22 +156,27 @@ public class Crusader extends MovingRobot implements Machine {
 					return FloodPathing(robot, GetOrCreateMap(robot, routesToEnemies, goal, false), goal, false,
 							new ArrayList<Robot>());
 				}
-			} else if (targetCastle != null) {
+			} else if (crossMapTarget != null) {
 				boolean rushTime = true;
+				for (int i = 0; i < enemyCastleLocations.size(); i++) {
+					robot.log("Castle/ Target " + enemyCastleLocations.get(i));
+				}
 
 				CastleDown(robot, enemyCastleLocations, routesToEnemies);
 				ArrayList<Robot> preachers = EnemiesOfTypeInVision(robot, new int[] { robot.SPECS.PREACHER });
-				if (Helper.ContainsPosition(enemyCastleLocations, targetCastle)) {
-					if (Helper.DistanceSquared(robot.location, targetCastle) <= 196) {
+				if (Helper.ContainsPosition(enemyCastleLocations, crossMapTarget)) {
+					if (Helper.DistanceSquared(robot.location, crossMapTarget) <= 196) {
 						rushTime = false;
 					}
-					float[][] pathingMap = GetOrCreateMap(robot, routesToEnemies, targetCastle, true);
+					float[][] pathingMap = GetOrCreateMap(robot, routesToEnemies, crossMapTarget, true);
 					if (preachers.size() > 0) {
 						pathingMap = BlackOutPreacherPaths(pathingMap, preachers);
 					}
-					return FloodPathing(robot, pathingMap, targetCastle, rushTime, preachers);
+					return FloodPathing(robot, pathingMap, crossMapTarget, rushTime, preachers);
 				} else {
-					Position closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies);
+					Position closestEnemyCastle = ClosestEnemyCastle(robot, routesToEnemies, enemyCastleLocations);
+					robot.log("Castle  : " + closestEnemyCastle);
+
 					if (closestEnemyCastle != null
 							&& Helper.DistanceSquared(robot.location, closestEnemyCastle) <= 196) {
 						rushTime = false;

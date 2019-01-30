@@ -26,6 +26,49 @@ public class MyRobot extends BCAbstractRobot {
 	float[][] test;
 	int testCount;
 
+/*
+
+http://battlecode.org/replays/9vp2h1y5y19.bc19 arnold bot win (rush signal doesn't work on everyone, lattice breaking)
+http://battlecode.org/replays/jw6xn7eor4.bc19 arnold bot win (rush signal fails to go out
+http://battlecode.org/replays/ljmxdrm4z7.bc19 arnold bot win (pilgrims need to not move into enemies for resources)
+http://battlecode.org/replays/lej92oq73rs.bc19 team 3 win (bug on pathing not going to one of the resources, need to send out cross map pilgrims earlier
+http://battlecode.org/replays/4v9be62vsek.bc19 team 3 loss (not enough resources small map, ineffective rushes)
+https://battlecode.org/replays/3wjkzmqh70n.bc19 team 3 win (pilgrims getting produced cross, because one keeps losing vision)
+http://battlecode.org/replays/oflthgf2wsr.bc19 justice of war loss (lose eco then get rolled, we arnt the first to build a church
+http://battlecode.org/replays/u9s02w7t2zc.bc19 justice of war loss (rushing on a small map)
+http://battlecode.org/replays/5mgyq2pcufq.bc19 justice of war win (small map ineffecitve rushes, however 2:1 karb to fuel makes it work
+http://battlecode.org/replays/e5wapqgw5uj.bc19 double j win (send cross map pilgrims on church spawn)
+http://battlecode.org/replays/y83jh9wou9r.bc19 double j win (clean win
+http://battlecode.org/replays/fl9vg6k4fop.bc19 double j loss (need to have churchs not spawn defense over castle, so raise church conditions
+http://battlecode.org/replays/nj6jrogrk0g.bc19 Freedom Dive (wrong direction lattice, not attacking preachers)
+http://battlecode.org/replays/9xo35793kwm.bc19 Freedom dive(Set up lattice towards enemy)
+http://battlecode.org/replays/721c6w48gbc.bc19 Freedom dive(clean win 
+http://battlecode.org/replays/2d4d45bgkk9.bc19 Big Red win(didnt build church at center resource built it elsewhere)
+https://battlecode.org/replays/zlxzxsnmvn.bc19 Big Red win(relatively clean)
+https://battlecode.org/replays/u35x8icp39.bc19 Big Red loss (bug on pathing, pilgrim not going around unit to get to resource)
+http://battlecode.org/replays/tgfd62ntczf.bc19 NPCGW loss (small map, little resource, useless rushes)						X
+http://battlecode.org/replays/8hhhirey8cr.bc19 NPCGW loss (large map, lost mid eco, spawning from church instead of castle)
+https://battlecode.org/replays/rg52o6y0ig.bc19 NPCGW win (small map, win the eco but crusaders dont attk)
+
+
+
+lattice blockup
+if pilgrim crosses and sees a church just mine shit
+pilgrim goes to what church sees.
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+
 
 
 	public Action turn() {

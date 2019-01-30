@@ -67,7 +67,7 @@ public class Helper {
 	public static boolean EnemiesAround(MyRobot robot) {
 		Robot[] robots = robot.getVisibleRobots();
 		for (int i = 0; i < robots.length; i++) {
-			if (robots[i].team != robot.ourTeam) {
+			if (Helper.DistanceSquared(new Position(robots[i].y, robots[i].x), robot.location) <= robot.visionRange && robots[i].team != robot.ourTeam) {
 				return true;
 			}
 		}
@@ -346,8 +346,8 @@ public class Helper {
 					ResourceCluster cluster = new ResourceCluster();
 					cluster.resourceLocations.add(new Position(y + yAdd, x + xAdd));
 					resourceMap[y][x] = false;
-					for (int i = 0; i <= 4; i++) {
-						for (int j = -4; j <= 4; j++) {
+					for (int i = 0; i <= 5; i++) {
+						for (int j = -5; j <= 5; j++) {
 							if (inMap(resourceMap, new Position(y + i, x + j)) && resourceMap[y + i][x + j]) {
 								cluster.resourceLocations.add(new Position(y + yAdd + i, x + xAdd + j));
 								resourceMap[y + i][x + j] = false;
@@ -394,6 +394,9 @@ public class Helper {
 		}
 		return churchLocations;
 	}
+
+
+	
 
 }
 

@@ -2113,9 +2113,19 @@ var bc19;
             if (!this.initialized) {
                 this.CastleInit();
             }
+            if (bc19.Helper.EnemiesAround(this.robot)) {
+                var closeEnemies = bc19.Helper.EnemiesWithin(this.robot, this.robot.attackRange[0]);
+                if (this.initialized && closeEnemies.length > 0 && bc19.Helper.Have(this.robot, 0, 50)) {
+                    return this.Flee(closeEnemies);
+                }
+                else if (this.robot.fuel > 110) {
+                    var attackable = bc19.Helper.EnemiesWithin(this.robot, this.robot.attackRange[1]);
+                    return this.AttackEnemies(/* toArray */ attackable.slice(0));
+                }
+            }
             this.targetCastle = bc19.MovingRobot.UpdateBattleStatus(this.robot, this.enemyCastleLocations, this.targetCastle);
             var invader = this.ListenForDefense(this.robot);
-            if (this.robot.me.turn > 50) {
+            if (this.robot.me.turn == 3) {
                 if (bc19.Helper.Have(this.robot, 0, 50)) {
                     if (bc19.Helper.EnemiesAround(this.robot)) {
                         return this.AttackEnemies(this.robot.getVisibleRobots());
@@ -2123,9 +2133,11 @@ var bc19;
                 }
                 if (this.parentLocation.y === 1 && this.parentLocation.x === 1) {
                 }
-                this.targetCastle = bc19.Helper.FindEnemyCastle(this.robot.map, this.robot.mapIsHorizontal, this.parentLocation);
-                return bc19.MovingRobot.FloodPathing(this.robot, this.GetOrCreateMap(this.robot, this.routesToEnemies, this.targetCastle, true), this.targetCastle, false);
+                this.targetCastle = new bc19.Position(38,24);
+
+
             }
+            return bc19.MovingRobot.FloodPathing(this.robot, this.GetOrCreateMap(this.robot, this.routesToEnemies, this.targetCastle, true), this.targetCastle, false);
         };
         Prophet.prototype.CastleInit = function () {
             this.initialized = this.ReadCombatSignals(this.robot, this.castleLocations);
@@ -2214,13 +2226,12 @@ var bc19;
                 this.Initialize();
             }
             this.positionInSpawnOrder = this.positionInSpawnOrder === this.spawnOrder.length ? 0 : this.positionInSpawnOrder;
-            if (this.initialized && bc19.Helper.Have(this.robot, 50 + this.robot.SPECS.UNITS[this.spawnOrder[this.positionInSpawnOrder]].CONSTRUCTION_KARBONITE, 500)) {
                 var buildHere = bc19.Helper.RandomAdjacentNonResource(this.robot, this.robot.location);
                 if (buildHere != null) {
                     signal = this.DeclareAllyCastlePositions(1);
                     output = this.robot.buildUnit(this.spawnOrder[this.positionInSpawnOrder], buildHere.x - this.robot.me.x, buildHere.y - this.robot.me.y);
                     this.positionInSpawnOrder++;
-                }
+                
             }
             return output;
         };
