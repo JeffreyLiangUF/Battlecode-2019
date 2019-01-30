@@ -43,7 +43,7 @@ public class MyRobot extends BCAbstractRobot {
 		currentHealth = me.health;
 
 if(me.turn == 1){
-for (int l = 0; l < 3; l++) {
+for (int l = 0; l < 1; l++) {
 	tileMovementRange = 2;
 	movementRange = 4;
 	test = MovingRobot.CreateLayeredFloodPath(this, new Position(53, 40));
