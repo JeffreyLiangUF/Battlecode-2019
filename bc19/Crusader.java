@@ -52,7 +52,7 @@ public class Crusader extends MovingRobot implements Machine {
 			crossMapTarget = UpdateBattleStatus(robot, enemyCastleLocations, crossMapTarget);
 		}
 		Position invader = ListenForDefense(robot);
-/*
+
 		if (Helper.Have(robot, 0, 50)) {
 			if (Helper.EnemiesAround(robot)) {
 
@@ -102,7 +102,7 @@ public class Crusader extends MovingRobot implements Machine {
 			}
 
 		}
-*/
+
 		if (Helper.Have(robot, 0, 50) && robot.currentHealth < robot.previousHealth && EnemiesOfTypeInVision(robot,
 				new int[] { robot.SPECS.CRUSADER, robot.SPECS.PREACHER, robot.SPECS.PROPHET }).size() == 0) {
 			int x = robot.mapIsHorizontal ? parentLocation.x

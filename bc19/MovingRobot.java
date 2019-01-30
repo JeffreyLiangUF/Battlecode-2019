@@ -458,7 +458,10 @@ public class MovingRobot {
 				Position possible = new Position(robot.me.y + y, robot.me.x + x);
 				if (Helper.DistanceSquared(robot.location, possible) <= robot.visionRange
 						&& Helper.TileEmpty(robot, possible)) {
-					if (!Fortified(robot, possible)) {
+					float distanceTileToEnemy = Helper.DistanceSquared(possible, Helper.FindEnemyCastle(robot.map, robot.mapIsHorizontal, parent));
+					float distanceParentAcross = Helper.DistanceSquared(parent, Helper.FindEnemyCastle(robot.map, robot.mapIsHorizontal, parent));
+
+					if (!Fortified(robot, possible) || distanceTileToEnemy > distanceParentAcross) {
 						continue;
 					}
 					if (((possible.y) % 2 == 0) && ((possible.x) % 2 == 0)) {

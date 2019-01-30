@@ -152,7 +152,7 @@ public class Pilgrim extends MovingRobot implements Machine {
                         }
                     }
                     Robot robotThere = Helper.RobotAtPosition(robot, tile);
-                    if ((robotThere != null)) {
+                    if (robotThere != null && robotThere.unit == robot.SPECS.PILGRIM) {
                         occupiedResources[yNew][xNew] = 1;
                     } 
 

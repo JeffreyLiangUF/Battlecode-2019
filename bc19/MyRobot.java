@@ -50,13 +50,13 @@ http://battlecode.org/replays/tgfd62ntczf.bc19 NPCGW loss (small map, little res
 http://battlecode.org/replays/8hhhirey8cr.bc19 NPCGW loss (large map, lost mid eco, spawning from church instead of castle)
 https://battlecode.org/replays/rg52o6y0ig.bc19 NPCGW win (small map, win the eco but crusaders dont attk)
 
-
+1491091196 seed Im breaking on in terms of over spawning of stuff
 
 lattice blockup
-if pilgrim crosses and sees a church just mine shit
-pilgrim goes to what church sees.
+over spawning pilgrims for cross map
+possible make it a prophet if close to castle
 
-
+bc19run -b C:\Users\boput\Desktop\BCode19\bc19 --rc C:\Users\boput\Desktop\BCode19\Compiled\stand_still.js -s 109
 
 
 
