@@ -26,6 +26,6 @@ tools, seed picker/clairvoyance
 
 https://challonge.com/bc_19_finals
 
-http://localhost:8123/settings/
+https://github.com/hgarrereyn/Clairvoyance
 
 https://stonet2000.github.io/BC19-Seeds-Catalog/
