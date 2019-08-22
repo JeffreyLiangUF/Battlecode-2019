@@ -9,16 +9,14 @@ Another great explanation and deeper dive into the 2019 Battlecode comes from a 
 
 ## My Participation in Battlecode
 
-2017 : competed in a team of 2, was eliminated in the qualifying tournmanet in the round best of 64.
-2018 : competed solo, was eliminated in the qualifying tournament in the round best of 32.
-2019 : Competed in a duo, Made top 16 in qualifying tournament and moved on to the top 16 finalist tournament where we placed 5/6.
+2017 : Competed in a duo, was eliminated in the best of 64 round of the qualifying tournament.
+2018 : Competed solo, was eliminated in the best of 64 round of the qualifying tournament.
+2019 : Competed in a [duo](https://github.com/JeffreyLiangUF), made top 16 in qualifying tournament, and moved on to the top 16 finalist tournament where we placed 5/6.
+
+### Clips of rounds from 2019 finalist tournament
 
 
-reference to jeffrey
-reference to different versions
-previous years
 transcompilation
-reference to website
 reference to post mordom
 reference to video of finals
 reference to shittiness of commits
@@ -26,3 +24,8 @@ reference to shittiness of code
 
 tools, seed picker/clairvoyance
 
+https://challonge.com/bc_19_finals
+
+http://localhost:8123/settings/
+
+https://stonet2000.github.io/BC19-Seeds-Catalog/
