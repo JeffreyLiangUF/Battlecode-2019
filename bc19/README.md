@@ -8,4 +8,4 @@ refrecnece to video
 reference to commits
 reference to bad code
 transpilation
-tools used, seed picker
+tools used, seed picker, https://github.com/hgarrereyn/Clairvoyance
