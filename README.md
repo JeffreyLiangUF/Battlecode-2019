@@ -1,5 +1,7 @@
 # Battlecode 2019
 
+Note: .js files are transpiled by a Battlecode tool, the actually source is the java files.
+
 ## What is [Battlecode](http://www.battlecode.org/)?
 
 Summary form the Battlecode Website:
