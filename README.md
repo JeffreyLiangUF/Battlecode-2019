@@ -7,7 +7,7 @@ Summary form the Battlecode Website:
 
 Another great explanation and deeper dive into the 2019 Battlecode comes from a [post-mortem](http://jerrymao.net/blog/battlecode/) written by another finalist team NP-cgw. Highly recommend giving it a read if interested in Battlecode as it covers the "essence" of the competition.
 
-## My Participation in Battlecode
+## My Participation in Battlecode, Team : Chicken
 
 2017 : Competed in a duo, was eliminated in the best of 64 round of the qualifying tournament.
 
@@ -15,8 +15,14 @@ Another great explanation and deeper dive into the 2019 Battlecode comes from a 
 
 2019 : Competed in a [duo](https://github.com/JeffreyLiangUF), made top 16 in qualifying tournament, and moved on to the top 16 finalist tournament where we placed 5/6.
 [Tournament Bracket](https://challonge.com/bc_19_finals)
+
 ### Clips of rounds from 2019 finalist tournament
 
+Chicken(red) vs Codelympians(blue)
+
+[Game 1](https://youtu.be/_HeSkdl9QCU?t=1461)
+[Game 2](https://youtu.be/_HeSkdl9QCU?t=1502)
+[Game 3](https://youtu.be/_HeSkdl9QCU?t=1568)
 
 transcompilation
 reference to post mordom
