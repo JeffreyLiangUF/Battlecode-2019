@@ -18,6 +18,16 @@ Another great explanation and deeper dive into the 2019 Battlecode comes from a 
 
 ### 2019 Strategy
 
+Note: If your curious of the context of the strategy please go read the above linked Battlecode post-mortem.
+
+My teams AI strategy was heavily dependent on fighting over resources and skirmishing to drain the resources of the enemies. 
+Key Strategy Ideas: 
+
+1. Rushing central resources immediately.
+2. Using cheap high health knights to burn the fuel of the enemy by dying until the enemy runs out of the ability to attack then overrunning them.
+3. Planting Churchs in the open to allow for the spawning of knights to retake enemy controlled resource clusters
+4. At predetermined rounds sending all knights to the enemy castle in hopes of draining enemy fuel and overrunning them to kill the castle.
+
 ### Clips of rounds from 2019 finalist tournament
 
 Chicken vs Codelympians, Loss in the winners bracket round 1
@@ -50,14 +60,7 @@ Chicken vs Knights of Cowmelot, Loss in the Losers round 4
 
 
 
-transcompilation
-reference to post mordom
-reference to video of finals
-reference to shittiness of commits
-reference to shittiness of code
-
-tools, seed picker/clairvoyance
-
+## Awesome tools created by the community for 2019
 
 https://github.com/hgarrereyn/Clairvoyance
 
