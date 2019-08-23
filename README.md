@@ -16,13 +16,39 @@ Another great explanation and deeper dive into the 2019 Battlecode comes from a 
 2019 : Competed in a [duo](https://github.com/JeffreyLiangUF), made top 16 in qualifying tournament, and moved on to the top 16 finalist tournament where we placed 5/6.
 [Tournament Bracket](https://challonge.com/bc_19_finals)
 
+### 2019 Strategy
+
 ### Clips of rounds from 2019 finalist tournament
 
-Chicken(red) vs Codelympians(blue)
+Chicken vs Codelympians, Loss in the winners bracket round 1
 
-[Game 1](https://youtu.be/_HeSkdl9QCU?t=1461)
-[Game 2](https://youtu.be/_HeSkdl9QCU?t=1502)
-[Game 3](https://youtu.be/_HeSkdl9QCU?t=1568)
+- [Game 1](https://youtu.be/_HeSkdl9QCU?t=1461) : win
+- [Game 2](https://youtu.be/_HeSkdl9QCU?t=1502) : loss, bug occured.
+- [Game 3](https://youtu.be/_HeSkdl9QCU?t=1568) : loss
+
+Chicken vs DOS, Win in the Losers round 1
+
+- [Game 1](https://youtu.be/_HeSkdl9QCU?t=3702) : win
+- [Game 2](https://youtu.be/_HeSkdl9QCU?t=3747) : win
+
+Chicken vs Wololo, Win in the Losers round 2
+
+- [Game 1](https://youtu.be/_HeSkdl9QCU?t=4404) : loss, bug occured.
+- [Game 2](https://youtu.be/_HeSkdl9QCU?t=4467) : win, good example of strategy execution/
+- [Game 3](https://youtu.be/_HeSkdl9QCU?t=4511) : win
+
+Chicken vs Big Red Battlecode, Win in the Losers round 3
+
+- [Game 1](https://youtu.be/_HeSkdl9QCU?t=5745) : win
+- [Game 2](https://youtu.be/_HeSkdl9QCU?t=5809) : win, another good example of strategy execution/
+
+Chicken vs Knights of Cowmelot, Loss in the Losers round 4
+
+- [Game 1](https://youtu.be/_HeSkdl9QCU?t=6187) : loss
+- [Game 2](https://youtu.be/_HeSkdl9QCU?t=6233) : win, another good example of strategy execution
+- [Game 3](https://youtu.be/_HeSkdl9QCU?t=6295) : loss
+
+
 
 transcompilation
 reference to post mordom
